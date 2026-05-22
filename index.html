@@ -1786,6 +1786,53 @@ select.sm{padding:5px 7px;border:1px solid var(--bd);border-radius:5px;font-fami
       <textarea class="ai-paste-area" id="persona-ai-paste" rows="6" placeholder='{"name":"...","age":"...",...}'></textarea>
       <div style="margin-top:6px"><button class="ai-copy-btn" onclick="parsePersonaAI()">자동 채우기</button><button class="ai-clear-btn" onclick="clearPersonaAI()">전체 지우기</button></div>
     </div>
+    <!-- 페르소나 상태 + 가설 검증 결과 -->
+    <div style="background:linear-gradient(135deg,#fff8ec,#fff5e0);border:1px solid #e8d4a8;border-radius:8px;padding:12px 14px;margin-bottom:14px">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start">
+        <!-- 타입 -->
+        <div style="flex:1;min-width:200px">
+          <label style="display:block;font-size:11px;font-weight:700;color:#8B5E00;margin-bottom:6px">📌 페르소나 타입 <span style="font-size:9px;color:var(--mu);font-weight:400">(이 페르소나가 무엇인지)</span></label>
+          <div class="pm-type-chips" style="display:flex;gap:4px;flex-wrap:wrap">
+            <button type="button" class="pm-type-chip" data-type="hypothesis" onclick="setPersonaType(\'hypothesis\')">💭 가설</button>
+            <button type="button" class="pm-type-chip" data-type="validating" onclick="setPersonaType(\'validating\')">🔍 검증중</button>
+            <button type="button" class="pm-type-chip" data-type="real" onclick="setPersonaType(\'real\')">✅ 실제 고객</button>
+          </div>
+          <input type="hidden" id="pm-type" value="hypothesis">
+        </div>
+        
+        <!-- 가설 검증 결과 (가설일 때만 표시) -->
+        <div id="pm-hypothesis-result-wrap" style="flex:1;min-width:200px">
+          <label style="display:block;font-size:11px;font-weight:700;color:#8B5E00;margin-bottom:6px">🧪 가설 검증 결과 <span style="font-size:9px;color:var(--mu);font-weight:400">(가설일 때만)</span></label>
+          <div class="pm-result-chips" style="display:flex;gap:4px;flex-wrap:wrap">
+            <button type="button" class="pm-result-chip" data-result="pending" onclick="setPersonaResult(\'pending\')">⏳ 미검증</button>
+            <button type="button" class="pm-result-chip" data-result="in_progress" onclick="setPersonaResult(\'in_progress\')">🔄 진행중</button>
+            <button type="button" class="pm-result-chip" data-result="confirmed" onclick="setPersonaResult(\'confirmed\')">✓ 검증됨</button>
+            <button type="button" class="pm-result-chip" data-result="rejected" onclick="setPersonaResult(\'rejected\')">✗ 틀림</button>
+            <button type="button" class="pm-result-chip" data-result="partial" onclick="setPersonaResult(\'partial\')">◐ 부분 검증</button>
+          </div>
+          <input type="hidden" id="pm-result" value="pending">
+        </div>
+      </div>
+      
+      <!-- 검증 메모 (어떻게 검증했는지/왜 틀렸는지) -->
+      <div style="margin-top:10px">
+        <label style="display:block;font-size:11px;font-weight:600;color:#8B5E00;margin-bottom:4px">📝 검증 메모 <span style="font-size:9px;color:var(--mu);font-weight:400">(어떻게 검증했나, 어떤 데이터로, 결과는 무엇인가)</span></label>
+        <textarea id="pm-validation-memo" placeholder="예: 인스타 광고 200건 노출 후 35-45 여성 클릭률 1.8% (전체 평균 0.9% 2배). 가설 검증됨.&#10;예: 1차 가설은 \'30대 직장맘\'이었으나 실제 구매자 분석 결과 40대 전업주부가 60% 점유. 가설 틀림 → 페르소나 수정 필요." style="width:100%;padding:8px 10px;border:1px solid #e8d4a8;border-radius:6px;font-size:12px;font-family:inherit;min-height:60px;resize:vertical;background:#fff"></textarea>
+      </div>
+      
+      <!-- 검증일 -->
+      <div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div style="flex:1;min-width:160px">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">📅 가설 작성일</label>
+          <input type="date" id="pm-hypothesis-date" style="width:100%;padding:6px 8px;border:1px solid var(--bd);border-radius:5px;font-size:12px;font-family:inherit">
+        </div>
+        <div style="flex:1;min-width:160px">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">📅 검증 완료일</label>
+          <input type="date" id="pm-validation-date" style="width:100%;padding:6px 8px;border:1px solid var(--bd);border-radius:5px;font-size:12px;font-family:inherit">
+        </div>
+      </div>
+    </div>
+
     <div class="fg3">
       <div class="fi"><label>이름 (가명)</label><input id="pm-name" placeholder="박지영 (35세)"></div>
       <div class="fi"><label>나이/직업</label><input id="pm-age" placeholder="35세, 직장맘/마케터"></div>
@@ -6500,7 +6547,31 @@ function renderPersonas(){
   const ocs=(j.ourChannels||[]);
   const infs=(j.influencers||[]);
   const dist=(j.distribution||[]);
-  return`<div class="persona-card">
+  return`<div class="persona-card persona-card-${d.personaType||'hypothesis'}">
+  ${(function(){
+    const t = d.personaType || 'hypothesis';
+    const r = d.hypothesisResult || 'pending';
+    const typeMap = {
+      'hypothesis': {label:'💭 가설', cls:'persona-badge-hypothesis'},
+      'validating': {label:'🔍 검증중', cls:'persona-badge-validating'},
+      'real': {label:'✅ 실제 고객', cls:'persona-badge-real'}
+    };
+    const resultMap = {
+      'pending': {label:'⏳ 미검증', cls:'persona-result-pending'},
+      'in_progress': {label:'🔄 진행중', cls:'persona-result-in-progress'},
+      'confirmed': {label:'✓ 검증됨', cls:'persona-result-confirmed'},
+      'rejected': {label:'✗ 가설 틀림', cls:'persona-result-rejected'},
+      'partial': {label:'◐ 부분 검증', cls:'persona-result-partial'}
+    };
+    const ti = typeMap[t] || typeMap['hypothesis'];
+    const ri = resultMap[r] || resultMap['pending'];
+    const showResult = (t === 'hypothesis');
+    return `<div class="persona-status-bar">
+      <span class="persona-badge ${ti.cls}">${ti.label}</span>
+      ${showResult ? `<span class="persona-badge ${ri.cls}">${ri.label}</span>` : ''}
+      ${d.validationDate && (r==='confirmed'||r==='rejected'||r==='partial') ? `<span class="persona-date-badge">📅 ${d.validationDate}</span>` : (d.hypothesisDate && t==='hypothesis' ? `<span class="persona-date-badge">📅 ${d.hypothesisDate}~</span>` : '')}
+    </div>`;
+  })()}
   <div class="persona-header">
    <div class="persona-avatar">${d.emoji||'👩'}</div>
    <div class="persona-name">${d.name}</div>
@@ -6511,6 +6582,7 @@ function renderPersonas(){
    ${(d.pain||[]).length?`<div class="p-sec"><div class="p-sec-t">페인포인트</div><div>${d.pain.map(t=>`<span class="ptag pain">${t}</span>`).join('')}</div></div>`:''}
    ${(d.goal||[]).length?`<div class="p-sec"><div class="p-sec-t">목표/욕구</div><div>${d.goal.map(t=>`<span class="ptag goal">${t}</span>`).join('')}</div></div>`:''}
    ${d.msg?`<div class="p-sec"><div class="p-sec-t">최적 광고 메시지</div><div style="font-size:12px;background:#FFFDE8;border-radius:6px;padding:8px 10px;line-height:1.6">${d.msg}</div></div>`:''}
+   ${d.validationMemo?`<div class="p-sec"><div class="p-sec-t">🧪 검증 메모</div><div class="persona-validation-memo">${d.validationMemo.replace(/\n/g,'<br>')}</div></div>`:''}
    ${(j.problem||j.discovery||kws.length||ocs.length||infs.length||dist.length)?`
    <div style="margin-top:10px;padding-top:10px;border-top:1.5px solid var(--bd)">
     <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#2563EB;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#2563EB"></span>고객 여정</div>
@@ -6532,11 +6604,46 @@ function renderPersonas(){
 function openPersonaModal(){
  personaModalId=null;
  ['pm-name','pm-age','pm-bg','pm-pain','pm-goal','pm-ch','pm-buy','pm-resist','pm-msg','pm-price',
-  'pm-j-problem','pm-j-discovery','pm-j-keywords','pm-j-ourChannels','pm-j-influencers','pm-j-distribution'
+  'pm-j-problem','pm-j-discovery','pm-j-keywords','pm-j-ourChannels','pm-j-influencers','pm-j-distribution',
+  'pm-validation-memo','pm-hypothesis-date','pm-validation-date'
  ].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
  const ej=document.getElementById('pm-emoji');if(ej)ej.value='👩';
  const rp=document.getElementById('pm-repurchase');if(rp)rp.value='높음';
+ setPersonaType('hypothesis');
+ setPersonaResult('pending');
+ const today = new Date().toISOString().slice(0,10);
+ const hd = document.getElementById('pm-hypothesis-date');
+ if(hd) hd.value = today;
  const mo=document.getElementById('persona-mo');if(mo)mo.className='mov open';
+}
+
+// 페르소나 타입 선택 (가설/검증중/실제 고객)
+function setPersonaType(type){
+ const input = document.getElementById('pm-type');
+ if(input) input.value = type;
+ document.querySelectorAll('.pm-type-chip').forEach(function(chip){
+   chip.classList.toggle('active', chip.getAttribute('data-type') === type);
+ });
+ const wrap = document.getElementById('pm-hypothesis-result-wrap');
+ if(wrap){
+   wrap.style.opacity = (type === 'hypothesis') ? '1' : '0.4';
+   wrap.style.pointerEvents = (type === 'hypothesis') ? 'auto' : 'none';
+ }
+}
+
+// 가설 검증 결과 선택
+function setPersonaResult(result){
+ const input = document.getElementById('pm-result');
+ if(input) input.value = result;
+ document.querySelectorAll('.pm-result-chip').forEach(function(chip){
+   chip.classList.toggle('active', chip.getAttribute('data-result') === result);
+ });
+ if(result === 'confirmed' || result === 'rejected' || result === 'partial'){
+   const vd = document.getElementById('pm-validation-date');
+   if(vd && !vd.value){
+     vd.value = new Date().toISOString().slice(0,10);
+   }
+ }
 }
 function openEditPersona(id){
  const d=personaData.find(x=>x.id===id);if(!d)return;personaModalId=id;
@@ -6552,6 +6659,12 @@ function openEditPersona(id){
  const joi=document.getElementById('pm-j-ourChannels');if(joi)joi.value=(j.ourChannels||[]).join(', ');
  const jii=document.getElementById('pm-j-influencers');if(jii)jii.value=(j.influencers||[]).join(', ');
  const jdi=document.getElementById('pm-j-distribution');if(jdi)jdi.value=(j.distribution||[]).join(', ');
+ // 새 필드: 타입/검증
+ set('pm-validation-memo', d.validationMemo||'');
+ set('pm-hypothesis-date', d.hypothesisDate||'');
+ set('pm-validation-date', d.validationDate||'');
+ setPersonaType(d.personaType || 'hypothesis');
+ setPersonaResult(d.hypothesisResult || 'pending');
  const mo=document.getElementById('persona-mo');if(mo)mo.className='mov open';
 }
 function parsePersonaAI(){
@@ -6615,6 +6728,11 @@ function savePersona(){
   pain:spl(get('pm-pain')),goal:spl(get('pm-goal')),ch:spl(get('pm-ch')),
   buy:spl(get('pm-buy')),resist:spl(get('pm-resist')),
   msg:get('pm-msg'),price:get('pm-price'),repurchase:rp?rp.value:'높음',
+  personaType:get('pm-type')||'hypothesis',
+  hypothesisResult:get('pm-result')||'pending',
+  validationMemo:get('pm-validation-memo'),
+  hypothesisDate:get('pm-hypothesis-date'),
+  validationDate:get('pm-validation-date'),
   journey:{
    problem:get('pm-j-problem'),
    discovery:get('pm-j-discovery'),
@@ -12567,6 +12685,141 @@ body.edit-mode-on #edit-mode-indicator{
   });
 })();
 </script>
+
+
+<style id="persona-status-styles">
+/* 페르소나 타입 칩 (모달 안) */
+.pm-type-chip, .pm-result-chip{
+  padding:6px 11px;
+  background:#fff;
+  border:1px solid #e8d4a8;
+  border-radius:14px;
+  font-size:11px;
+  font-weight:600;
+  color:#8B5E00;
+  cursor:pointer;
+  font-family:inherit;
+  transition:.12s;
+}
+.pm-type-chip:hover, .pm-result-chip:hover{
+  background:#fff8ec;
+  border-color:#C8A45A;
+}
+.pm-type-chip.active{
+  background:#1A1916;
+  border-color:#1A1916;
+  color:#fff;
+}
+.pm-result-chip.active{
+  background:#1A1916;
+  border-color:#1A1916;
+  color:#fff;
+}
+
+/* 카드 상태 바 */
+.persona-status-bar{
+  display:flex;
+  gap:5px;
+  align-items:center;
+  flex-wrap:wrap;
+  padding:8px 14px;
+  border-bottom:1px solid var(--bd);
+  background:#fafaf8;
+}
+.persona-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 9px;
+  border-radius:11px;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.02em;
+  white-space:nowrap;
+}
+.persona-badge-hypothesis{
+  background:rgba(139,94,0,.1);
+  color:#8B5E00;
+  border:1px solid rgba(139,94,0,.3);
+}
+.persona-badge-validating{
+  background:rgba(37,99,235,.1);
+  color:#2563EB;
+  border:1px solid rgba(37,99,235,.3);
+}
+.persona-badge-real{
+  background:rgba(26,107,74,.1);
+  color:#1A6B4A;
+  border:1px solid rgba(26,107,74,.3);
+}
+
+/* 검증 결과 배지 */
+.persona-result-pending{
+  background:#f0f0eb;
+  color:#7a7870;
+  border:1px solid var(--bd);
+}
+.persona-result-in-progress{
+  background:rgba(37,99,235,.08);
+  color:#2563EB;
+  border:1px solid rgba(37,99,235,.25);
+}
+.persona-result-confirmed{
+  background:rgba(26,107,74,.12);
+  color:#1A6B4A;
+  border:1px solid rgba(26,107,74,.4);
+}
+.persona-result-rejected{
+  background:rgba(192,57,43,.12);
+  color:#C0392B;
+  border:1px solid rgba(192,57,43,.4);
+}
+.persona-result-partial{
+  background:rgba(255,193,7,.15);
+  color:#8B5E00;
+  border:1px solid rgba(255,193,7,.5);
+}
+
+.persona-date-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:2px 7px;
+  border-radius:4px;
+  font-size:9px;
+  color:var(--mu);
+  background:#fff;
+  border:1px solid var(--bd);
+  font-family:var(--mn);
+  margin-left:auto;
+}
+
+/* 카드 외곽 색상 (타입별) */
+.persona-card-hypothesis{
+  border-top:3px solid #C8A45A;
+}
+.persona-card-validating{
+  border-top:3px solid #2563EB;
+}
+.persona-card-real{
+  border-top:3px solid #1A6B4A;
+}
+
+/* 검증 메모 */
+.persona-validation-memo{
+  font-size:11px;
+  line-height:1.7;
+  color:var(--tx);
+  background:#fff8ec;
+  border-left:3px solid #C8A45A;
+  padding:8px 10px;
+  border-radius:0 6px 6px 0;
+  font-style:italic;
+}
+
+/* 결과별 카드 미묘한 표시 */
+.persona-card-hypothesis[data-result="rejected"]{
+  opacity:0.7;
+}
+</style>
 
 </body>
 </html>
