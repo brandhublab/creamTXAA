@@ -1006,6 +1006,7 @@ select.sm{padding:5px 7px;border:1px solid var(--bd);border-radius:5px;font-fami
   </div>
   <div class="subtab-nav">
     <button class="stab act" onclick="showCostTab('cost',this)">💰 준비비용</button>
+    <button class="stab" onclick="showCostTab('adbudget',this)">📢 광고비준비비용</button>
     <button class="stab" onclick="showCostTab('prod',this)">🏭 생산</button>
     <button class="stab" onclick="showCostTab('roas',this)">📊 ROAS</button>
     <button class="stab" onclick="showCostTab('expense',this)">💸 지출-판매준비</button>
@@ -1029,19 +1030,7 @@ select.sm{padding:5px 7px;border:1px solid var(--bd);border-radius:5px;font-fami
         <tfoot><tr class="tot-row"><td>합계</td><td id="ct-ex">0원</td><td id="ct-vat">0원</td><td id="ct-inc">0원</td><td>100%</td><td></td><td></td></tr></tfoot>
       </table>
     </div>
-    <div class="section">
-      <div class="sec-head"><h3>📢 초기 광고비 예산</h3></div>
-      <div class="sec-body">
-        <div class="fg3">
-          <div class="fi"><label>월 Meta 광고 예산 (원)</label><input type="number" id="ad-meta" value="500000" oninput="calcAdBudget()"></div>
-          <div class="fi"><label>월 Google 광고 예산 (원)</label><input type="number" id="ad-google" value="200000" oninput="calcAdBudget()"></div>
-          <div class="fi"><label>협찬 예산 (월, 원)</label><input type="number" id="ad-spon" value="300000" oninput="calcAdBudget()"></div>
-          <div class="fi"><label>기타 마케팅 (원)</label><input type="number" id="ad-other" value="100000" oninput="calcAdBudget()"></div>
-          <div class="fi"><label>초기 운영 개월 수</label><input type="number" id="ad-months" value="3" oninput="calcAdBudget()"></div>
-          <div class="fi"><label style="color:var(--green)">초기 총 광고 예산</label><input id="ad-total" readonly style="font-weight:500;background:#F0FBF4;color:var(--green)"></div>
-        </div>
-      </div>
-    </div>
+<!-- 광고비 예산 섹션은 별도 탭(adbudget)으로 이동됨 -->
   </div>
 </div>
 
@@ -1153,6 +1142,75 @@ select.sm{padding:5px 7px;border:1px solid var(--bd);border-radius:5px;font-fami
           <td colspan="3"></td>
         </tr></tfoot>
       </table>
+    </div>
+  </div>
+</div>
+
+<div id="adbudget-tab-panel" style="display:none;padding:12px 18px">
+  <div class="section">
+    <div class="sec-head"><h3>📢 초기 광고비 예산 (월별)</h3>
+      <span style="font-size:10px;color:var(--mu)">광고비를 별도로 정밀하게 관리. 총 예산·월별 현금흐름·통합 매출 예측에 자동 반영</span>
+    </div>
+    <div class="sec-body">
+      <div class="fg3">
+        <div class="fi"><label>월 Meta 광고 예산 (원)</label><input type="number" id="ad-meta" value="500000" oninput="calcAdBudget()"></div>
+        <div class="fi"><label>월 Google 광고 예산 (원)</label><input type="number" id="ad-google" value="200000" oninput="calcAdBudget()"></div>
+        <div class="fi"><label>협찬 예산 (월, 원)</label><input type="number" id="ad-spon" value="300000" oninput="calcAdBudget()"></div>
+        <div class="fi"><label>기타 마케팅 (원)</label><input type="number" id="ad-other" value="100000" oninput="calcAdBudget()"></div>
+        <div class="fi"><label>초기 운영 개월 수</label><input type="number" id="ad-months" value="3" oninput="calcAdBudget()"></div>
+        <div class="fi"><label style="color:var(--green)">초기 총 광고 예산 (자동계산)</label><input id="ad-total" readonly style="font-weight:500;background:#F0FBF4;color:var(--green)"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 광고비 추가 항목 (사용자 정의) -->
+  <div class="section">
+    <div class="sec-head">
+      <h3>📋 추가 광고비 항목</h3>
+      <button class="btn" onclick="addAdBudgetCustomRow()">+ 항목 추가</button>
+    </div>
+    <div class="sec-body">
+      <div style="font-size:11px;color:var(--mu);padding:0 14px 8px">기본 항목(Meta·Google·협찬·기타) 외에 추가할 광고/마케팅 비용을 자유롭게 등록</div>
+      <table class="cost-table" id="adbudget-custom-tbl" style="margin:0">
+        <thead><tr>
+          <th>항목명</th>
+          <th style="width:130px">월 예산 (원)</th>
+          <th style="width:100px">개월 수</th>
+          <th style="width:140px">총액 (자동)</th>
+          <th>메모</th>
+          <th style="width:32px"></th>
+        </tr></thead>
+        <tbody id="adbudget-custom-body"></tbody>
+        <tfoot><tr class="tot-row">
+          <td>추가 항목 합계</td>
+          <td></td><td></td>
+          <td id="adbudget-custom-sum">0원</td>
+          <td colspan="2"></td>
+        </tr></tfoot>
+      </table>
+    </div>
+  </div>
+  
+  <!-- 광고비 합계 요약 -->
+  <div class="section">
+    <div class="sec-head"><h3>💎 광고비 준비비용 총합</h3>
+      <span style="font-size:10px;color:var(--mu)">기본 + 추가 항목 합산 (총 예산·월별 현금흐름에 자동 반영)</span>
+    </div>
+    <div class="sec-body">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:10px 14px">
+        <div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:10px;color:var(--mu);margin-bottom:4px">기본 광고 예산</div>
+          <div style="font-size:18px;font-weight:600;font-family:var(--mn);color:var(--tx)" id="adbudget-base-sum">0원</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:10px;color:var(--mu);margin-bottom:4px">추가 항목 합계</div>
+          <div style="font-size:18px;font-weight:600;font-family:var(--mn);color:var(--tx)" id="adbudget-extra-sum">0원</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#F0FBF4,#E8F5E9);border:1px solid #A5D6A7;border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:10px;color:#2E7D32;margin-bottom:4px">광고비 준비비용 총합</div>
+          <div style="font-size:20px;font-weight:700;font-family:var(--mn);color:var(--green)" id="adbudget-grand-total">0원</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -2499,6 +2557,7 @@ function sv(label){
    cashflowChartData:_g(typeof cashflowChartData!=='undefined'?cashflowChartData:null,{}),
    sensitivityData:_g(typeof sensitivityData!=='undefined'?sensitivityData:null,{}),
    productsRegistry:_g(typeof productsRegistry!=='undefined'?productsRegistry:null,[]),
+   adBudgetExtra:_g(typeof adBudgetExtraData!=='undefined'?adBudgetExtraData:null,[]),
    activeProductId:_g(typeof activeProductId!=='undefined'?activeProductId:null,'')
   };
   const snapStr=JSON.stringify(snap);
@@ -3553,9 +3612,9 @@ function renderCashflowChart(){
   +'<input type="number" value="'+(base.price||0)+'" oninput="updateCashflowChartBase(\'price\', parseFloat(this.value)||0)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:12px;font-family:var(--mn);text-align:right;background:var(--sur);color:var(--tx);outline:none">'
   +'<div style="font-size:9px;color:var(--mu);margin-top:2px">'+(cfc.price?'직접 입력':(_inv.price?'재고자산 탭':'ROAS 탭'))+'</div></div>';
  // 목표 ROAS
- h+='<div><div style="font-size:10px;color:var(--mu);margin-bottom:3px">🎯 목표 ROAS (%)</div>'
-  +'<input type="number" value="'+(base.targetROAS||300)+'" oninput="updateCashflowChartBase(\'targetROAS\', parseFloat(this.value)||0)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:12px;font-family:var(--mn);text-align:right;background:var(--sur);color:var(--tx);outline:none">'
-  +'<div style="font-size:9px;color:var(--mu);margin-top:2px">'+(cfc.targetROAS?'직접 입력':'재고자산 기본')+'</div></div>';
+ h+='<div><div style="font-size:10px;color:var(--mu);margin-bottom:3px">🎯 목표 ROAS (%) <span style="color:var(--amber);font-size:9px" title="ROAS 300 = 광고비 1원당 매출 3원 / 최소 손익분기 ROAS는 보통 300~500% / 2를 입력하면 2%로 계산되어 큰 손실">ⓘ</span></div>'
+  +'<input type="number" value="'+(base.targetROAS||300)+'" oninput="updateCashflowChartBase(\'targetROAS\', parseFloat(this.value)||0)" style="width:100%;padding:4px 6px;border:1px solid '+((base.targetROAS||0)<100?'#C62828':'var(--bd)')+';border-radius:4px;font-size:12px;font-family:var(--mn);text-align:right;background:var(--sur);color:var(--tx);outline:none">'
+  +'<div style="font-size:9px;color:'+((base.targetROAS||0)<100?'#C62828':'var(--mu)')+';margin-top:2px">'+((base.targetROAS||0)<100?'⚠ 100 미만은 손실 확실':(cfc.targetROAS?'직접 입력':'재고자산 기본'))+'</div></div>';
  // 단가 (읽기 전용 - 생산원가 탭 자동)
  h+='<div><div style="font-size:10px;color:var(--mu);margin-bottom:3px">🏭 단가 (VAT포함)</div>'
   +'<input type="number" value="'+(base.unitCost||0)+'" readonly style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:12px;font-family:var(--mn);text-align:right;background:#F5F5F5;color:var(--mu);outline:none;cursor:not-allowed">'
@@ -3704,16 +3763,30 @@ function renderCashflowChart(){
 function updateCashflowPeriod(p){
  if(typeof cashflowChartData==='undefined')window.cashflowChartData={};
  cashflowChartData.period=p;
- cashflowChartData.monthlyQty=null; // 기간 바뀌면 기본값 재생성
+ cashflowChartData.monthlyQty=null;
  if(typeof sv==='function')sv('현금흐름 기간');
- renderCashflowChart();
+ if(typeof flushCashflowRender==='function') flushCashflowRender();
+ else renderCashflowChart();
 }
 
+// ━━ 디바운스된 재렌더 (input 튕김 방지) ━━
+let _cashflowRenderTimer = null;
 function updateCashflowChartBase(field, value){
  if(typeof cashflowChartData==='undefined') cashflowChartData={};
  cashflowChartData[field] = value;
- // price나 targetROAS 바뀌면 자동 곡선 재계산 위해 monthlyQty 초기화 옵션
  sv('월별 현금흐름 '+field+' 수정');
+ // 디바운스: 700ms 동안 추가 입력 없으면 그때 재렌더
+ // → input 안에서 연속 타이핑할 때 포커스 안 빠짐
+ if(_cashflowRenderTimer) clearTimeout(_cashflowRenderTimer);
+ _cashflowRenderTimer = setTimeout(function(){
+   if(typeof renderCashflowChart==='function') renderCashflowChart();
+   _cashflowRenderTimer = null;
+ }, 700);
+}
+
+// 즉시 재렌더가 필요할 때 호출 (기간 변경, 초기화 등)
+function flushCashflowRender(){
+ if(_cashflowRenderTimer){ clearTimeout(_cashflowRenderTimer); _cashflowRenderTimer = null; }
  if(typeof renderCashflowChart==='function') renderCashflowChart();
 }
 
@@ -3738,7 +3811,8 @@ function resetCashflowChart(){
  if(!confirm('월별 현금흐름을 초기값으로 되돌립니다. 계속할까요?'))return;
  window.cashflowChartData={};
  if(typeof sv==='function')sv('현금흐름 초기화');
- renderCashflowChart();
+ if(typeof flushCashflowRender==='function') flushCashflowRender();
+ else renderCashflowChart();
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -6320,7 +6394,7 @@ function saveIdea(){sv();buildIdea();buildIdeaIngredients();showToast('아이디
 // COSTS (t5)
 // ============================================================
 function showCostTab(tab, btn){
- const panels=['cost','expense','adspend','monthly','prod','roas','allexp','adexp','prodexp','totalbudget','inventory','cashflow','scenario','sensitivity','integrated'];
+ const panels=['cost','adbudget','expense','adspend','monthly','prod','roas','allexp','adexp','prodexp','totalbudget','inventory','cashflow','scenario','sensitivity','integrated'];
  panels.forEach(p=>{const el=document.getElementById(p+'-tab-panel');if(el)el.style.display='none';});
  const active=document.getElementById(tab+'-tab-panel');if(active)active.style.display='block';
  // Toggle action buttons
@@ -6350,6 +6424,7 @@ function showCostTab(tab, btn){
  if(tab==='scenario')renderScenarioCompare();
  if(tab==='sensitivity')renderROASSensitivity();
  if(tab==='integrated')renderIntegratedFinance();
+ if(tab==='adbudget')renderAdBudget();
 }
 function showIdeaSubTab(which,btn){
  const panelZ=document.getElementById('idea4z-panel');
@@ -6487,7 +6562,155 @@ function calcAdBudget(){
   const tbWrap=document.getElementById('totalbudget-wrap');
   if(tbWrap&&tbWrap.offsetParent!==null)renderTotalBudget();
  }
+ // 광고비준비비용 탭이 열려있으면 즉시 재렌더
+ if(typeof renderAdBudget==='function'){
+  const abEl=document.getElementById('adbudget-tab-panel');
+  if(abEl&&abEl.style.display!=='none')renderAdBudget();
+ }
 }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 📢 광고비준비비용 탭 - 추가 항목 (사용자 정의) 관리
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// adBudgetExtraData : 사용자가 직접 추가한 광고비 항목들
+// 형식: [{name, monthly, months, memo}]
+if(typeof window.adBudgetExtraData === 'undefined') window.adBudgetExtraData = [];
+
+function loadAdBudgetExtra(){
+ try {
+  const raw = localStorage.getItem(SK);
+  if(raw){
+   const d = JSON.parse(raw);
+   if(d.adBudgetExtra && Array.isArray(d.adBudgetExtra)){
+    adBudgetExtraData = d.adBudgetExtra;
+   }
+  }
+ } catch(e){}
+}
+
+function saveAdBudgetExtra(){
+ try {
+  const raw = localStorage.getItem(SK);
+  const d = raw ? JSON.parse(raw) : {};
+  d.adBudgetExtra = adBudgetExtraData;
+  localStorage.setItem(SK, JSON.stringify(d));
+ } catch(e){}
+}
+
+function addAdBudgetCustomRow(){
+ if(!Array.isArray(adBudgetExtraData)) adBudgetExtraData = [];
+ adBudgetExtraData.push({name:'',monthly:0,months:1,memo:''});
+ renderAdBudget();
+}
+
+function updateAdBudgetExtra(idx, field, value){
+ if(!adBudgetExtraData[idx]) return;
+ if(field === 'monthly' || field === 'months'){
+  adBudgetExtraData[idx][field] = parseFloat(value) || 0;
+ } else {
+  adBudgetExtraData[idx][field] = value;
+ }
+ saveAdBudgetExtra();
+ if(typeof sv === 'function') sv('광고비 추가항목');
+ // 합계만 즉시 갱신 (input 재렌더 X = 튕김 방지)
+ updateAdBudgetTotals();
+}
+
+function deleteAdBudgetExtra(idx){
+ if(!confirm('이 항목을 삭제하시겠습니까?')) return;
+ adBudgetExtraData.splice(idx, 1);
+ saveAdBudgetExtra();
+ if(typeof sv === 'function') sv('광고비 추가항목 삭제');
+ renderAdBudget();
+}
+
+function getAdBudgetExtraTotal(){
+ if(!Array.isArray(adBudgetExtraData)) return 0;
+ return adBudgetExtraData.reduce(function(sum, it){
+  return sum + ((parseFloat(it.monthly)||0) * (parseFloat(it.months)||1));
+ }, 0);
+}
+
+function getAdBudgetBaseTotal(){
+ const m = parseFloat(document.getElementById('ad-meta')?.value || 0) || 0;
+ const g = parseFloat(document.getElementById('ad-google')?.value || 0) || 0;
+ const s = parseFloat(document.getElementById('ad-spon')?.value || 0) || 0;
+ const o = parseFloat(document.getElementById('ad-other')?.value || 0) || 0;
+ const mo = parseFloat(document.getElementById('ad-months')?.value || 1) || 1;
+ return (m+g+s+o) * mo;
+}
+
+function getAdBudgetGrandTotal(){
+ return getAdBudgetBaseTotal() + getAdBudgetExtraTotal();
+}
+
+function updateAdBudgetTotals(){
+ const N = function(n){ return (Math.round(n||0)).toLocaleString('ko-KR')+'원'; };
+ const baseTotal = getAdBudgetBaseTotal();
+ const extraTotal = getAdBudgetExtraTotal();
+ const grandTotal = baseTotal + extraTotal;
+ const baseEl = document.getElementById('adbudget-base-sum');
+ const extraEl = document.getElementById('adbudget-extra-sum');
+ const grandEl = document.getElementById('adbudget-grand-total');
+ const customSumEl = document.getElementById('adbudget-custom-sum');
+ if(baseEl) baseEl.textContent = N(baseTotal);
+ if(extraEl) extraEl.textContent = N(extraTotal);
+ if(grandEl) grandEl.textContent = N(grandTotal);
+ if(customSumEl) customSumEl.textContent = N(extraTotal);
+ // 추가 항목의 각 행 합계도 갱신
+ if(Array.isArray(adBudgetExtraData)){
+  adBudgetExtraData.forEach(function(it, i){
+   const rowTotalEl = document.getElementById('adbudget-row-total-'+i);
+   if(rowTotalEl){
+    const total = (parseFloat(it.monthly)||0) * (parseFloat(it.months)||1);
+    rowTotalEl.textContent = N(total);
+   }
+  });
+ }
+}
+
+function renderAdBudget(){
+ loadAdBudgetExtra();
+ // 기본 광고비 값 불러오기 (hubSettings에서)
+ if(typeof hubSettings !== 'undefined' && hubSettings.adBudgetInputs){
+  const a = hubSettings.adBudgetInputs;
+  const setIfEmpty = function(id, val){
+   const el = document.getElementById(id);
+   if(el && val !== undefined && val !== null){
+    if(!el.value || el.value === '0') el.value = val;
+   }
+  };
+  setIfEmpty('ad-meta', a.meta);
+  setIfEmpty('ad-google', a.google);
+  setIfEmpty('ad-spon', a.spon);
+  setIfEmpty('ad-other', a.other);
+  setIfEmpty('ad-months', a.months);
+ }
+ if(typeof calcAdBudget === 'function') calcAdBudget();
+ 
+ // 추가 항목 테이블 렌더
+ const tbody = document.getElementById('adbudget-custom-body');
+ if(!tbody) return;
+ 
+ if(!Array.isArray(adBudgetExtraData) || adBudgetExtraData.length === 0){
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px 12px;color:var(--mu);font-style:italic">＋ 항목 추가 버튼을 눌러서 추가 광고비를 등록하세요 (예: 인플루언서 단가, 컨텐츠 제작비, 외주비 등)</td></tr>';
+ } else {
+  tbody.innerHTML = adBudgetExtraData.map(function(it, i){
+   return '<tr>'
+    + '<td><input type="text" value="'+(it.name||'').replace(/"/g,'&quot;')+'" placeholder="예: 인플루언서 협찬" oninput="updateAdBudgetExtra('+i+',\'name\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:12px;font-family:inherit;background:var(--sur);outline:none"></td>'
+    + '<td><input type="number" value="'+(it.monthly||0)+'" oninput="updateAdBudgetExtra('+i+',\'monthly\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:12px;font-family:var(--mn);text-align:right;background:var(--sur);outline:none"></td>'
+    + '<td><input type="number" value="'+(it.months||1)+'" oninput="updateAdBudgetExtra('+i+',\'months\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:12px;font-family:var(--mn);text-align:right;background:var(--sur);outline:none"></td>'
+    + '<td style="text-align:right;font-family:var(--mn);font-weight:500" id="adbudget-row-total-'+i+'">0원</td>'
+    + '<td><input type="text" value="'+(it.memo||'').replace(/"/g,'&quot;')+'" placeholder="메모" oninput="updateAdBudgetExtra('+i+',\'memo\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:12px;font-family:inherit;background:var(--sur);outline:none"></td>'
+    + '<td style="text-align:center"><button onclick="deleteAdBudgetExtra('+i+')" style="background:none;border:1px solid var(--bd);border-radius:4px;padding:2px 7px;font-size:11px;color:var(--mu);cursor:pointer" title="삭제">×</button></td>'
+    + '</tr>';
+  }).join('');
+ }
+ 
+ updateAdBudgetTotals();
+}
+
 // Expense functions
 function updateExpSummary(){
  const budget=parseFloat(document.getElementById('exp-budget-prep')?.value)||0;
@@ -7503,7 +7726,16 @@ function exportExcel(){
 function exportGoogleSheets(){exportCSVBrands();setTimeout(()=>{window.open('https://sheets.new','_blank');showToast('구글 시트에서 파일→가져오기→CSV 선택');},400);}
 function exportJSON(){
  const snap={brands:allData,reviews:revData,idea:ideaData,mapPos,mapCustomItems,costs:costData,expenses:expenseData||[],vendors:vendorData,mktPlan,progressData,analysis:analysisData,personas:personaData,devForms,wig:wigData,hubSettings};
- dl(JSON.stringify(snap,null,2),'epitect_backup.json','application/json');showToast('JSON 백업 완료');
+ // 파일명: BrandOSKIT_YYYYMMDD_HHMM.json (동기화 시스템과 통일)
+ const now = new Date();
+ const ts = now.getFullYear() + 
+            String(now.getMonth()+1).padStart(2,'0') + 
+            String(now.getDate()).padStart(2,'0') + '_' +
+            String(now.getHours()).padStart(2,'0') + 
+            String(now.getMinutes()).padStart(2,'0');
+ const filename = 'BrandOSKIT_' + ts + '.json';
+ dl(JSON.stringify(snap,null,2), filename, 'application/json');
+ showToast('JSON 백업 완료 - ' + filename);
 }
 function importJSON(){document.getElementById('json-import').click();}
 function loadJSON(input){
@@ -11971,9 +12203,10 @@ function forceIsolationReset(){
       var blob = new Blob([json], {type: 'application/json'});
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
-      var ts = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+      var now = new Date();
+      var ts = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_' + String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0');
       a.href = url;
-      a.download = 'brandoskit-backup-' + ts + '.json';
+      a.download = 'BrandOSKIT_' + ts + '.json';
       document.body.appendChild(a);
       a.click();
       a.remove();
