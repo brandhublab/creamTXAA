@@ -661,8 +661,9 @@ select.sm{padding:5px 7px;border:1px solid var(--bd);border-radius:5px;font-fami
   <button class="exp-btn" onclick="exportCSVAll()">📄 CSV</button>
   <button class="exp-btn" onclick="exportGoogleSheets()">🔗 Google Sheets</button>
   <button class="exp-btn" onclick="captureImage()">📷 이미지</button>
-  <button class="exp-btn" onclick="exportJSON()">💾 JSON 백업</button>
-  <button class="exp-btn" onclick="document.getElementById('json-import').click()">📂 불러오기</button>
+  <button class="exp-btn" onclick="exportJSON()" title="JSON 다운로드 (단축키: Ctrl+Shift+S)">💾 JSON 백업</button>
+  <button class="exp-btn" onclick="document.getElementById('json-import').click()" title="JSON 파일에서 복원">📂 불러오기</button>
+  <button class="exp-btn" onclick="quickGistPush()" title="Gist로 푸시 (단축키: Ctrl+Shift+G)" style="background:#1A6B4A;color:#fff;border-color:#1A6B4A">☁️ Gist 푸시</button>
   <input type="file" id="json-import" accept=".json" style="display:none" onchange="loadJSON(this)">
   <span class="save-indicator" id="save-indicator">저장 준비됨</span>
 </div>
@@ -1009,6 +1010,7 @@ select.sm{padding:5px 7px;border:1px solid var(--bd);border-radius:5px;font-fami
     <button class="stab" onclick="showCostTab('adbudget',this)">📢 광고비준비비용</button>
     <button class="stab" onclick="showCostTab('prod',this)">🏭 생산</button>
     <button class="stab" onclick="showCostTab('roas',this)">📊 ROAS</button>
+    <button class="stab" onclick="showCostTab('roasset',this)">🎁 END ROAS 세트</button>
     <button class="stab" onclick="showCostTab('expense',this)">💸 지출-판매준비</button>
     <button class="stab" onclick="showCostTab('prodexp',this)">🏭 지출-생산</button>
     <button class="stab" onclick="showCostTab('adexp',this)">📢 지출-광고비</button>
@@ -1372,11 +1374,50 @@ select.sm{padding:5px 7px;border:1px solid var(--bd);border-radius:5px;font-fami
       <div class="sec-body">
         <div style="margin-bottom:12px;padding:10px 12px;background:var(--bg);border-radius:8px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="font-size:11px;color:var(--mu)">판매가</span>
+            <span style="font-size:11px;color:var(--mu)">판매가 (단품)</span>
             <input type="number" id="roas-price2" placeholder="40000" oninput="calcROAS2()"
               style="width:120px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:13px;font-weight:600;text-align:right;outline:none;background:var(--sur)">
           </div>
         </div>
+        
+        <!-- 💳 결제수수료 + 기타 수수료 + 기타 비용 입력 -->
+        <div style="margin-bottom:12px;padding:10px 12px;background:#FFFDE7;border:1px solid #FFE082;border-radius:8px">
+          <div style="font-size:11px;font-weight:600;color:#8B5E00;margin-bottom:8px">💳 수수료 + 기타비용 (END ROAS에 반영)</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:10px;color:var(--mu)" title="PG/카드 결제수수료 (보통 2.9~3.5%)">💳 결제수수료 (%)</span>
+              <input type="number" id="roas-payfee" step="0.1" placeholder="3.3" oninput="calcROAS2()" 
+                value="3.3"
+                style="width:60px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:10px;color:var(--mu)" title="채널수수료, 플랫폼수수료 등 기타 수수료 합">📊 기타 수수료 (%)</span>
+              <input type="number" id="roas-etcfee" step="0.1" placeholder="0" oninput="calcROAS2()" 
+                style="width:60px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:10px;color:var(--mu)" title="택배상자 단가">📦 택배상자 (원)</span>
+              <input type="number" id="roas-box" placeholder="500" oninput="calcROAS2()" 
+                style="width:70px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:10px;color:var(--mu)" title="합포장 인건비/물품비">🎁 합포장비 (원)</span>
+              <input type="number" id="roas-wrapfee" placeholder="0" oninput="calcROAS2()" 
+                style="width:70px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:10px;color:var(--mu)" title="뽁뽁이, 완충재, 스티커, 사은품 등">📋 포장부자재 (원)</span>
+              <input type="number" id="roas-extramaterial" placeholder="200" oninput="calcROAS2()" 
+                style="width:70px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:10px;color:var(--mu)" title="무료배송 시 부담하는 배송비">🚚 무료배송비 (원)</span>
+              <input type="number" id="roas-shipfee" placeholder="3000" oninput="calcROAS2()" 
+                style="width:70px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
+            </div>
+          </div>
+        </div>
+        
         <div id="roas-result2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
         <div style="margin-top:12px;padding:10px 12px;background:#E8F5E9;border:1px solid #A5D6A7;border-radius:8px;text-align:center">
           <div style="font-size:10px;color:#2E7D32;margin-bottom:4px">END ROAS <span style="font-weight:500">(세전 · 손익분기)</span></div>
@@ -1396,6 +1437,84 @@ select.sm{padding:5px 7px;border:1px solid var(--bd);border-radius:5px;font-fami
     </div>
   </div>
 </div>
+<div id="roasset-tab-panel" style="display:none;padding:14px 18px">
+  <div style="background:#FFF3E0;border:1px solid #FFB74D;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:#BF360C;line-height:1.7">
+    💡 <b>세트 판매 시뮬레이션</b> — ROAS 탭의 단품 원가 + 수수료 설정을 기반으로 세트별 END ROAS 자동 계산. 세트별 판매가·무료배송비만 입력하면 됩니다.
+  </div>
+  
+  <!-- 세트 가격/배송비 입력 -->
+  <div class="section" style="margin-bottom:14px">
+    <div class="sec-head"><h3>🎁 세트 가격 + 배송비 설정</h3></div>
+    <div class="sec-body" style="padding:14px">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+        <!-- 단품 (무료배송) -->
+        <div style="background:#FAFAF8;border:1px solid var(--bd);border-radius:8px;padding:12px">
+          <div style="font-size:12px;font-weight:700;color:var(--tx);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bd)">📦 단품 + 무료배송</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;color:var(--mu)">판매가 (원)</span>
+            <input type="number" id="rs1-price" placeholder="40000" oninput="calcRoasSet()" 
+              style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;color:var(--mu)">무료배송비 (원)</span>
+            <input type="number" id="rs1-ship" placeholder="3000" oninput="calcRoasSet()" value="3000"
+              style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">단품 가격 + 무료배송비를 우리가 부담</div>
+        </div>
+        
+        <!-- 2개 세트 -->
+        <div style="background:#F0F8FF;border:1px solid #B5C9E8;border-radius:8px;padding:12px">
+          <div style="font-size:12px;font-weight:700;color:#1A3FAA;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #B5C9E8">🎁 2개 세트</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;color:var(--mu)">세트 판매가 (원)</span>
+            <input type="number" id="rs2-price" placeholder="76000" oninput="calcRoasSet()" 
+              style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;color:var(--mu)">무료배송비 (원)</span>
+            <input type="number" id="rs2-ship" placeholder="3000" oninput="calcRoasSet()" value="3000"
+              style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">제품 2개 + 1박스 + 1배송비</div>
+        </div>
+        
+        <!-- 3개 세트 -->
+        <div style="background:#F0FBF4;border:1px solid #A5D6A7;border-radius:8px;padding:12px">
+          <div style="font-size:12px;font-weight:700;color:#1A6B4A;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #A5D6A7">🎁 3개 세트</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;color:var(--mu)">세트 판매가 (원)</span>
+            <input type="number" id="rs3-price" placeholder="108000" oninput="calcRoasSet()" 
+              style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;color:var(--mu)">무료배송비 (원)</span>
+            <input type="number" id="rs3-ship" placeholder="3000" oninput="calcRoasSet()" value="3000"
+              style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">제품 3개 + 1박스 + 1배송비</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 계산 결과 비교 -->
+  <div class="section">
+    <div class="sec-head"><h3>📊 세트별 END ROAS 비교</h3>
+      <span style="font-size:10px;color:var(--mu)">단품 원가 + 수수료(%)는 ROAS 탭과 자동 연동</span>
+    </div>
+    <div class="sec-body" style="padding:14px">
+      <div id="roasset-results" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px"></div>
+      
+      <!-- 단품 정보 표시 -->
+      <div style="margin-top:14px;padding:10px 12px;background:#FFFDE7;border:1px solid #FFE082;border-radius:6px;font-size:11px;color:#8B5E00;line-height:1.7">
+        <b>💡 자동 연동되는 항목 (ROAS 탭에서 입력)</b><br>
+        <span id="roasset-base-info">— 결제수수료 0% · 기타수수료 0% · 단품원가 0원 · 박스 0원 · 부자재 0원 · 합포장 0원</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="allexp-tab-panel" style="display:none;padding:14px 18px">
   <div class="section" style="margin:0">
     <div class="sec-head"><h3>📋 전체 지출 현황</h3><span style="font-size:10px;color:var(--mu)">예산 대비 소진율 · 잔여 예산 한눈에</span></div>
@@ -3298,31 +3417,33 @@ function resetInventory(){
 // 🧮 공통 재무 계산 헬퍼
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function calcFinance(params){
- // params: {qty, price, unitCost, channelFee, pgFee, shipPerUnit, adROAS, opexPerUnit, opexTotal, corpTaxRate}
+ // params: {qty, price, unitCost, channelFee, pgFee, shipPerUnit, adROAS, opexPerUnit, opexTotal, corpTaxRate, packagingPerUnit}
+ // packagingPerUnit: ROAS 탭의 박스+합포장+부자재 (단위당) — 추가하면 시나리오/감도/통합 모두 ROAS 탭과 일치
  const p = Object.assign({
   qty:0, price:0, unitCost:0, channelFee:10.8, pgFee:2.9, shipPerUnit:3000,
-  adROAS:300, opexPerUnit:0, opexTotal:0, corpTaxRate:9
+  adROAS:300, opexPerUnit:0, opexTotal:0, corpTaxRate:9, packagingPerUnit:0
  }, params);
 
  const grossRevenue = p.qty * p.price;
  const channelFeeAmt = Math.round(grossRevenue * p.channelFee/100);
  const pgFeeAmt = Math.round(grossRevenue * p.pgFee/100);
  const shipTotal = p.qty * p.shipPerUnit;
- const netRevenue = grossRevenue - channelFeeAmt - pgFeeAmt - shipTotal;
+ const packagingTotal = p.qty * p.packagingPerUnit;  // ━ 신규: 포장비 (박스+합포장+부자재) ━
+ const netRevenue = grossRevenue - channelFeeAmt - pgFeeAmt - shipTotal - packagingTotal;
  const cogsTotal = p.qty * p.unitCost;
  const grossProfit = netRevenue - cogsTotal;
  const adSpend = p.adROAS?Math.round(grossRevenue/p.adROAS*100):0;
  const opexCalcTotal = p.qty * p.opexPerUnit + p.opexTotal;
  const operatingProfit = grossProfit - adSpend - opexCalcTotal;
- // VAT: 광고비 공제 제외
- const vatDeductible = cogsTotal + opexCalcTotal;
+ // VAT: 광고비 공제 제외 (포장비는 공제 가능)
+ const vatDeductible = cogsTotal + opexCalcTotal + packagingTotal;
  const inputVAT = Math.round(vatDeductible/11);
  const outputVAT = Math.round(grossRevenue/11);
  const vatPayable = Math.max(0, outputVAT - inputVAT);
  const corpTax = Math.max(0, Math.round(operatingProfit * p.corpTaxRate/100));
  const netProfit = operatingProfit - vatPayable - corpTax;
  return {
-  grossRevenue, channelFeeAmt, pgFeeAmt, shipTotal, netRevenue,
+  grossRevenue, channelFeeAmt, pgFeeAmt, shipTotal, packagingTotal, netRevenue,
   cogsTotal, grossProfit, adSpend, opexCalcTotal, operatingProfit,
   vatPayable, corpTax, netProfit,
   grossMargin: grossRevenue?Math.round(grossProfit/grossRevenue*1000)/10:0,
@@ -3333,11 +3454,33 @@ function calcFinance(params){
 function getInventoryBase(){
  // 현재 inventoryData 에서 기본 파라미터 가져오기
  const inv = (typeof inventoryData!=='undefined'&&inventoryData)?inventoryData:{};
- let unitCost=0;
+ 
+ // ━━ ROAS 탭의 단품 원가 합산 (roasData) — 시나리오/감도/통합도 같은 원가 사용 ━━
+ // cogsData 가 비어있어도 ROAS 탭에서 입력한 값이 우선
+ let unitCost = 0;
+ let priceForRoasPctCalc = 0;
+ const priceEl = document.getElementById('roas-price2');
+ if(priceEl) priceForRoasPctCalc = parseFloat(priceEl.value) || 0;
+ 
+ // 우선순위 1: roasData (ROAS 탭에서 사용자가 직접 본 원가)
+ let roasDataCost = 0;
+ if(typeof roasData !== 'undefined' && Array.isArray(roasData)){
+  roasData.forEach(function(r){
+   if(r.amount) roasDataCost += r.amount;
+   else if(r.pct && priceForRoasPctCalc) roasDataCost += (priceForRoasPctCalc * r.pct / 100);
+  });
+ }
+ 
+ // 우선순위 2: cogsData (생산탭) - VAT 1.1 적용
+ let cogsCost = 0;
  if(typeof cogsData!=='undefined'&&Array.isArray(cogsData)){
   const totalUnit=cogsData.reduce((s,r)=>s+((r.unitPrice||r.amount)||0),0);
-  unitCost=Math.round(totalUnit*1.1);
+  cogsCost = Math.round(totalUnit*1.1);
  }
+ 
+ // 둘 중 더 큰 값 사용 (둘 다 있으면 roasData 우선, 없으면 cogs)
+ unitCost = roasDataCost > 0 ? Math.round(roasDataCost) : cogsCost;
+ 
  let autoStock=0;
  if(typeof cogsData!=='undefined'&&Array.isArray(cogsData)&&cogsData.length){
   const fillRow=cogsData.find(r=>/(충진|완제품|완성|final|fill)/i.test(r.name||''));
@@ -3345,20 +3488,55 @@ function getInventoryBase(){
   else autoStock=Math.min(...cogsData.map(r=>r.prodQty||Infinity).filter(v=>v!==Infinity&&v>0))||0;
  }
  let autoPrice=0;
- const priceEl=document.getElementById('roas-price2');
  if(priceEl) autoPrice=parseFloat(priceEl.value)||0;
+ 
+ // ━━ ROAS 탭의 추가비용 필드 6개 읽기 (시나리오/감도/통합에 자동 반영) ━━
+ const payfeePctEl = document.getElementById('roas-payfee');
+ const etcfeePctEl = document.getElementById('roas-etcfee');
+ const boxEl = document.getElementById('roas-box');
+ const wrapEl = document.getElementById('roas-wrapfee');
+ const extraMatEl = document.getElementById('roas-extramaterial');
+ const shipFeeEl = document.getElementById('roas-shipfee');
+ const payfeePct = payfeePctEl ? (parseFloat(payfeePctEl.value)||0) : 0;
+ const etcfeePct = etcfeePctEl ? (parseFloat(etcfeePctEl.value)||0) : 0;
+ const boxCost = boxEl ? (parseFloat(boxEl.value)||0) : 0;
+ const wrapCost = wrapEl ? (parseFloat(wrapEl.value)||0) : 0;
+ const extraMaterial = extraMatEl ? (parseFloat(extraMatEl.value)||0) : 0;
+ const roasShipFee = shipFeeEl ? (parseFloat(shipFeeEl.value)||0) : 0;
+ 
+ // ROAS 탭의 무료배송비가 있으면 shipPerUnit 으로도 사용 (없으면 inventory 또는 기본 3000)
+ const finalShipPerUnit = roasShipFee > 0 ? roasShipFee : 
+                          (inv.shipPerUnit!==undefined ? inv.shipPerUnit : 3000);
+ 
+ // ROAS 탭의 결제수수료를 pgFee 로 (3.3 기본값)
+ const finalPgFee = payfeePctEl && payfeePctEl.value !== '' ? payfeePct : 
+                    (inv.pgFee!==undefined ? inv.pgFee : 2.9);
+ 
+ // ROAS 탭의 기타 수수료를 channelFee 로 (기타 수수료가 있으면 추가, 없으면 inventory 기본값 10.8)
+ // 둘 다 추가하면 이중계산이므로 ROAS 탭 etcfee가 입력됐을 때만 그걸 사용
+ const finalChannelFee = etcfeePctEl && etcfeePctEl.value !== '' ? etcfeePct : 
+                         (inv.channelFee!==undefined ? inv.channelFee : 10.8);
+ 
  return {
   stock: inv.stock!==undefined?inv.stock:autoStock,
   targetQty: inv.targetQty!==undefined?inv.targetQty:Math.round(autoStock*0.5),
   price: inv.price!==undefined?inv.price:autoPrice,
   unitCost: unitCost,
-  channelFee: inv.channelFee!==undefined?inv.channelFee:10.8,
-  pgFee: inv.pgFee!==undefined?inv.pgFee:2.9,
-  shipPerUnit: inv.shipPerUnit!==undefined?inv.shipPerUnit:3000,
+  channelFee: finalChannelFee,
+  pgFee: finalPgFee,
+  shipPerUnit: finalShipPerUnit,
   targetROAS: inv.targetROAS!==undefined?inv.targetROAS:300,
   opexPerUnit: inv.opexPerUnit!==undefined?inv.opexPerUnit:0,
   opexTotal: inv.opexTotal!==undefined?inv.opexTotal:0,
-  corpTaxRate: inv.corpTaxRate!==undefined?inv.corpTaxRate:9
+  corpTaxRate: inv.corpTaxRate!==undefined?inv.corpTaxRate:9,
+  // ━━ ROAS 탭 추가비용 (calcFinance 가 packagingPerUnit 으로 활용) ━━
+  packagingPerUnit: boxCost + wrapCost + extraMaterial,  // 박스+합포장+부자재 (단위당)
+  payfeePct: payfeePct,
+  etcfeePct: etcfeePct,
+  boxCost: boxCost,
+  wrapCost: wrapCost,
+  extraMaterial: extraMaterial,
+  roasShipFee: roasShipFee
  };
 }
 
@@ -3371,6 +3549,11 @@ function renderScenarioCompare(){
  const base=getInventoryBase();
  const sc = (typeof scenarioData!=='undefined'&&scenarioData)?scenarioData:{};
 
+ // ━━ ROAS 탭의 추가비용 정보 (사용자 인지용) ━━
+ const _scInfoBox = (base.packagingPerUnit > 0 || (base.payfeePct && base.payfeePct !== 2.9) || (base.etcfeePct && base.etcfeePct !== 10.8)) 
+  ? '<div style="background:#FFFDE7;border:1px solid #FFE082;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#8B5E00;line-height:1.7"><b>💡 ROAS 탭 연동:</b> 결제수수료 <b>'+(base.pgFee||0)+'%</b> · 기타수수료 <b>'+(base.channelFee||0)+'%</b> · 단위당 포장비 <b>'+(base.packagingPerUnit||0).toLocaleString('ko-KR')+'원</b> · 단위당 배송비 <b>'+(base.shipPerUnit||0).toLocaleString('ko-KR')+'원</b> (ROAS 탭 변경 시 자동 반영)</div>'
+  : '';
+ 
  // 시나리오 파라미터 (사용자 조정 가능)
  const scenarios = [
   {key:'worst', label:'😨 최악', color:'#C62828', bg:'#FFEBEE',
@@ -3403,7 +3586,8 @@ function renderScenarioCompare(){
    adROAS: s.roas,
    opexPerUnit: base.opexPerUnit * s.opexBoost,
    opexTotal: base.opexTotal * s.opexBoost,
-   corpTaxRate: base.corpTaxRate
+   corpTaxRate: base.corpTaxRate,
+   packagingPerUnit: base.packagingPerUnit || 0
   });
   // 3개월 뒤 현금 (cashflowData 참조)
   const cf = (typeof cashflowData!=='undefined'&&cashflowData)?cashflowData:{};
@@ -3503,6 +3687,7 @@ function renderScenarioCompare(){
  h+='</div></div>';
  h+='</div>';
 
+ h = _scInfoBox + h;
  wrap.innerHTML=h;
 
  function rowLine(label,val,color,bold){
@@ -3577,7 +3762,8 @@ function renderCashflowChart(){
    adROAS: base.targetROAS,
    opexPerUnit: base.opexPerUnit,
    opexTotal: 0, // 고정비는 별도
-   corpTaxRate: base.corpTaxRate
+   corpTaxRate: base.corpTaxRate,
+   packagingPerUnit: base.packagingPerUnit || 0
   });
   // 월 순현금흐름 = 순이익 - 월 고정비 (인건비·외주·판관)
   const monthNetCash = fin.netProfit - monthlyFixed;
@@ -3822,7 +4008,10 @@ function renderROASSensitivity(){
  const wrap=document.getElementById('sensitivity-wrap');if(!wrap)return;
  const N=n=>(Math.round(n||0)).toLocaleString('ko-KR');
  const base=getInventoryBase();
- const sens = (typeof sensitivityData!=='undefined'&&sensitivityData)?sensitivityData:{};
+
+ const _sensInfoBox = (base.packagingPerUnit > 0 || (base.payfeePct && base.payfeePct !== 2.9) || (base.etcfeePct && base.etcfeePct !== 10.8)) 
+  ? '<div style="background:#FFFDE7;border:1px solid #FFE082;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#8B5E00;line-height:1.7"><b>💡 ROAS 탭 연동:</b> 결제수수료 <b>'+(base.pgFee||0)+'%</b> · 기타수수료 <b>'+(base.channelFee||0)+'%</b> · 단위당 포장비 <b>'+(base.packagingPerUnit||0).toLocaleString('ko-KR')+'원</b> · 단위당 배송비 <b>'+(base.shipPerUnit||0).toLocaleString('ko-KR')+'원</b> (ROAS 탭 변경 시 자동 반영)</div>'
+  : ''; const sens = (typeof sensitivityData!=='undefined'&&sensitivityData)?sensitivityData:{};
  const targetQty = sens.qty!==undefined?sens.qty:base.targetQty;
 
  // 테스트할 ROAS 값들
@@ -3838,7 +4027,8 @@ function renderROASSensitivity(){
    adROAS: roas,
    opexPerUnit: base.opexPerUnit,
    opexTotal: base.opexTotal,
-   corpTaxRate: base.corpTaxRate
+   corpTaxRate: base.corpTaxRate,
+   packagingPerUnit: base.packagingPerUnit || 0
   });
   return {roas, fin};
  });
@@ -3946,6 +4136,7 @@ function renderROASSensitivity(){
  h+='<b>개선 전략:</b> 콘텐츠 CTR·CVR·객단가 상승 → ROAS 자동 상승. 단순히 "광고비 줄이기"는 매출까지 떨어뜨릴 수 있음';
  h+='</div></div>';
 
+ h = _sensInfoBox + h;
  wrap.innerHTML=h;
 
  function kpiCell(label,value,color,bg,sub){
@@ -4901,21 +5092,55 @@ function renderAllProductsView(productsFinance, N, CLR){
    const qty = inv.targetQty || inv.stock || 0;
    const price = inv.price || product.price || 0;
    expRevenue = qty * price;
-   // 간이 순이익 추정
-   const channelFee = (inv.channelFee!==undefined?inv.channelFee:10.8);
-   const pgFee = (inv.pgFee!==undefined?inv.pgFee:2.9);
-   const ship = (inv.shipPerUnit!==undefined?inv.shipPerUnit:3000);
+   // ━━ ROAS 탭의 추가비용도 반영 (활성 제품일 때 메모리값 우선) ━━
+   // 활성 제품: 메모리의 roasData + ROAS 탭 input들 자동 반영
+   // 비활성 제품: snap에 저장된 값으로 (roasData/추가비용)
+   let unitCost = 0;
+   let packagingPerUnit = 0;
+   let extraChannelFee = 0;
+   let extraPgFee = 0;
+   let extraShipFee = 0;
+   
+   if(product.id === activeProductId && typeof getInventoryBase === 'function'){
+    // 활성 제품 — 메모리 + ROAS 탭 입력에서 즉시 반영
+    const liveBase = getInventoryBase();
+    unitCost = liveBase.unitCost;
+    packagingPerUnit = liveBase.packagingPerUnit || 0;
+    extraChannelFee = liveBase.channelFee;
+    extraPgFee = liveBase.pgFee;
+    extraShipFee = liveBase.shipPerUnit;
+   } else {
+    // 비활성 제품 — snap의 roasData + 추가비용 필드들
+    let roasDataCost = 0;
+    (snap.roasData||[]).forEach(function(r){
+     if(r.amount) roasDataCost += r.amount;
+     else if(r.pct && price) roasDataCost += (price * r.pct / 100);
+    });
+    const cogsCost = (snap.cogsData||[]).reduce((s,r)=>s+((r.unitPrice||r.amount)||0),0)*1.1;
+    unitCost = roasDataCost > 0 ? Math.round(roasDataCost) : cogsCost;
+    
+    // snap의 hubSettings 또는 별도 필드에서 추가비용 (있을 경우)
+    const sInv = snap.inventoryData || {};
+    extraChannelFee = sInv.channelFee!==undefined ? sInv.channelFee : 10.8;
+    extraPgFee = sInv.pgFee!==undefined ? sInv.pgFee : 2.9;
+    extraShipFee = sInv.shipPerUnit!==undefined ? sInv.shipPerUnit : 3000;
+   }
+   
    const roas = (inv.targetROAS!==undefined?inv.targetROAS:300);
-   const unitCost = (snap.cogsData||[]).reduce((s,r)=>s+((r.unitPrice||r.amount)||0),0)*1.1;
-   const netRev = expRevenue * (1 - (channelFee+pgFee)/100) - qty*ship;
-   const grossProfit = netRev - qty*unitCost;
-   const adSpend = roas?Math.round(expRevenue/roas*100):0;
-   const opProfit = grossProfit - adSpend;
-   const corpTax = Math.max(0, Math.round(opProfit*0.09));
-   const outputVAT = Math.round(expRevenue/11);
-   const inputVAT = Math.round((qty*unitCost)/11);
-   const vatPayable = Math.max(0, outputVAT-inputVAT);
-   expNetProfit = opProfit - corpTax - vatPayable;
+   const fin = calcFinance({
+    qty: qty,
+    price: price,
+    unitCost: unitCost,
+    channelFee: extraChannelFee,
+    pgFee: extraPgFee,
+    shipPerUnit: extraShipFee,
+    adROAS: roas,
+    opexPerUnit: 0,
+    opexTotal: 0,
+    corpTaxRate: 9,
+    packagingPerUnit: packagingPerUnit
+   });
+   expNetProfit = fin.netProfit;
   }
 
   return {product, cost:costVAT, cogs:cogsVAT, ad:adTotal, totalBudget, expRevenue, expNetProfit};
@@ -5568,6 +5793,21 @@ function calcROAS2(){
   if(r.amount) totalCost+=r.amount;
   else if(r.pct&&price) totalCost+=(price*r.pct/100);
  });
+ // ━━━ 결제수수료 + 기타수수료 + 기타비용 추가 반영 ━━━
+ var payfeePct = parseFloat(document.getElementById('roas-payfee')?.value)||0;
+ var etcfeePct = parseFloat(document.getElementById('roas-etcfee')?.value)||0;
+ var boxCost = parseFloat(document.getElementById('roas-box')?.value)||0;
+ var wrapCost = parseFloat(document.getElementById('roas-wrapfee')?.value)||0;
+ var extraMaterial = parseFloat(document.getElementById('roas-extramaterial')?.value)||0;
+ var shipCost = parseFloat(document.getElementById('roas-shipfee')?.value)||0;
+ // 추가 비용 합산
+ var payfeeAmt = Math.round(price * payfeePct / 100);
+ var etcfeeAmt = Math.round(price * etcfeePct / 100);
+ var packagingCost = boxCost + wrapCost + extraMaterial;
+ var extraCost = payfeeAmt + etcfeeAmt + packagingCost + shipCost;
+ totalCost += extraCost;
+ // 추가비용 전역 저장 (END ROAS 세트 계산에서 재사용)
+ window._roasExtraBreakdown = {payfeePct, etcfeePct, boxCost, wrapCost, extraMaterial, shipCost};
  var margin=price-totalCost;
  var marginRate=price?Math.round(margin/price*100):0;
  var costRate=price?Math.round(totalCost/price*100):0;
@@ -5575,6 +5815,8 @@ function calcROAS2(){
  var wrap=document.getElementById('roas-result2');
  if(wrap){
   var items=[
+   {label:'생산+준비 원가',value:N(Math.round(totalCost-extraCost))+'원',color:'var(--tx)'},
+   {label:'추가비용 (수수료+포장+배송)',value:N(Math.round(extraCost))+'원',color:'#8B5E00'},
    {label:'총 비용',value:N(Math.round(totalCost))+'원',color:'var(--red)'},
    {label:'판매당 마진',value:N(Math.round(margin))+'원',color:margin>=0?'var(--green)':'var(--red)'},
    {label:'마진율',value:marginRate+'%',color:marginRate>=30?'var(--green)':marginRate>=15?'var(--amber)':'var(--red)'},
@@ -5623,7 +5865,182 @@ function calcROAS2(){
   else if(marginVAT<=0){evVAT.textContent='비용+VAT > 판매가';evVAT.style.color='var(--red)';}
   else{evVAT.textContent=endROAS_VAT+'%';evVAT.style.color=endROAS_VAT<=300?'#BF360C':'var(--amber)';}
  }
+
+ // ━━ 시나리오/감도/통합/현금흐름 탭들 즉시 반영 ━━
+ if(typeof renderCashflowChart === 'function' && document.getElementById('cashflow-tab-panel')?.style.display !== 'none'){
+  if(typeof flushCashflowRender === 'function') flushCashflowRender();
+  else renderCashflowChart();
+ }
+ if(typeof renderScenarioCompare === 'function' && document.getElementById('scenario-tab-panel')?.style.display !== 'none'){
+  renderScenarioCompare();
+ }
+ if(typeof renderROASSensitivity === 'function' && document.getElementById('sensitivity-tab-panel')?.style.display !== 'none'){
+  renderROASSensitivity();
+ }
+ if(typeof renderIntegratedFinance === 'function' && document.getElementById('integrated-tab-panel')?.style.display !== 'none'){
+  renderIntegratedFinance();
+ }
+ // ━━ END ROAS 세트 탭도 갱신 ━━
+ if(typeof calcRoasSet === 'function' && document.getElementById('roasset-tab-panel')?.style.display !== 'none'){
+  calcRoasSet();
+ }
 }
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🎁 END ROAS 세트 시뮬레이션 (단품 / 2개세트 / 3개세트)
+// ROAS 탭의 단품 원가 + 수수료 설정을 자동 연동
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function renderRoasSet(){
+ // 기존 ROAS 탭 값으로 계산 워밍업
+ if(typeof calcROAS2 === 'function') calcROAS2();
+ calcRoasSet();
+}
+
+function calcRoasSet(){
+ var N=function(n){return Math.round(n||0).toLocaleString('ko-KR');};
+ 
+ // ROAS 탭에서 단품 원가 (수수료/추가비용 제외한 순수 원가) 가져오기
+ // roasData 합산
+ var unitPureCost = 0;
+ var unitPrice = parseFloat(document.getElementById('roas-price2')?.value)||0;
+ (roasData||[]).forEach(function(r){
+  if(r.amount) unitPureCost += r.amount;
+  else if(r.pct && unitPrice) unitPureCost += (unitPrice * r.pct / 100);
+ });
+ 
+ // 수수료/포장 정보 (ROAS 탭 입력)
+ var payfeePct = parseFloat(document.getElementById('roas-payfee')?.value)||0;
+ var etcfeePct = parseFloat(document.getElementById('roas-etcfee')?.value)||0;
+ var boxCost = parseFloat(document.getElementById('roas-box')?.value)||0;
+ var wrapCost = parseFloat(document.getElementById('roas-wrapfee')?.value)||0;
+ var extraMaterial = parseFloat(document.getElementById('roas-extramaterial')?.value)||0;
+ 
+ // 정보 표시 박스
+ var infoEl = document.getElementById('roasset-base-info');
+ if(infoEl){
+  infoEl.innerHTML = '• 결제수수료 <b>'+payfeePct+'%</b> · 기타수수료 <b>'+etcfeePct+'%</b> · 단품원가 <b>'+N(unitPureCost)+'원</b>'
+   + ' · 택배상자 <b>'+N(boxCost)+'원</b> · 포장부자재 <b>'+N(extraMaterial)+'원</b> · 합포장비 <b>'+N(wrapCost)+'원</b>';
+ }
+ 
+ // 세트별 계산 함수
+ function calcSet(qty, price, shipCost){
+  // 비용 구성:
+  // - 제품 원가 × qty
+  // - 결제수수료 + 기타수수료 (세트 판매가 기준)
+  // - 박스 (세트당 1개) + 합포장비 (세트당 1) + 부자재 × qty (제품마다 부착)
+  // - 무료배송비 (세트당 1)
+  var productCost = unitPureCost * qty;
+  var payfeeAmt = price * payfeePct / 100;
+  var etcfeeAmt = price * etcfeePct / 100;
+  var boxOnce = boxCost; // 1박스
+  var wrapOnce = wrapCost; // 합포장 1회
+  var extraMat = extraMaterial * qty; // 제품마다 부자재
+  var totalCost = productCost + payfeeAmt + etcfeeAmt + boxOnce + wrapOnce + extraMat + shipCost;
+  var margin = price - totalCost;
+  var marginRate = price>0 ? Math.round(margin/price*100*10)/10 : 0;
+  var costRate = price>0 ? Math.round(totalCost/price*100*10)/10 : 0;
+  var endROAS = (margin>0 && price>0) ? Math.round(price/margin*100) : 0;
+  // VAT 후
+  var vat = Math.round(price * 0.1);
+  var totalCostVAT = totalCost + vat;
+  var marginVAT = price - totalCostVAT;
+  var endROAS_VAT = (marginVAT>0 && price>0) ? Math.round(price/marginVAT*100) : 0;
+  
+  return {
+   productCost: productCost,
+   payfeeAmt: payfeeAmt,
+   etcfeeAmt: etcfeeAmt,
+   packaging: boxOnce + wrapOnce + extraMat,
+   shipCost: shipCost,
+   totalCost: totalCost,
+   margin: margin,
+   marginRate: marginRate,
+   costRate: costRate,
+   endROAS: endROAS,
+   endROAS_VAT: endROAS_VAT,
+   marginVAT: marginVAT,
+   discount: (qty>1 && price>0 && unitPrice>0) ? Math.round((1 - (price / (unitPrice*qty))) * 100 * 10)/10 : 0
+  };
+ }
+ 
+ // 세트 1/2/3 값 읽기
+ var sets = [
+  {key:'rs1', qty:1, label:'📦 단품 + 무료배송', color:'#7A7870', bg:'#FAFAF8', border:'var(--bd)'},
+  {key:'rs2', qty:2, label:'🎁 2개 세트', color:'#1A3FAA', bg:'#F0F8FF', border:'#B5C9E8'},
+  {key:'rs3', qty:3, label:'🎁 3개 세트', color:'#1A6B4A', bg:'#F0FBF4', border:'#A5D6A7'}
+ ];
+ 
+ var wrap = document.getElementById('roasset-results');
+ if(!wrap) return;
+ 
+ wrap.innerHTML = sets.map(function(s){
+  var price = parseFloat(document.getElementById(s.key+'-price')?.value)||0;
+  var ship = parseFloat(document.getElementById(s.key+'-ship')?.value)||0;
+  var r = calcSet(s.qty, price, ship);
+  
+  var endROASColor = r.endROAS>0 ? (r.endROAS<=300?'#1A6B4A':(r.endROAS<=500?'#E65100':'#C0392B')) : '#7A7870';
+  var marginColor = r.margin>=0 ? '#1A6B4A' : '#C0392B';
+  
+  var html = '<div style="background:'+s.bg+';border:1px solid '+s.border+';border-radius:10px;padding:14px">';
+  html += '<div style="font-size:13px;font-weight:700;color:'+s.color+';margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid '+s.border+'">'+s.label+'</div>';
+  
+  // 비용 구성 디테일
+  html += '<div style="font-size:10px;color:var(--mu);line-height:1.8;margin-bottom:10px">';
+  html += '• 제품원가('+s.qty+'개): <b style="color:var(--tx)">'+N(r.productCost)+'원</b><br>';
+  html += '• 결제수수료('+payfeePct+'%): <b style="color:var(--tx)">'+N(r.payfeeAmt)+'원</b><br>';
+  if(etcfeePct>0) html += '• 기타수수료('+etcfeePct+'%): <b style="color:var(--tx)">'+N(r.etcfeeAmt)+'원</b><br>';
+  html += '• 포장(박스+합포장+부자재×'+s.qty+'): <b style="color:var(--tx)">'+N(r.packaging)+'원</b><br>';
+  html += '• 무료배송비: <b style="color:var(--tx)">'+N(r.shipCost)+'원</b><br>';
+  html += '<div style="margin-top:5px;padding-top:5px;border-top:1px dashed '+s.border+'">총 비용: <b style="color:#C0392B">'+N(r.totalCost)+'원</b></div>';
+  html += '</div>';
+  
+  // 할인율 (단품 대비)
+  if(s.qty > 1 && r.discount > 0){
+   html += '<div style="font-size:10px;color:#8B5E00;background:#FFFDE7;padding:4px 8px;border-radius:4px;margin-bottom:8px;text-align:center">단품×'+s.qty+' 대비 <b>'+r.discount+'% 할인</b></div>';
+  }
+  
+  // 마진 / 마진율
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">';
+  html += '<div style="background:#fff;border:1px solid '+s.border+';border-radius:6px;padding:6px;text-align:center">';
+  html += '<div style="font-size:9px;color:var(--mu)">판매당 마진</div>';
+  html += '<div style="font-size:13px;font-weight:700;font-family:var(--mn);color:'+marginColor+'">'+N(r.margin)+'원</div></div>';
+  html += '<div style="background:#fff;border:1px solid '+s.border+';border-radius:6px;padding:6px;text-align:center">';
+  html += '<div style="font-size:9px;color:var(--mu)">마진율</div>';
+  html += '<div style="font-size:13px;font-weight:700;font-family:var(--mn);color:'+marginColor+'">'+r.marginRate+'%</div></div>';
+  html += '</div>';
+  
+  // END ROAS
+  html += '<div style="background:#fff;border:2px solid '+endROASColor+';border-radius:8px;padding:10px;text-align:center;margin-bottom:6px">';
+  html += '<div style="font-size:10px;color:var(--mu);margin-bottom:3px">END ROAS (세전 손익분기)</div>';
+  if(price<=0){
+   html += '<div style="font-size:22px;font-weight:700;font-family:var(--mn);color:var(--mu)">판매가 입력 필요</div>';
+  } else if(r.margin<=0){
+   html += '<div style="font-size:18px;font-weight:700;font-family:var(--mn);color:#C0392B">비용 > 판매가</div>';
+  } else {
+   html += '<div style="font-size:24px;font-weight:700;font-family:var(--mn);color:'+endROASColor+'">'+r.endROAS+'%</div>';
+   html += '<div style="font-size:9px;color:var(--mu);margin-top:2px">이상이면 수익</div>';
+  }
+  html += '</div>';
+  
+  // VAT 후 END ROAS
+  html += '<div style="background:#FFF3E0;border:1px solid #FFB74D;border-radius:6px;padding:6px;text-align:center">';
+  html += '<div style="font-size:9px;color:#BF360C;margin-bottom:2px">END ROAS (VAT 후)</div>';
+  if(price<=0){
+   html += '<div style="font-size:14px;font-weight:700;color:var(--mu)">—</div>';
+  } else if(r.marginVAT<=0){
+   html += '<div style="font-size:12px;font-weight:700;color:#C0392B">비용+VAT > 판매가</div>';
+  } else {
+   html += '<div style="font-size:16px;font-weight:700;font-family:var(--mn);color:#BF360C">'+r.endROAS_VAT+'%</div>';
+  }
+  html += '</div>';
+  
+  html += '</div>';
+  return html;
+ }).join('');
+}
+
 
 function renderProdRows(){
  const tbody=document.getElementById('prod-rows');if(!tbody)return;
@@ -6394,7 +6811,7 @@ function saveIdea(){sv();buildIdea();buildIdeaIngredients();showToast('아이디
 // COSTS (t5)
 // ============================================================
 function showCostTab(tab, btn){
- const panels=['cost','adbudget','expense','adspend','monthly','prod','roas','allexp','adexp','prodexp','totalbudget','inventory','cashflow','scenario','sensitivity','integrated'];
+ const panels=['cost','adbudget','expense','adspend','monthly','prod','roas','roasset','allexp','adexp','prodexp','totalbudget','inventory','cashflow','scenario','sensitivity','integrated'];
  panels.forEach(p=>{const el=document.getElementById(p+'-tab-panel');if(el)el.style.display='none';});
  const active=document.getElementById(tab+'-tab-panel');if(active)active.style.display='block';
  // Toggle action buttons
@@ -6425,6 +6842,7 @@ function showCostTab(tab, btn){
  if(tab==='sensitivity')renderROASSensitivity();
  if(tab==='integrated')renderIntegratedFinance();
  if(tab==='adbudget')renderAdBudget();
+ if(tab==='roasset')renderRoasSet();
 }
 function showIdeaSubTab(which,btn){
  const panelZ=document.getElementById('idea4z-panel');
@@ -6562,10 +6980,10 @@ function calcAdBudget(){
   const tbWrap=document.getElementById('totalbudget-wrap');
   if(tbWrap&&tbWrap.offsetParent!==null)renderTotalBudget();
  }
- // 광고비준비비용 탭이 열려있으면 즉시 재렌더
- if(typeof renderAdBudget==='function'){
+ // 광고비준비비용 탭이 열려있으면 합계만 갱신 (전체 재렌더 X = 무한루프 방지)
+ if(typeof updateAdBudgetTotals==='function'){
   const abEl=document.getElementById('adbudget-tab-panel');
-  if(abEl&&abEl.style.display!=='none')renderAdBudget();
+  if(abEl&&abEl.style.display!=='none')updateAdBudgetTotals();
  }
 }
 
@@ -6687,7 +7105,15 @@ function renderAdBudget(){
   setIfEmpty('ad-other', a.other);
   setIfEmpty('ad-months', a.months);
  }
- if(typeof calcAdBudget === 'function') calcAdBudget();
+ // ad-total 값 직접 계산 (calcAdBudget 호출 안 함 - 무한루프 방지)
+ const _meta=parseFloat(document.getElementById('ad-meta')?.value||0)||0;
+ const _google=parseFloat(document.getElementById('ad-google')?.value||0)||0;
+ const _spon=parseFloat(document.getElementById('ad-spon')?.value||0)||0;
+ const _other=parseFloat(document.getElementById('ad-other')?.value||0)||0;
+ const _months=parseFloat(document.getElementById('ad-months')?.value||1)||1;
+ const _adTotal=(_meta+_google+_spon+_other)*_months;
+ const _adTotalEl=document.getElementById('ad-total');
+ if(_adTotalEl) _adTotalEl.value=(typeof N==='function'?N(_adTotal):_adTotal.toLocaleString('ko-KR'))+'원';
  
  // 추가 항목 테이블 렌더
  const tbody = document.getElementById('adbudget-custom-body');
@@ -11109,10 +11535,14 @@ function forceIsolationReset(){
         var daysUntil = Math.ceil((start - today) / 86400000);
         weekText = '<span class="cal-item-week-bos future">D-' + daysUntil + '</span>';
       } else if(isActive || !end){
-        weekText = '<span class="cal-item-week-bos active">현재 ' + weekNum + '주차</span>';
+        // 진행중: 며칠째인지 + 몇 주차인지 둘 다 표시
+        var activeDays = diffDays + 1;  // 시작일 포함
+        weekText = '<span class="cal-item-week-bos active">현재 ' + weekNum + '주차 · ' + activeDays + '일째</span>';
       } else {
+        // 종료: 총 일수 + 주수 표시
+        var totalDays = Math.floor((end - start) / 86400000) + 1;  // 종료일 포함
         var totalWeeks = Math.floor((end - start) / 86400000 / 7) + 1;
-        weekText = '<span class="cal-item-week-bos ended">종료 (' + totalWeeks + '주 진행)</span>';
+        weekText = '<span class="cal-item-week-bos ended">종료 (' + totalWeeks + '주 · ' + totalDays + '일 진행)</span>';
       }
       
       return '<div class="cal-item-card-bos" onclick="editCalendarItem_BOS(\'' + item.id + '\')">'
@@ -11965,13 +12395,13 @@ function forceIsolationReset(){
         
         <div style="margin-bottom:10px">
           <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">GitHub Personal Access Token <a href="#" onclick="event.preventDefault();showGistTokenGuide()" style="font-size:10px;color:#2563EB;text-decoration:underline">📖 발급 가이드</a></label>
-          <input type="password" id="gist-token-input" placeholder="ghp_... 또는 github_pat_..." style="width:100%;padding:7px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;font-family:'SF Mono',monospace">
+          <input type="password" id="gist-token-input" placeholder="ghp_... 또는 github_pat_..." oninput="if(typeof syncAutoApplyInputs==='function')syncAutoApplyInputs()" style="width:100%;padding:7px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;font-family:'SF Mono',monospace">
           <div style="font-size:10px;color:var(--mu);margin-top:3px">🔒 이 토큰은 <b>이 브라우저 localStorage에만</b> 저장됩니다 (외부 전송 없음)</div>
         </div>
         
         <div style="margin-bottom:10px">
           <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">Gist ID (선택 - 기존 Gist 사용 시)</label>
-          <input type="text" id="gist-id-input" placeholder="비워두면 새로 생성됨" style="width:100%;padding:7px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;font-family:'SF Mono',monospace">
+          <input type="text" id="gist-id-input" placeholder="비워두면 새로 생성됨" oninput="if(typeof syncAutoApplyInputs==='function')syncAutoApplyInputs()" style="width:100%;padding:7px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;font-family:'SF Mono',monospace">
           <div style="font-size:10px;color:var(--mu);margin-top:3px">새 Gist를 만들면 자동으로 ID가 저장됩니다</div>
         </div>
         
@@ -12030,26 +12460,49 @@ function forceIsolationReset(){
 
 <!-- 토큰 발급 가이드 모달 -->
 <div id="gist-token-guide-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9100;align-items:center;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
-  <div style="background:#fff;border-radius:12px;padding:24px;max-width:560px;width:92%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <div style="font-size:15px;font-weight:700">📖 GitHub Personal Access Token 발급 방법</div>
+  <div style="background:#fff;border-radius:12px;padding:24px;max-width:620px;width:92%;max-height:92vh;overflow-y:auto" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #E8E6E0">
+      <div style="font-size:16px;font-weight:700">📖 GitHub Token 발급 방법</div>
       <button onclick="document.getElementById('gist-token-guide-modal').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu)">×</button>
     </div>
-    <ol style="font-size:12px;line-height:1.9;color:var(--tx);padding-left:20px">
-      <li><a href="https://github.com/settings/tokens?type=beta" target="_blank" style="color:#2563EB;font-weight:600">GitHub Settings → Developer settings → Personal access tokens (Fine-grained tokens)</a> 접속</li>
-      <li><b>"Generate new token"</b> 클릭</li>
-      <li>Token name: <code style="background:#fafaf8;padding:1px 4px;border-radius:3px">BrandOSKIT Sync</code></li>
-      <li>Expiration: 원하는 기간 (1년 추천)</li>
-      <li>Resource owner: 본인 계정</li>
-      <li>Repository access: <b>Public Repositories (read-only)</b> 선택 (Gist는 별도 권한)</li>
-      <li>Account permissions → <b>Gists: Read and write</b> 선택 ★</li>
-      <li><b>Generate token</b> 클릭 → <span style="background:#fff8ec;padding:1px 6px;border-radius:3px;font-weight:700;color:#C0392B">토큰 즉시 복사</span> (다시 못 봄!)</li>
-      <li>BrandOSKIT의 Token 입력칸에 붙여넣기 → <b>설정 저장</b></li>
-    </ol>
-    <div style="margin-top:14px;padding:10px 12px;background:#fff8ec;border:1px solid #e8d4a8;border-radius:6px;font-size:11px;color:#8B5E00;line-height:1.7">
-      <b>⚠ Classic Token도 사용 가능:</b><br>
-      <a href="https://github.com/settings/tokens" target="_blank" style="color:#2563EB">Tokens (classic)</a> → Generate new token (classic) → <b>"gist"</b> 스코프만 체크 → Generate
+    
+    <!-- 강력 추천: Classic Token -->
+    <div style="background:#F0FBF4;border:2px solid #A5D6A7;border-radius:10px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-size:13px;font-weight:700;color:#1A6B4A;margin-bottom:10px">✅ 방법 A — Classic Token <span style="font-size:10px;background:#1A6B4A;color:#fff;padding:2px 6px;border-radius:3px;margin-left:4px">강력 추천 · 간단</span></div>
+      <ol style="font-size:12px;line-height:1.9;color:var(--tx);padding-left:22px;margin:0">
+        <li><a href="https://github.com/settings/tokens" target="_blank" style="color:#2563EB;font-weight:600">github.com/settings/tokens</a> 접속 (Tokens classic 페이지)</li>
+        <li>우상단 <b>Generate new token</b> → <b>Generate new token (classic)</b> 클릭</li>
+        <li>Note: <code style="background:#fff;padding:1px 4px;border-radius:3px">BrandOSKIT Sync</code></li>
+        <li>Expiration: <code style="background:#fff;padding:1px 4px;border-radius:3px">90 days</code> (또는 No expiration)</li>
+        <li><b style="color:#C0392B">Select scopes에서 <code style="background:#fff;padding:2px 6px;border-radius:3px">gist</code> 딱 하나만 체크</b> ★<br><span style="font-size:10px;color:var(--mu)">(다른 항목은 모두 체크 안 해도 OK)</span></li>
+        <li>맨 아래 <b>Generate token</b> 클릭</li>
+        <li><code style="background:#fff;padding:1px 4px;border-radius:3px">ghp_...</code>로 시작하는 토큰을 <b style="color:#C0392B">즉시 복사</b> (다시 못 봄!)</li>
+        <li>BrandOSKIT의 Token 입력칸에 붙여넣기 → <b>설정 저장</b></li>
+      </ol>
     </div>
+    
+    <!-- 방법 B: Fine-grained -->
+    <div style="background:#F0F4F8;border:1px solid #b5c9e8;border-radius:10px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-size:13px;font-weight:700;color:#2563EB;margin-bottom:10px">🔧 방법 B — Fine-grained Token <span style="font-size:10px;color:var(--mu)">(설정 복잡)</span></div>
+      <ol style="font-size:12px;line-height:1.9;color:var(--tx);padding-left:22px;margin:0">
+        <li><a href="https://github.com/settings/tokens?type=beta" target="_blank" style="color:#2563EB;font-weight:600">github.com/settings/tokens?type=beta</a> 접속</li>
+        <li><b>Generate new token</b> 클릭</li>
+        <li>Token name: <code style="background:#fff;padding:1px 4px;border-radius:3px">BrandOSKIT Sync</code></li>
+        <li>Expiration: 원하는 기간 (1년 추천)</li>
+        <li>Resource owner: 본인 계정</li>
+        <li>Repository access: <code style="background:#fff;padding:1px 4px;border-radius:3px">Public Repositories</code> 선택<br><span style="font-size:10px;color:var(--mu)">(Gist 권한은 별도)</span></li>
+        <li><b style="color:#C0392B">⚠ 가장 중요</b>: <b>Account permissions</b> 섹션까지 스크롤 (Repository permissions가 아님!) → <b>Gists</b> 찾기 → <code style="background:#fff;padding:1px 4px;border-radius:3px">Read and write</code> 선택 ★</li>
+        <li>맨 아래 <b>Generate token</b> 클릭</li>
+        <li><code style="background:#fff;padding:1px 4px;border-radius:3px">github_pat_...</code> 토큰을 <b style="color:#C0392B">즉시 복사</b></li>
+        <li>BrandOSKIT의 Token 입력칸에 붙여넣기 → <b>설정 저장</b></li>
+      </ol>
+      <div style="margin-top:8px;padding:8px 10px;background:#fff;border-radius:5px;font-size:11px;color:#C0392B">⚠ Fine-grained Token에서 가장 자주 실수: <b>Account permissions의 Gists</b>를 빠뜨림. Repository permissions와 다른 섹션이에요.</div>
+    </div>
+    
+    <div style="padding:10px 12px;background:#fff8ec;border:1px solid #e8d4a8;border-radius:6px;font-size:11px;color:#8B5E00;line-height:1.7">
+      💡 <b>이미 토큰 만들었는데 403 오류가 뜬다면?</b> → Gist 푸시 시 자동으로 진단 모달이 떠서 어떻게 고치는지 알려줍니다.
+    </div>
+    
     <div style="margin-top:10px;padding:10px 12px;background:#fff;border:1px solid var(--bd);border-radius:6px;font-size:11px;color:var(--mu);line-height:1.7">
       🔒 <b>보안:</b> 발급한 토큰은 BrandOSKIT의 localStorage에만 저장되며, 외부로 전송되지 않습니다. (오직 GitHub API 호출에만 사용)
     </div>
@@ -12085,16 +12538,44 @@ function forceIsolationReset(){
 (function(){
   // 동기화 대상 localStorage 키 목록
   // _hub_pwd_auth(비밀번호) 와 phase2_migrated_v1(마이그레이션 플래그)는 제외 - 기기별 상태
+  // ━━ 동기화 대상 명시적 키 ━━
   var SYNC_KEYS = [
-    'hub_data_v1',             // 메인 데이터 (브랜드, 제품 레지스트리 등)
+    'epitect-v7',              // ★ 메인 데이터 (경쟁사DB·전략·페르소나·ROAS·시나리오·비용 등 핵심) ★
+    'hub_data_v1',             // 제품 레지스트리·hub 설정
     'manifesto_v1',            // 매니페스토
     'products_store_v1',       // 제품별 데이터 저장소
     'writeup_v1',              // 글쓰기 데이터
     'bos_calendar_v1',         // 캘린더
     'bos_extra_brand_subtabs', // 사용자 추가 서브탭
     'bos_info_storage_v1',     // 정보저장소
-    'bos_info_custom_categories_v1'  // 정보저장소 사용자 정의 분류
+    'bos_info_custom_categories_v1',  // 정보저장소 사용자 정의 분류
+    'bos_edit_mode_v1',        // 편집 모드 상태
+    'tetrarix_injected_v1'     // TETRARIX 데이터 주입 플래그
   ];
+  
+  // ━━ 동적 키 prefix (제품별 데이터: epitect-v7__제품ID) ━━
+  var SYNC_KEY_PREFIXES = [
+    'epitect-v7__'             // 제품별 분리된 데이터
+  ];
+  
+  // 실제 동기화 대상 키 = SYNC_KEYS + (prefix로 시작하는 모든 키)
+  function getAllSyncKeys(){
+    var keys = SYNC_KEYS.slice();
+    try {
+      for(var i = 0; i < localStorage.length; i++){
+        var k = localStorage.key(i);
+        if(!k) continue;
+        if(SYNC_KEYS.indexOf(k) !== -1) continue;  // 이미 포함됨
+        for(var j = 0; j < SYNC_KEY_PREFIXES.length; j++){
+          if(k.indexOf(SYNC_KEY_PREFIXES[j]) === 0){
+            keys.push(k);
+            break;
+          }
+        }
+      }
+    } catch(e){}
+    return keys;
+  }
   
   var SYNC_SETTINGS_KEY = 'bos_sync_settings_v1';
   var BACKUP_BEFORE_RESTORE_KEY = 'bos_pre_restore_backup_v1';
@@ -12145,16 +12626,29 @@ function forceIsolationReset(){
   // ━━━━━ 백업 데이터 만들기 ━━━━━
   function buildBackupData(){
     var data = {};
-    SYNC_KEYS.forEach(function(k){
+    // ━ 동적 키까지 포함하여 모든 동기화 대상 키 수집 ━
+    var allKeys = getAllSyncKeys();
+    allKeys.forEach(function(k){
       var v = localStorage.getItem(k);
       if(v !== null) data[k] = v;
     });
+    // sv() 호출 강제 (메모리에만 있는 변경사항을 localStorage로 flush)
+    try { if(typeof sv === 'function') sv('동기화 직전 저장'); } catch(e){}
+    // 다시 한번 모든 키 수집 (sv() 후의 최신값)
+    data = {};
+    allKeys = getAllSyncKeys();
+    allKeys.forEach(function(k){
+      var v = localStorage.getItem(k);
+      if(v !== null) data[k] = v;
+    });
+    console.log('[Sync] buildBackupData: ' + allKeys.length + '개 키 백업');
     return {
-      version: '1.0',
+      version: '1.1',
       app: 'BrandOSKIT',
       exportedAt: new Date().toISOString(),
       exportedAtTs: Date.now(),
-      keys: data
+      keys: data,
+      keyCount: allKeys.length
     };
   }
   
@@ -12176,11 +12670,19 @@ function forceIsolationReset(){
       } catch(e){ console.warn('pre-restore backup 실패', e); }
     }
     
-    // 키별로 적용
+    // 키별로 적용 (동적 키 prefix도 허용)
     var applied = 0, skipped = 0;
+    function isAllowedKey(k){
+      if(SYNC_KEYS.indexOf(k) !== -1) return true;
+      for(var i = 0; i < SYNC_KEY_PREFIXES.length; i++){
+        if(k.indexOf(SYNC_KEY_PREFIXES[i]) === 0) return true;
+      }
+      return false;
+    }
     Object.keys(backup.keys).forEach(function(k){
-      if(SYNC_KEYS.indexOf(k) === -1){
+      if(!isAllowedKey(k)){
         skipped++;
+        console.warn('[Sync] 알 수 없는 키 skip: ' + k);
         return;
       }
       try {
@@ -12190,6 +12692,7 @@ function forceIsolationReset(){
         console.error('apply ' + k + ' 실패', e);
       }
     });
+    console.log('[Sync] applyBackup: ' + applied + '개 적용, ' + skipped + '개 skip');
     
     return {applied: applied, skipped: skipped, total: Object.keys(backup.keys).length};
   }
@@ -12337,26 +12840,30 @@ function forceIsolationReset(){
     if(!summary) return;
     var lines = [];
     var total = 0;
-    SYNC_KEYS.forEach(function(k){
+    var allKeys = getAllSyncKeys();
+    allKeys.forEach(function(k){
       var v = localStorage.getItem(k);
       var sz = v ? v.length : 0;
       total += sz;
       if(sz > 0){
         var label = ({
-          'hub_data_v1': '메인 데이터 (브랜드·제품)',
-          'manifesto_v1': '매니페스토',
-          'products_store_v1': '제품 데이터',
-          'writeup_v1': '글쓰기',
+          'epitect-v7': '⭐ 메인 데이터 (경쟁사·전략·페르소나·ROAS·시나리오 등)',
+          'hub_data_v1': '🏢 브랜드/제품 레지스트리',
+          'manifesto_v1': '📜 매니페스토',
+          'products_store_v1': '📦 제품별 데이터 저장소',
+          'writeup_v1': '✍ 글쓰기',
           'bos_calendar_v1': '📅 캘린더',
-          'bos_extra_brand_subtabs': '추가 서브탭',
+          'bos_extra_brand_subtabs': '➕ 추가 서브탭',
           'bos_info_storage_v1': '📦 정보저장소',
-          'bos_info_custom_categories_v1': '정보저장소 분류'
-        })[k] || k;
+          'bos_info_custom_categories_v1': '🏷 정보저장소 분류',
+          'bos_edit_mode_v1': '✏ 편집 모드 상태',
+          'tetrarix_injected_v1': '💉 TETRARIX 주입 플래그'
+        })[k] || ('📋 ' + k + ' (동적)');
         lines.push('<div>• ' + label + ' <span style="color:var(--mu);font-size:10px">' + formatSize(sz) + '</span></div>');
       }
     });
     summary.innerHTML = lines.join('') + 
-      '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed var(--bd);font-weight:700;color:#1A1916">총 크기: ' + formatSize(total) + '</div>';
+      '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed var(--bd);font-weight:700;color:#1A1916">총 크기: ' + formatSize(total) + ' · ' + allKeys.length + '개 키</div>';
   }
   
   // ━━━━━ Phase 2: Gist 동기화 ━━━━━
@@ -12411,7 +12918,9 @@ function forceIsolationReset(){
   };
   
   window.gistPush = function(){
-    if(!syncSettings.gistToken){ syncToast('먼저 토큰을 저장하세요', 'warn'); return; }
+    // 입력칸의 토큰/Gist ID가 저장된 값과 다르면 자동 반영
+    syncAutoApplyInputs();
+    if(!syncSettings.gistToken){ syncToast('먼저 토큰을 입력하고 설정 저장하세요', 'warn'); return; }
     
     var backup = buildBackupData();
     var content = JSON.stringify(backup, null, 2);
@@ -12435,15 +12944,32 @@ function forceIsolationReset(){
         },
         body: JSON.stringify(body)
       }).then(function(r){
-        if(!r.ok) throw new Error('HTTP ' + r.status + (r.status===404?' (Gist를 못 찾음)':''));
+        console.log('[Sync] Push response status:', r.status);
+        if(!r.ok){
+          return r.text().then(function(text){
+            console.error('[Sync] Push error body:', text);
+            throw new Error('HTTP ' + r.status + (r.status===404?' (Gist를 못 찾음)':'') + ': ' + (text||'').slice(0,200));
+          });
+        }
         return r.json();
       }).then(function(gist){
+        console.log('[Sync] Push success - updated_at:', gist.updated_at);
         syncSettings.lastPushAt = Date.now();
         saveSyncSettings();
-        syncToast('✅ 푸시 성공 (' + formatSize(content.length) + ')', 'ok');
+        var allKeys = getAllSyncKeys();
+        syncToast('✅ 푸시 성공 (' + allKeys.length + '개 키, ' + formatSize(content.length) + ')', 'ok');
         refreshGistStatus();
       }).catch(function(err){
-        syncToast('❌ 푸시 실패: ' + err.message, 'err');
+        var msg = err.message || '';
+        if(msg.indexOf('403') !== -1){
+          showGistPermissionError('업데이트');
+        } else if(msg.indexOf('404') !== -1){
+          syncToast('❌ Gist를 찾을 수 없습니다 (ID 확인 또는 빈 ID로 새로 생성)', 'err');
+        } else if(msg.indexOf('401') !== -1){
+          syncToast('❌ 토큰이 유효하지 않습니다. 다시 발급해주세요.', 'err');
+        } else {
+          syncToast('❌ 푸시 실패: ' + msg, 'err');
+        }
       });
     } else {
       // 새 Gist 생성
@@ -12473,27 +12999,51 @@ function forceIsolationReset(){
         syncToast('✅ 새 Gist 생성됨! ID: ' + gist.id.slice(0,8) + '... 다른 컴퓨터에서 같은 ID 입력하면 동기화됩니다', 'ok');
         refreshGistStatus();
       }).catch(function(err){
-        syncToast('❌ Gist 생성 실패: ' + err.message, 'err');
+        var msg = err.message || '';
+        if(msg.indexOf('403') !== -1){
+          showGistPermissionError('생성');
+        } else if(msg.indexOf('401') !== -1){
+          syncToast('❌ 토큰이 유효하지 않습니다. 다시 발급해주세요.', 'err');
+        } else {
+          syncToast('❌ Gist 생성 실패: ' + msg, 'err');
+        }
       });
     }
   };
   
   window.gistPull = function(){
-    if(!syncSettings.gistToken){ syncToast('먼저 토큰을 저장하세요', 'warn'); return; }
-    if(!syncSettings.gistId){ syncToast('먼저 Gist ID를 입력하거나 푸시로 새 Gist를 생성하세요', 'warn'); return; }
+    // 입력칸의 값을 자동으로 settings에 반영 (사용자가 설정 저장 안 눌렀어도)
+    syncAutoApplyInputs();
+    if(!syncSettings.gistToken){ syncToast('먼저 토큰을 입력하세요', 'warn'); return; }
+    if(!syncSettings.gistId){ 
+      syncToast('💡 Gist ID 입력칸에 값을 넣고 [설정 저장]을 먼저 누르세요', 'warn'); 
+      return; 
+    }
     
     syncToast('⏳ Gist에서 풀 중...', 'info');
+    console.log('[Sync] Pull start - Gist ID:', syncSettings.gistId);
     
+    // CORS-safe: GitHub API는 Cache-Control 등 사용자 정의 헤더에 민감하므로
+    // 표준 헤더(Authorization, Accept) 만 사용. cache:'no-store' 만으로 충분
     fetch('https://api.github.com/gists/' + syncSettings.gistId, {
+      method: 'GET',
       headers: {
         'Authorization': 'token ' + syncSettings.gistToken,
         'Accept': 'application/vnd.github+json'
       },
-      cache: 'no-cache'
+      cache: 'no-store'
     }).then(function(r){
-      if(!r.ok) throw new Error('HTTP ' + r.status);
+      console.log('[Sync] Pull response status:', r.status);
+      if(!r.ok){
+        // 응답 body 도 읽어서 자세한 에러 메시지
+        return r.text().then(function(text){
+          console.error('[Sync] Pull error body:', text);
+          throw new Error('HTTP ' + r.status + ': ' + (text||'').slice(0,200));
+        });
+      }
       return r.json();
     }).then(function(gist){
+      console.log('[Sync] Pull success - gist:', {id: gist.id, files: Object.keys(gist.files||{}), updated_at: gist.updated_at});
       var file = gist.files['brandoskit-data.json'];
       if(!file){
         // 첫번째 파일 사용
@@ -12506,9 +13056,13 @@ function forceIsolationReset(){
       try { backup = JSON.parse(file.content); }
       catch(e){ throw new Error('JSON 파싱 실패: ' + e.message); }
       
-      // 확인 다이얼로그
-      var meta = backup.exportedAt ? '내보낸 시각: ' + backup.exportedAt + '\n' : '';
-      if(!confirm('⚠ Gist의 데이터로 현재 데이터를 덮어쓰시겠습니까?\n\n' + meta + '\n새로고침 후 적용됩니다.')) return;
+      // 확인 다이얼로그 + Gist 메타 표시
+      var meta = '';
+      if(backup.exportedAt) meta += '📥 백업 시각: ' + new Date(backup.exportedAt).toLocaleString('ko-KR') + '\n';
+      if(gist.updated_at) meta += '📡 Gist 갱신: ' + new Date(gist.updated_at).toLocaleString('ko-KR') + '\n';
+      if(backup.keyCount) meta += '📊 키 개수: ' + backup.keyCount + '개\n';
+      meta += '\n';
+      if(!confirm('⚠ Gist의 데이터로 현재 데이터를 덮어쓰시겠습니까?\n\n' + meta + '새로고침 후 적용됩니다.\n\n💡 백업 시각이 예상보다 옛날이면 다른 컴퓨터에서 푸시가 안 된 것일 수 있습니다.')) return;
       
       var result = applyBackup(backup);
       syncSettings.lastPullAt = Date.now();
@@ -12516,7 +13070,16 @@ function forceIsolationReset(){
       syncToast('✅ 풀 성공! ' + result.applied + '개 키 적용. 새로고침합니다...', 'ok');
       setTimeout(function(){ location.reload(); }, 1500);
     }).catch(function(err){
-      syncToast('❌ 풀 실패: ' + err.message, 'err');
+      var msg = err.message || '';
+      if(msg.indexOf('403') !== -1){
+        showGistPermissionError('읽기');
+      } else if(msg.indexOf('404') !== -1){
+        syncToast('❌ Gist ID를 찾을 수 없습니다. ID를 다시 확인해주세요.', 'err');
+      } else if(msg.indexOf('401') !== -1){
+        syncToast('❌ 토큰이 유효하지 않습니다. 다시 발급해주세요.', 'err');
+      } else {
+        syncToast('❌ 풀 실패: ' + msg, 'err');
+      }
     });
   };
   
@@ -12678,14 +13241,16 @@ function forceIsolationReset(){
     var lines = [];
     lines.push('=== 동기화 대상 키 ===');
     var total = 0;
-    SYNC_KEYS.forEach(function(k){
+    var allKeys = getAllSyncKeys();
+    allKeys.forEach(function(k){
       var v = localStorage.getItem(k);
       var sz = v ? v.length : 0;
       total += sz;
-      lines.push('  ' + k + ': ' + (v ? formatSize(sz) : '(없음)'));
+      var marker = (SYNC_KEYS.indexOf(k) !== -1) ? '  ' : '  └ ';  // 동적 키는 들여쓰기
+      lines.push(marker + k + ': ' + (v ? formatSize(sz) : '(없음)'));
     });
     lines.push('  ─────────────');
-    lines.push('  총 크기: ' + formatSize(total));
+    lines.push('  총 크기: ' + formatSize(total) + ' · ' + allKeys.length + '개 키');
     lines.push('');
     lines.push('=== 동기화 제외 키 (기기별) ===');
     ['_hub_pwd_auth', 'phase2_migrated_v1', SYNC_SETTINGS_KEY, BACKUP_BEFORE_RESTORE_KEY].forEach(function(k){
@@ -12718,6 +13283,102 @@ function forceIsolationReset(){
       }
     }, 500);
   });
+  
+  // 입력칸의 값을 자동으로 settings에 적용 (저장 버튼 안 눌러도 동작)
+  function syncAutoApplyInputs(){
+    var tokenEl = document.getElementById('gist-token-input');
+    var idEl = document.getElementById('gist-id-input');
+    var changed = false;
+    if(tokenEl && tokenEl.value && tokenEl.value.trim() !== syncSettings.gistToken){
+      syncSettings.gistToken = tokenEl.value.trim();
+      changed = true;
+    }
+    if(idEl && idEl.value !== undefined){
+      var newId = idEl.value.trim();
+      if(newId !== (syncSettings.gistId||'')){
+        syncSettings.gistId = newId;
+        changed = true;
+      }
+    }
+    if(changed){
+      saveSyncSettings();
+      refreshGistStatus();
+      console.log('[Sync] 입력칸 값을 자동 적용');
+    }
+  }
+  
+  // 403 오류 시 친절한 가이드 모달 띄우기
+  window.showGistPermissionError = function(action){
+    var existing = document.getElementById('gist-403-modal');
+    if(existing) existing.remove();
+    
+    var tokenPrefix = (syncSettings.gistToken || '').slice(0, 11);
+    var isFineGrained = tokenPrefix.indexOf('github_pat_') === 0;
+    var isClassic = tokenPrefix.indexOf('ghp_') === 0;
+    
+    var modal = document.createElement('div');
+    modal.id = 'gist-403-modal';
+    modal.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9200;align-items:center;justify-content:center';
+    modal.onclick = function(e){ if(e.target === modal) modal.remove(); };
+    
+    var html = '<div style="background:#fff;border-radius:12px;padding:24px;max-width:620px;width:94%;max-height:92vh;overflow-y:auto" onclick="event.stopPropagation()">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #E8E6E0">';
+    html += '<div style="font-size:16px;font-weight:700;color:#C0392B">⚠️ Gist ' + action + ' 권한 오류 (HTTP 403)</div>';
+    html += '<button onclick="document.getElementById(\'gist-403-modal\').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#7A7870">×</button>';
+    html += '</div>';
+    
+    html += '<div style="background:#fff8ec;border:1px solid #e8d4a8;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;line-height:1.8;color:#1A1916">';
+    html += '<b style="color:#8B5E00">🔍 진단:</b> 토큰은 유효하지만 <b>Gist 접근 권한이 없습니다</b>.<br>';
+    if(isFineGrained){
+      html += '현재 토큰 타입: <code style="background:#fff;padding:1px 5px;border-radius:3px">github_pat_...</code> (Fine-grained Token)<br>';
+      html += '<span style="color:#C0392B">⚠ Fine-grained Token은 Gist 권한 설정이 까다롭습니다.</span>';
+    } else if(isClassic){
+      html += '현재 토큰 타입: <code style="background:#fff;padding:1px 5px;border-radius:3px">ghp_...</code> (Classic Token)<br>';
+      html += '<span style="color:#C0392B">⚠ Classic Token에 <b>gist</b> scope가 체크되지 않은 것 같습니다.</span>';
+    } else {
+      html += '현재 토큰 타입: <code style="background:#fff;padding:1px 5px;border-radius:3px">' + tokenPrefix + '...</code><br>';
+      html += '<span style="color:#C0392B">⚠ 알 수 없는 토큰 형식입니다.</span>';
+    }
+    html += '</div>';
+    
+    // 해결책 A: Classic Token (강력 추천)
+    html += '<div style="background:#F0FBF4;border:2px solid #A5D6A7;border-radius:10px;padding:14px;margin-bottom:12px">';
+    html += '<div style="font-size:13px;font-weight:700;color:#1A6B4A;margin-bottom:10px">✅ 해결책 A — Classic Token 재발급 <span style="font-size:10px;background:#1A6B4A;color:#fff;padding:2px 6px;border-radius:3px;margin-left:4px">강력 추천</span></div>';
+    html += '<ol style="font-size:12px;line-height:1.9;color:#1A1916;padding-left:22px;margin:0">';
+    html += '<li><a href="https://github.com/settings/tokens" target="_blank" style="color:#2563EB;font-weight:600">github.com/settings/tokens</a> 접속 (Classic 탭)</li>';
+    html += '<li>우상단 <b>Generate new token (classic)</b> 클릭</li>';
+    html += '<li>Note: <code style="background:#fff;padding:1px 4px;border-radius:3px">BrandOSKIT Sync</code></li>';
+    html += '<li>Expiration: <code style="background:#fff;padding:1px 4px;border-radius:3px">90 days</code></li>';
+    html += '<li><b style="color:#C0392B">Select scopes에서 <code style="background:#fff;padding:1px 4px;border-radius:3px">gist</code> 딱 하나만 체크</b> ★</li>';
+    html += '<li>맨 아래 <b>Generate token</b> 클릭</li>';
+    html += '<li><code style="background:#fff;padding:1px 4px;border-radius:3px">ghp_...</code>로 시작하는 토큰을 <span style="color:#C0392B;font-weight:700">즉시 복사</span> (다시 못 봄)</li>';
+    html += '<li>아래 <b>설정 삭제</b> → 새 토큰 붙여넣기 → <b>설정 저장</b> → <b>Gist로 푸시</b> 재시도</li>';
+    html += '</ol></div>';
+    
+    // 해결책 B: Fine-grained 권한 수정
+    html += '<div style="background:#F0F4F8;border:1px solid #b5c9e8;border-radius:10px;padding:14px;margin-bottom:14px">';
+    html += '<div style="font-size:13px;font-weight:700;color:#2563EB;margin-bottom:10px">🔧 해결책 B — Fine-grained Token 권한 수정 (기존 토큰 살리기)</div>';
+    html += '<ol style="font-size:12px;line-height:1.9;color:#1A1916;padding-left:22px;margin:0">';
+    html += '<li><a href="https://github.com/settings/tokens?type=beta" target="_blank" style="color:#2563EB;font-weight:600">github.com/settings/tokens?type=beta</a> 접속</li>';
+    html += '<li>발급해둔 <b>BrandOSKIT Sync</b> 토큰 클릭 (편집 페이지로 이동)</li>';
+    html += '<li>스크롤 내려서 <b>Account permissions</b> 섹션 찾기 (Repository permissions 아래)</li>';
+    html += '<li><b>Gists</b> 항목 찾기 → 우측 드롭다운을 <code style="background:#fff;padding:1px 4px;border-radius:3px">Read and write</code>로 변경</li>';
+    html += '<li>페이지 맨 아래 <b>Update</b> 버튼 클릭</li>';
+    html += '<li>BrandOSKIT으로 돌아와서 <b>Gist로 푸시</b> 재시도</li>';
+    html += '</ol>';
+    html += '<div style="margin-top:8px;padding:8px 10px;background:#fff;border-radius:5px;font-size:11px;color:#7A7870">⚠ Fine-grained Token은 <b>Account permissions</b> 안의 Gists 권한이 따로 있습니다. Repository permissions가 아닙니다.</div>';
+    html += '</div>';
+    
+    // 액션 버튼
+    html += '<div style="display:flex;gap:8px;justify-content:flex-end">';
+    html += '<button onclick="document.getElementById(\'gist-403-modal\').remove()" style="padding:9px 16px;background:#fff;color:#1A1916;border:1px solid #E8E6E0;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">닫기</button>';
+    html += '<button onclick="document.getElementById(\'gist-403-modal\').remove();clearGistSettings();" style="padding:9px 16px;background:#C0392B;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🗑 현재 토큰 삭제하고 다시 시작</button>';
+    html += '</div>';
+    
+    html += '</div>';
+    modal.innerHTML = html;
+    document.body.appendChild(modal);
+  };
   
   console.log('[Sync] BrandOSKIT Sync System loaded');
 })();
@@ -12910,6 +13571,53 @@ body.edit-mode-on #edit-mode-indicator{
     init();
   }
   
+  // ━━ 편집 모드 확장: 탭 이름 input + 표 항목명도 잠금 ━━
+  // 표 항목명 input들 (cost-tbl, expense-tbl 등의 첫 컬럼)
+  // 평소엔 readonly, 편집 모드일 때만 수정 가능
+  var EDITABLE_INPUT_SELECTORS = [
+    'input.nav-brand-edit',          // 헤더 브랜드명
+    'input.sec-title-edit',           // 섹션 제목 (있다면)
+    'input.tab-title-edit',           // 탭 제목 (있다면)
+    '.cost-table tbody input[type="text"]',   // 비용 테이블 텍스트 input
+    '.cost-table tbody input.item-name',      // 항목명 input
+    'input.editable-name',             // 명시적 편집 가능 클래스
+  ];
+  
+  function applyInputLockMode(){
+    EDITABLE_INPUT_SELECTORS.forEach(function(selector){
+      try {
+        document.querySelectorAll(selector).forEach(function(inp){
+          if(!inp.hasAttribute('data-em-input-locked')){
+            inp.setAttribute('data-em-input-locked', '1');
+            // 원본 readonly 상태 기억
+            inp.setAttribute('data-em-orig-readonly', inp.readOnly ? '1' : '0');
+          }
+          // 편집 모드 OFF면 readonly
+          if(editMode){
+            // 편집 모드 ON → 원래 readonly가 아니었던 것은 풀어줌
+            if(inp.getAttribute('data-em-orig-readonly') === '0'){
+              inp.readOnly = false;
+              inp.style.cursor = '';
+            }
+          } else {
+            // 편집 모드 OFF → readonly
+            if(inp.getAttribute('data-em-orig-readonly') === '0'){
+              inp.readOnly = true;
+              inp.style.cursor = 'default';
+            }
+          }
+        });
+      } catch(e){}
+    });
+  }
+  
+  // applyEditMode 가 호출될 때 input 잠금도 같이 처리
+  var _origApplyEditMode = applyEditMode;
+  applyEditMode = function(){
+    _origApplyEditMode();
+    applyInputLockMode();
+  };
+  
   // 페이지 추가 로딩 후 한 번 더 (다른 스크립트 후에 동적으로 추가될 수 있음)
   window.addEventListener('load', function(){
     setTimeout(applyEditMode, 100);
@@ -13054,5 +13762,76 @@ body.edit-mode-on #edit-mode-indicator{
 }
 </style>
 
+
+
+<!-- ━━━ 빠른 액션 단축키 + 모달 외부 버튼 핸들러 ━━━ -->
+<script id="quick-actions-script">
+(function(){
+  // 동기화 모달을 열지 않고 바로 Gist 푸시
+  window.quickGistPush = function(){
+    // 토큰이 설정되어 있는지 확인 (sync-system-script의 syncSettings 사용)
+    var raw = null;
+    try { raw = localStorage.getItem('bos_sync_settings_v1'); } catch(e){}
+    var settings = null;
+    try { if(raw) settings = JSON.parse(raw); } catch(e){}
+    
+    if(!settings || !settings.gistToken){
+      // 설정 안 되어 있으면 동기화 모달 열기
+      if(typeof openSyncModal === 'function'){
+        openSyncModal();
+        if(typeof switchSyncTab === 'function') switchSyncTab('phase2');
+        setTimeout(function(){
+          if(typeof syncToast === 'function') syncToast('💡 먼저 Token을 설정하세요', 'warn');
+        }, 200);
+      } else {
+        alert('동기화 시스템을 먼저 설정해주세요.');
+      }
+      return;
+    }
+    
+    // 토큰 있음 → 바로 푸시 실행
+    if(typeof gistPush === 'function'){
+      gistPush();
+    } else {
+      alert('Gist 푸시 함수를 찾을 수 없습니다.');
+    }
+  };
+  
+  // 단축키 시스템
+  document.addEventListener('keydown', function(e){
+    // input/textarea/contenteditable 안에서는 단축키 무시 (텍스트 입력 우선)
+    var tag = (e.target.tagName||'').toLowerCase();
+    var isEditable = (tag === 'input' || tag === 'textarea' || 
+                      e.target.isContentEditable);
+    if(isEditable) return;
+    
+    var ctrl = e.ctrlKey || e.metaKey;
+    var shift = e.shiftKey;
+    
+    // Ctrl+Shift+S = JSON 백업 다운로드
+    if(ctrl && shift && (e.key === 'S' || e.key === 's')){
+      e.preventDefault();
+      if(typeof exportJSON === 'function'){
+        exportJSON();
+      }
+      return;
+    }
+    
+    // Ctrl+Shift+G = Gist 푸시
+    if(ctrl && shift && (e.key === 'G' || e.key === 'g')){
+      e.preventDefault();
+      quickGistPush();
+      return;
+    }
+    
+    // ? 키 = 단축키 안내 (input 밖에서)
+    if(e.key === '?' && !ctrl && !shift && !e.altKey){
+      // shift를 누르지 않은 ? 만 — 한국어 키보드 환경 호환
+    }
+  });
+  
+  console.log('[Shortcuts] Ctrl+Shift+S = JSON 백업 / Ctrl+Shift+G = Gist 푸시 / Ctrl+E = 편집 모드');
+})();
+</script>
 </body>
 </html>
