@@ -343,6 +343,58 @@ select.sm{padding:5px 7px;border:1px solid var(--bd);border-radius:5px;font-fami
    RESPONSIVE / MOBILE - 768px 이하
    ============================================================ */
 
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* 🖥 데스크톱 NEW: 헤더 세로 스택 (로고줄 → 액션줄(undo) → 탭줄) */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (min-width: 769px){
+  /* nav를 세로 스택으로 - 위:로고줄, 아래:탭줄 (그 사이에 undo-bar는 nav 밖에 있음) */
+  .nav{flex-direction:column !important}
+  
+  /* nav-brand: 가로 한 줄 (로고+브랜드명 옆에 ⚙설정 / ✏편집모드) */
+  .nav-brand{
+    flex-direction:row !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    border-right:none !important;
+    border-bottom:1px solid rgba(255,255,255,.12) !important;
+    padding:6px 14px !important;
+    gap:14px !important;
+    min-width:0 !important;
+    width:100% !important;
+    flex-shrink:1 !important;
+  }
+  
+  /* nav-brand 첫번째 자식 div(로고+브랜드명+햄버거) - 가변 폭 */
+  .nav-brand > div:first-child{
+    width:auto !important;
+    flex:0 1 auto !important;
+    justify-content:flex-start !important;
+  }
+  
+  /* hub-top-actions(설정+편집) 로고 옆에 - 위쪽 마진 제거 */
+  .nav-brand .hub-top-actions{
+    margin-top:0 !important;
+  }
+  
+  /* nav-tabs-wrap도 전체 가로 폭 (탭이 한 줄에 잘 보이게) */
+  .nav-tabs-wrap{
+    width:100% !important;
+    flex:1 1 auto !important;
+  }
+  
+  /* undo-bar 액션 영역 (저장됨/제품/진단) 오른쪽 정렬 */
+  .undo-bar-actions{
+    margin-left:auto !important;
+  }
+  
+  /* 제품 스위처: 안에 흰 텍스트가 잘 보이도록 */
+  .undo-bar-actions .product-switcher-bar{
+    background:rgba(255,255,255,.08) !important;
+    border-color:rgba(255,255,255,.18) !important;
+  }
+}
+
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 /* 📱 좁은 PC 화면 반응형 (모바일과 별도) */
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -654,10 +706,6 @@ body.edit-mode-on .tab-btn .tab-name-edit{
     <div class="hub-top-actions" id="hub-top-actions" style="display:flex;align-items:center;gap:4px;margin-top:4px;flex-wrap:wrap">
       <button class="hub-action-btn" data-icon="⚙" data-label="설정" onclick="toggleBrandSettings()" title="브랜드 설정" style="background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.8);cursor:pointer;font-size:11px;padding:2px 7px;border-radius:4px;line-height:1.4"><span class="hub-action-icon">⚙</span><span class="hub-action-text"> 설정</span></button>
       <button id="edit-mode-toggle-btn" class="hub-action-btn" onclick="toggleEditMode()" title="편집 모드 켜기/끄기 (Ctrl+E)" style="background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.8);cursor:pointer;font-size:11px;padding:2px 7px;border-radius:4px;line-height:1.4"><span class="hub-action-icon">✏</span><span class="hub-action-text"> 편집 모드</span></button>
-      <span class="save-indicator" id="save-indicator" title="저장 상태" style="font-size:10px;color:rgba(255,255,255,.5);white-space:nowrap">준비됨</span>
-      <!-- Phase 3: 상단 제품 스위처 바 (상시 표시) -->
-      <div id="product-switcher-bar" class="product-switcher-bar" style="display:none;align-items:center;gap:6px;padding:3px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:5px;flex-wrap:wrap;margin-left:8px;max-width:100%;overflow:hidden"></div>
-      <button class="hub-action-btn" onclick="showDiagnostic()" title="제품 분리 진단" style="background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:11px;padding:2px 7px;border-radius:4px;line-height:1.4;margin-left:4px"><span class="hub-action-icon">🔍</span><span class="hub-action-text"> 진단</span></button>
     </div>
   </div>
   <div class="nav-tabs-wrap">
@@ -724,10 +772,17 @@ body.edit-mode-on .tab-btn .tab-name-edit{
 </div>
 
 <!-- UNDO BAR -->
-<div class="undo-bar">
+<div class="undo-bar" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
   <button class="undo-btn" id="undo-btn" onclick="undo()" disabled title="실행취소 (Ctrl+Z)">↩ 실행취소</button>
   <button class="undo-btn" id="redo-btn" onclick="redo()" disabled title="다시실행 (Ctrl+Y)">↪ 다시실행</button>
   <span class="undo-info" id="undo-info"></span>
+  <!-- ━━ 이동: 저장됨 + 제품 스위처 + 진단 (로고 라인 → 액션 라인) ━━ -->
+  <div class="undo-bar-actions" style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap">
+    <span class="save-indicator" id="save-indicator" title="저장 상태" style="font-size:10px;color:rgba(255,255,255,.5);white-space:nowrap">준비됨</span>
+    <!-- Phase 3: 상단 제품 스위처 바 (상시 표시) -->
+      <div id="product-switcher-bar" class="product-switcher-bar" style="display:none;align-items:center;gap:6px;padding:3px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:5px;flex-wrap:wrap;max-width:100%;overflow:hidden"></div>
+    <button class="hub-action-btn" onclick="showDiagnostic()" title="제품 분리 진단" style="background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:11px;padding:2px 7px;border-radius:4px;line-height:1.4;"><span class="hub-action-icon">🔍</span><span class="hub-action-text"> 진단</span></button>
+  </div>
 </div>
 
 <!-- EXPORT BAR -->
