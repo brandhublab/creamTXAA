@@ -388,10 +388,76 @@ select.sm{padding:5px 7px;border:1px solid var(--bd);border-radius:5px;font-fami
     margin-left:auto !important;
   }
   
-  /* 제품 스위처: 안에 흰 텍스트가 잘 보이도록 */
+  /* 제품 스위처: 안에 흰 텍스트가 잘 보이도록 + 고정 폭으로 갑작스런 확장 방지 */
   .undo-bar-actions .product-switcher-bar{
     background:rgba(255,255,255,.08) !important;
     border-color:rgba(255,255,255,.18) !important;
+    max-width:220px !important;
+    overflow:hidden !important;
+    flex-shrink:0 !important;
+  }
+  .undo-bar-actions .product-switcher-bar select{
+    max-width:100%;
+    font-size:11px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  /* 📑 탭 영역: CSS Grid - 한 줄에 정확히 8개씩 */
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  .nav-row{
+    display:grid !important;
+    grid-template-columns:repeat(8, minmax(0, 1fr)) !important;
+    gap:2px !important;
+    padding:4px 8px !important;
+    align-items:stretch;
+  }
+  
+  /* 탭 버튼: grid cell 안에서 폭에 맞춰 ellipsis */
+  .nav-row .tab-btn{
+    min-width:0 !important;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    text-align:center;
+    padding:6px 4px !important;
+  }
+  
+  /* 탭 라벨도 ellipsis */
+  .nav-row .tab-btn .tab-name-edit{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    max-width:100% !important;
+  }
+  
+  /* tab-secondary(설득심리~동기화) - 3번째 줄로 강제 */
+  .nav-row .tab-secondary{
+    grid-row:3 !important;
+  }
+  /* 첫 번째 secondary는 1번째 칼럼부터 시작 */
+  .nav-row .tab-secondary:nth-of-type(1){
+    /* 자동 배치되도록 (이전 일반 탭이 어디까지 차지했는지에 따라 다름) */
+  }
+  /* 안전망: 첫 번째 secondary는 col 1 부터 시작하도록 명시 */
+  .nav-row > .tab-secondary ~ .tab-secondary{
+    /* 후속 secondary들은 자동으로 옆에 붙음 */
+  }
+  
+  /* 호버 시 풀 텍스트 표시 (Grid 안에서도 동작) */
+  .nav-row .tab-btn:hover{
+    overflow:visible;
+    z-index:5;
+    position:relative;
+  }
+  .nav-row .tab-btn:hover .tab-name-edit{
+    overflow:visible;
+    background:rgba(255,255,255,.08);
+    padding:0 6px;
+    border-radius:3px;
+    position:relative;
   }
 }
 
@@ -414,7 +480,7 @@ select.sm{padding:5px 7px;border:1px solid var(--bd);border-radius:5px;font-fami
  /* Brand OS KIT 배지 더 작게 */
  .brand-os-badge{font-size:8px !important;padding:1px 4px !important}
  /* 탭 라벨 ellipsis - 호버 시 title 자동 표시 */
- .tab-btn .tab-name-edit{max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle}
+ .tab-btn .tab-name-edit{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
  .tab-btn{flex-shrink:0}
 }
 
@@ -422,14 +488,14 @@ select.sm{padding:5px 7px;border:1px solid var(--bd);border-radius:5px;font-fami
 @media (max-width: 1100px) and (min-width: 769px){
  .save-indicator{max-width:75px !important;font-size:9px !important}
  .product-switcher-bar{max-width:190px !important}
- .tab-btn .tab-name-edit{max-width:70px}
+ .tab-btn .tab-name-edit{max-width:100%;font-size:11px}
 }
 
 /* 950px 이하: 제품 스위처도 아이콘만 토글 / 탭 라벨 더 짧게 */
 @media (max-width: 950px) and (min-width: 769px){
  .product-switcher-bar{max-width:160px !important}
  .save-indicator{display:none !important}
- .tab-btn .tab-name-edit{max-width:55px;font-size:10px}
+ .tab-btn .tab-name-edit{max-width:100%;font-size:10px}
 }
 
 /* 편집 모드 ON 일 때는 탭 텍스트 잘림 풀기 (이름 수정해야 함) */
@@ -727,12 +793,12 @@ body.edit-mode-on .tab-btn .tab-name-edit{
       <button class="tab-btn" onclick="showTab('t15',this)" title="⑭ 광고기획"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">⑭ 광고기획</span><button class="tab-del" onclick="deleteTabByBtn(this,'t15',event)">✕</button></button>
 <button class="tab-btn" onclick="showTab('t11',this)" title="⑮ 가중목"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">⑮ 가중목</span><button class="tab-del" onclick="deleteTabByBtn(this,'t11',event)">✕</button></button>
       <button class="tab-btn" onclick="showTab('t16',this)" title="⑯ 조직구성표"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">⑯ 조직구성표</span><button class="tab-del" onclick="deleteTabByBtn(this,'t16',event)">✕</button></button>
-      <button class="tab-btn" onclick="showTab('t19',this)" title="🧠 설득심리·카피"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">🧠 설득심리·카피</span><button class="tab-del" onclick="deleteTabByBtn(this,'t19',event)">✕</button></button>
-      <button class="tab-btn" onclick="showTab('t18',this)" title="🔬 임상체크"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">🔬 임상체크</span><button class="tab-del" onclick="deleteTabByBtn(this,'t18',event)">✕</button></button>
-      <button class="tab-btn" title="📅 캘린더" onclick="showTab('t20',this);initCalendarTab()"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">📅 캘린더</span><button class="tab-del" onclick="deleteTabByBtn(this,'t20',event)">✕</button></button>
-      <button class="tab-btn" title="📦 정보저장소" onclick="showTab('t21',this);initInfoStorage()"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">📦 정보저장소</span><button class="tab-del" onclick="deleteTabByBtn(this,'t21',event)">✕</button></button>
-      <button class="tab-btn" onclick="document.getElementById('save-hist-wrap').style.display=document.getElementById('save-hist-wrap').style.display==='none'?'block':'none';updateSaveSizeLabel()" style="color:rgba(255,255,255,.6)"><span>💾 저장관리</span></button>
-      <button class="tab-btn" onclick="openSyncModal()" style="color:rgba(255,255,255,.7)" title="여러 기기에서 같은 데이터 사용"><span>🔄 동기화</span></button>
+      <button class="tab-btn tab-secondary" onclick="showTab('t19',this)" title="🧠 설득심리·카피"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">🧠 설득심리·카피</span><button class="tab-del" onclick="deleteTabByBtn(this,'t19',event)">✕</button></button>
+      <button class="tab-btn tab-secondary" onclick="showTab('t18',this)" title="🔬 임상체크"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">🔬 임상체크</span><button class="tab-del" onclick="deleteTabByBtn(this,'t18',event)">✕</button></button>
+      <button class="tab-btn tab-secondary" title="📅 캘린더" onclick="showTab('t20',this);initCalendarTab()"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">📅 캘린더</span><button class="tab-del" onclick="deleteTabByBtn(this,'t20',event)">✕</button></button>
+      <button class="tab-btn tab-secondary" title="📦 정보저장소" onclick="showTab('t21',this);initInfoStorage()"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">📦 정보저장소</span><button class="tab-del" onclick="deleteTabByBtn(this,'t21',event)">✕</button></button>
+      <button class="tab-btn tab-secondary" onclick="document.getElementById('save-hist-wrap').style.display=document.getElementById('save-hist-wrap').style.display==='none'?'block':'none';updateSaveSizeLabel()" style="color:rgba(255,255,255,.6)"><span>💾 저장관리</span></button>
+      <button class="tab-btn tab-secondary" onclick="openSyncModal()" style="color:rgba(255,255,255,.7)" title="여러 기기에서 같은 데이터 사용"><span>🔄 동기화</span></button>
     </div>
     <button class="tab-btn" onclick="showTab('t6',this)" id="t6-nav-btn" style="display:none" title="⑥ 페르소나"><span>⑥ 페르소나</span></button>
   </div>
