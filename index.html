@@ -1981,14 +1981,65 @@ body.edit-mode-on .tab-btn .tab-name-edit{
     </div>
   </div>
 </div><div id="t10" class="tab-pane">
-  <div class="hbar">
-    <div style="font-size:12px;font-weight:500">제품 개발 의뢰서</div>
-    <div style="display:flex;gap:6px">
-      <button class="btn" onclick="addDevForm()">+ 의뢰서 추가</button>
-      <button class="btn pri" onclick="saveDevForms()">저장</button>
+  <!-- 서브탭 -->
+  <div class="hbar" style="padding:8px 18px 0">
+    <div style="display:flex;gap:4px;flex-wrap:wrap">
+      <button class="stab active" id="t10-sub-forms-btn" onclick="showDevSubTab('forms')">📋 개발 의뢰서</button>
+      <button class="stab" id="t10-sub-ingred-btn" onclick="showDevSubTab('ingred')">🧪 성분 컨셉 (HTML)</button>
     </div>
   </div>
-  <div id="dev-forms-wrap" style="padding:12px 18px"></div>
+  
+  <!-- 서브탭 1: 기존 개발의뢰서 -->
+  <div id="t10-sub-forms">
+    <div class="hbar">
+      <div style="font-size:12px;font-weight:500">제품 개발 의뢰서</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn" onclick="addDevForm()">+ 의뢰서 추가</button>
+        <button class="btn pri" onclick="saveDevForms()">저장</button>
+      </div>
+    </div>
+    <div id="dev-forms-wrap" style="padding:12px 18px"></div>
+  </div>
+  
+  <!-- 서브탭 2: 성분 컨셉 HTML iframe 로더 -->
+  <div id="t10-sub-ingred" style="display:none;padding:14px 18px">
+    
+    <!-- 안내 + 컨트롤 -->
+    <div style="background:#F0F4F8;border:1px solid #B5C9E8;border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:11px;color:#1A3FAA;line-height:1.7">
+      💡 <b>외부 HTML 파일을 탭 안에서 직접 보기</b> (같은 GitHub 저장소에 업로드한 파일)<br>
+      <span style="color:var(--mu)">예: 같은 폴더에 <code style="background:#fff;padding:1px 4px;border-radius:3px">ingredi.html</code>을 두면 <code style="background:#fff;padding:1px 4px;border-radius:3px">./ingredi.html</code>로 접근.<br>제품별로 여러 파일 운영 시 폴더 정리 권장: <code style="background:#fff;padding:1px 4px;border-radius:3px">./ingredient/제품명.html</code></span>
+    </div>
+    
+    <!-- 등록된 파일 리스트 -->
+    <div class="section" style="margin-bottom:14px">
+      <div class="sec-head">
+        <h3>📚 등록된 HTML 파일</h3>
+        <button class="btn" onclick="addIngredFile()" style="font-size:11px;padding:4px 10px">+ 파일 등록</button>
+      </div>
+      <div class="sec-body" style="padding:10px 14px">
+        <div id="ingred-files-list" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+    </div>
+    
+    <!-- iframe 뷰어 -->
+    <div class="section">
+      <div class="sec-head" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <h3 id="ingred-current-title" style="margin:0">🧪 성분 컨셉</h3>
+        <span id="ingred-current-url" style="font-family:var(--mn);font-size:10px;color:var(--mu);background:var(--bg);padding:2px 6px;border-radius:3px"></span>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn" onclick="reloadIngredIframe()" title="iframe 새로고침" style="font-size:11px;padding:4px 9px">🔄 새로고침</button>
+          <button class="btn" onclick="openIngredInNewTab()" title="새 탭에서 큰 화면으로 보기" style="font-size:11px;padding:4px 9px">↗ 새 탭에서 열기</button>
+          <button class="btn" onclick="toggleIngredFullscreen()" title="전체화면 모드" style="font-size:11px;padding:4px 9px">⛶ 전체화면</button>
+        </div>
+      </div>
+      <div class="sec-body" style="padding:0">
+        <iframe id="ingred-iframe" src="about:blank" 
+                style="width:100%;height:900px;border:none;display:block;background:#fff"
+                title="성분 컨셉 페이지"
+                onload="onIngredIframeLoad()"></iframe>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- TAB 12: 가중목/점수판 -->
@@ -13449,7 +13500,9 @@ function forceIsolationReset(){
     'bos_info_storage_v1',     // 정보저장소
     'bos_info_custom_categories_v1',  // 정보저장소 사용자 정의 분류
     'bos_edit_mode_v1',        // 편집 모드 상태
-    'tetrarix_injected_v1'     // TETRARIX 데이터 주입 플래그
+    'tetrarix_injected_v1',    // TETRARIX 데이터 주입 플래그
+    'bos_ingred_files_v1',     // 🧪 성분 컨셉 HTML 파일 목록
+    'bos_ingred_current_v1'    // 🧪 성분 컨셉 현재 선택 인덱스
   ];
   
   // ━━ 동적 키 prefix (제품별 데이터: epitect-v7__제품ID) ━━
@@ -14941,6 +14994,246 @@ window.toggleMobileHeaderActions = function(){
     btn.setAttribute('aria-label', isOpen ? '헤더 메뉴 접기' : '헤더 메뉴 펼치기');
   }
 };
+</script>
+
+<!-- ━━━ 🧪 성분 컨셉 HTML 로더 (t10 서브탭) ━━━ -->
+<script id="ingred-loader-script">
+(function(){
+  var LS_KEY = 'bos_ingred_files_v1';
+  var LS_CURRENT = 'bos_ingred_current_v1';
+  
+  // 등록된 파일 목록 로드
+  function loadIngredFiles(){
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if(raw) return JSON.parse(raw);
+    } catch(e){}
+    // 기본값 (사용자가 처음 들어왔을 때 예시)
+    return [
+      {name:'TX MELA REPAIR CREAM · 성분 컨셉', url:'./ingredi.html'}
+    ];
+  }
+  
+  function saveIngredFiles(files){
+    try { localStorage.setItem(LS_KEY, JSON.stringify(files)); } catch(e){}
+  }
+  
+  function loadCurrentIndex(){
+    try {
+      var v = localStorage.getItem(LS_CURRENT);
+      return v ? parseInt(v) || 0 : 0;
+    } catch(e){ return 0; }
+  }
+  
+  function saveCurrentIndex(idx){
+    try { localStorage.setItem(LS_CURRENT, String(idx)); } catch(e){}
+  }
+  
+  // 파일 목록 렌더
+  window.renderIngredFiles = function(){
+    var listEl = document.getElementById('ingred-files-list');
+    if(!listEl) return;
+    var files = loadIngredFiles();
+    var current = loadCurrentIndex();
+    
+    if(files.length === 0){
+      listEl.innerHTML = '<div style="padding:14px;text-align:center;color:var(--mu);font-size:12px">등록된 파일이 없습니다. <b>+ 파일 등록</b> 버튼을 눌러 추가하세요.</div>';
+      return;
+    }
+    
+    listEl.innerHTML = files.map(function(f, i){
+      var isActive = i === current;
+      var escName = (f.name||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+      var escUrl = (f.url||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+      return '<div style="display:flex;gap:6px;align-items:center;padding:8px 10px;border:1px solid ' + (isActive?'#1A6B4A':'var(--bd)') + ';border-radius:6px;background:' + (isActive?'#F0FBF4':'var(--sur)') + ';transition:.15s">'
+        + '<input value="' + escName + '" placeholder="제품명 / 라벨" onchange="updateIngredFile(' + i + ',\'name\',this.value)" style="flex:1;min-width:120px;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:12px;font-weight:' + (isActive?'600':'400') + ';background:var(--bg)">'
+        + '<input value="' + escUrl + '" placeholder="./ingredi.html 또는 ./ingredient/제품.html" onchange="updateIngredFile(' + i + ',\'url\',this.value)" style="flex:2;min-width:200px;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:11px;font-family:var(--mn);background:var(--bg)">'
+        + '<button onclick="selectIngredFile(' + i + ')" title="이 파일 로드" style="background:' + (isActive?'#1A6B4A':'var(--sur)') + ';color:' + (isActive?'#fff':'var(--tx)') + ';border:1px solid ' + (isActive?'#1A6B4A':'var(--bd)') + ';border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600;white-space:nowrap">' + (isActive?'✓ 사용 중':'▶ 로드') + '</button>'
+        + '<button onclick="deleteIngredFile(' + i + ')" title="삭제" style="background:none;border:1px solid var(--bd);border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;color:#C0392B">✕</button>'
+        + '</div>';
+    }).join('');
+  };
+  
+  window.addIngredFile = function(){
+    var files = loadIngredFiles();
+    files.push({name:'새 파일', url:'./'});
+    saveIngredFiles(files);
+    renderIngredFiles();
+  };
+  
+  window.updateIngredFile = function(idx, key, val){
+    var files = loadIngredFiles();
+    if(!files[idx]) return;
+    files[idx][key] = val;
+    saveIngredFiles(files);
+    // 현재 사용 중이면 iframe도 다시 로드
+    if(idx === loadCurrentIndex() && key === 'url') reloadCurrentIframe();
+    if(idx === loadCurrentIndex() && key === 'name') updateIframeTitle();
+  };
+  
+  window.deleteIngredFile = function(idx){
+    if(!confirm('이 파일 등록을 삭제하시겠습니까?\n(실제 파일은 안 지워집니다)')) return;
+    var files = loadIngredFiles();
+    files.splice(idx, 1);
+    saveIngredFiles(files);
+    var current = loadCurrentIndex();
+    if(current >= files.length) saveCurrentIndex(Math.max(0, files.length - 1));
+    renderIngredFiles();
+    reloadCurrentIframe();
+  };
+  
+  window.selectIngredFile = function(idx){
+    saveCurrentIndex(idx);
+    renderIngredFiles();
+    reloadCurrentIframe();
+  };
+  
+  function reloadCurrentIframe(){
+    var files = loadIngredFiles();
+    var current = loadCurrentIndex();
+    var file = files[current];
+    var iframe = document.getElementById('ingred-iframe');
+    if(!iframe) return;
+    if(!file || !file.url || file.url === './' || file.url.trim() === ''){
+      iframe.src = 'about:blank';
+      updateIframeTitle();
+      return;
+    }
+    // cache-busting 안 함 (같은 origin이라 캐시 신경 안 써도 됨)
+    iframe.src = file.url;
+    updateIframeTitle();
+  }
+  
+  function updateIframeTitle(){
+    var files = loadIngredFiles();
+    var current = loadCurrentIndex();
+    var file = files[current];
+    var titleEl = document.getElementById('ingred-current-title');
+    var urlEl = document.getElementById('ingred-current-url');
+    if(file){
+      if(titleEl) titleEl.textContent = '🧪 ' + (file.name || '성분 컨셉');
+      if(urlEl) urlEl.textContent = file.url || '';
+    } else {
+      if(titleEl) titleEl.textContent = '🧪 성분 컨셉';
+      if(urlEl) urlEl.textContent = '';
+    }
+  }
+  
+  window.reloadIngredIframe = function(){
+    var iframe = document.getElementById('ingred-iframe');
+    if(!iframe) return;
+    var current = iframe.src;
+    iframe.src = 'about:blank';
+    setTimeout(function(){
+      var files = loadIngredFiles();
+      var file = files[loadCurrentIndex()];
+      iframe.src = file ? (file.url || 'about:blank') : 'about:blank';
+    }, 50);
+  };
+  
+  window.openIngredInNewTab = function(){
+    var files = loadIngredFiles();
+    var file = files[loadCurrentIndex()];
+    if(!file || !file.url || file.url === './'){
+      alert('먼저 파일을 등록하고 선택하세요.');
+      return;
+    }
+    window.open(file.url, '_blank', 'noopener');
+  };
+  
+  window.toggleIngredFullscreen = function(){
+    var iframe = document.getElementById('ingred-iframe');
+    if(!iframe) return;
+    if(document.fullscreenElement){
+      document.exitFullscreen();
+    } else if(iframe.requestFullscreen){
+      iframe.requestFullscreen();
+    } else if(iframe.webkitRequestFullscreen){
+      iframe.webkitRequestFullscreen();
+    } else {
+      alert('이 브라우저는 전체화면을 지원하지 않습니다.');
+    }
+  };
+  
+  // iframe 로드 완료 시 - 같은 origin이면 자동 높이 조정 가능
+  window.onIngredIframeLoad = function(){
+    var iframe = document.getElementById('ingred-iframe');
+    if(!iframe || iframe.src === 'about:blank' || !iframe.src) return;
+    try {
+      var doc = iframe.contentDocument || iframe.contentWindow.document;
+      if(!doc || !doc.body) return;
+      // 자동 높이 조정 (같은 origin일 때만 동작)
+      var resize = function(){
+        try {
+          var h = Math.max(
+            doc.body.scrollHeight,
+            doc.body.offsetHeight,
+            doc.documentElement.scrollHeight,
+            doc.documentElement.offsetHeight
+          );
+          // 최소 600px, 최대는 제한 안 함
+          iframe.style.height = Math.max(600, h + 30) + 'px';
+        } catch(e){}
+      };
+      resize();
+      // 내부 콘텐츠 변경 감지 (탭 클릭 등으로 높이 바뀔 수 있음)
+      if(window.ResizeObserver){
+        var ro = new ResizeObserver(resize);
+        ro.observe(doc.body);
+      }
+      // 일정 간격 재확인 (탭 전환 등 대응)
+      setTimeout(resize, 200);
+      setTimeout(resize, 800);
+      setTimeout(resize, 2000);
+    } catch(e){
+      // CORS 차단 (다른 origin) - 무시, 기본 900px 유지
+      console.log('[Ingred] iframe 자동 높이 조정 불가 (CORS):', e.message);
+    }
+  };
+  
+  // 서브탭 전환
+  window.showDevSubTab = function(name){
+    var formsBtn = document.getElementById('t10-sub-forms-btn');
+    var ingredBtn = document.getElementById('t10-sub-ingred-btn');
+    var formsPane = document.getElementById('t10-sub-forms');
+    var ingredPane = document.getElementById('t10-sub-ingred');
+    if(name === 'ingred'){
+      formsBtn.classList.remove('active');
+      ingredBtn.classList.add('active');
+      formsPane.style.display = 'none';
+      ingredPane.style.display = '';
+      // 처음 진입 시 파일 목록 + iframe 로드
+      renderIngredFiles();
+      reloadCurrentIframe();
+    } else {
+      formsBtn.classList.add('active');
+      ingredBtn.classList.remove('active');
+      formsPane.style.display = '';
+      ingredPane.style.display = 'none';
+    }
+  };
+  
+  // showTab('t10') 호출 시 처음 서브탭 자동 렌더 보장
+  var _origShowTab = window.showTab;
+  if(typeof _origShowTab === 'function'){
+    window.showTab = function(){
+      _origShowTab.apply(this, arguments);
+      // t10 진입 시 초기화 (한 번만)
+      if(arguments[0] === 't10'){
+        setTimeout(function(){
+          renderIngredFiles();
+          // 현재 활성 서브탭에 따라 iframe 로드
+          var ingredPane = document.getElementById('t10-sub-ingred');
+          if(ingredPane && ingredPane.style.display !== 'none'){
+            reloadCurrentIframe();
+          }
+        }, 50);
+      }
+    };
+  }
+  
+  console.log('[Ingred] HTML iframe 로더 준비됨');
+})();
 </script>
 </body>
 </html>
