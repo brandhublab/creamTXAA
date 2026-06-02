@@ -12186,13 +12186,27 @@ function forceIsolationReset(){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
       <div>
         <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">시작일</label>
-        <input type="date" id="bos-cal-item-start" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit">
+        <input type="date" id="bos-cal-item-start" onchange="calcLeadtimeEnd_BOS()" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit">
       </div>
       <div>
         <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">종료일 (선택)</label>
-        <input type="date" id="bos-cal-item-end" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit">
+        <input type="date" id="bos-cal-item-end" onchange="onCalEndManualChange_BOS()" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit">
       </div>
     </div>
+    <!-- ━━ 리드타임 자동 계산 영역 ━━ -->
+    <div style="margin-bottom:14px;padding:10px 12px;background:#F5F9FF;border:1px solid #B5D0F5;border-radius:8px">
+      <label style="display:block;font-size:11px;font-weight:700;color:#1565C0;margin-bottom:6px">🕐 리드타임 (자동 종료일 계산)</label>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input type="number" id="bos-cal-item-leadtime-value" min="0" placeholder="숫자" oninput="calcLeadtimeEnd_BOS()" style="width:90px;padding:7px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit;background:#fff">
+        <select id="bos-cal-item-leadtime-unit" onchange="calcLeadtimeEnd_BOS()" style="padding:7px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit;background:#fff;cursor:pointer">
+          <option value="day">일</option>
+          <option value="week" selected>주</option>
+          <option value="month">월</option>
+        </select>
+        <span style="font-size:11px;color:var(--mu);flex:1;line-height:1.5">시작일 + 리드타임 → 종료일 자동 입력<br><span style="font-size:10px;color:#8AA8C0">예: 4주 / 25일 / 2월</span></span>
+      </div>
+    </div>
+
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">색상</label>
       <div class="cal-color-picker-bos" id="bos-cal-color-picker"></div>
@@ -12609,6 +12623,8 @@ function forceIsolationReset(){
     document.getElementById('bos-cal-item-start').value = todayStr;
     document.getElementById('bos-cal-item-end').value = '';
     document.getElementById('bos-cal-item-note').value = '';
+    document.getElementById('bos-cal-item-leadtime-value').value = '';
+    document.getElementById('bos-cal-item-leadtime-unit').value = 'week';
     var usedColors = {};
     (calData_BOS.items||[]).forEach(function(i){ usedColors[i.color] = true; });
     var nextColor = CAL_COLORS_BOS.find(function(c){ return !usedColors[c]; }) || CAL_COLORS_BOS[0];
@@ -12630,6 +12646,8 @@ function forceIsolationReset(){
     document.getElementById('bos-cal-item-start').value = item.startDate || '';
     document.getElementById('bos-cal-item-end').value = item.endDate || '';
     document.getElementById('bos-cal-item-note').value = item.note || '';
+    document.getElementById('bos-cal-item-leadtime-value').value = item.leadtimeValue || '';
+    document.getElementById('bos-cal-item-leadtime-unit').value = item.leadtimeUnit || 'week';
     document.getElementById('bos-cal-item-color').value = item.color || CAL_COLORS_BOS[0];
     renderColorPicker_BOS(item.color);
     document.getElementById('bos-cal-delete-btn').style.display = '';
@@ -12665,7 +12683,9 @@ function forceIsolationReset(){
       startDate: startDate,
       endDate: document.getElementById('bos-cal-item-end').value || '',
       color: document.getElementById('bos-cal-item-color').value,
-      note: document.getElementById('bos-cal-item-note').value.trim()
+      note: document.getElementById('bos-cal-item-note').value.trim(),
+      leadtimeValue: parseInt(document.getElementById('bos-cal-item-leadtime-value')?.value) || 0,
+      leadtimeUnit: document.getElementById('bos-cal-item-leadtime-unit')?.value || 'week'
     };
     
     if(calEditingItemId_BOS){
@@ -14024,25 +14044,90 @@ function forceIsolationReset(){
         var firstName = Object.keys(gist.files)[0];
         file = gist.files[firstName];
       }
-      if(!file || !file.content) throw new Error('Gist에 데이터 파일이 없습니다');
+      if(!file) throw new Error('Gist에 데이터 파일이 없습니다');
       
-      var backup;
-      try { backup = JSON.parse(file.content); }
-      catch(e){ throw new Error('JSON 파싱 실패: ' + e.message); }
+      // ━━ GitHub Gist API 큰 파일 처리 (개선판) ━━
+      // GitHub Gist API의 content 필드는 ~700KB+에서 잘릴 수 있음 (truncated 플래그 신뢰 안 함)
+      // raw_url이 있으면 무조건 그것을 사용 — 항상 전체 받음
+      // 푸시 1.4MB → 풀 750KB 잘림 케이스 대응
+      console.log('[Sync] File info:', {
+        name: file.filename,
+        size: file.size, 
+        truncated: file.truncated, 
+        contentLen: file.content ? file.content.length : 0,
+        hasRawUrl: !!file.raw_url,
+        rawUrl: file.raw_url
+      });
       
-      // 확인 다이얼로그 + Gist 메타 표시
-      var meta = '';
+      var contentPromise;
+      if(file.raw_url){
+        // raw_url이 있으면 무조건 사용 — truncated 플래그 무시 (가장 안전)
+        console.log('[Sync] raw_url로 전체 가져오기 (truncated 무관):', file.raw_url);
+        if(file.truncated){
+          syncToast('⏳ 큰 파일 감지, 전체 다시 가져오는 중...', 'info');
+        }
+        // raw_url은 공개 CDN(gist.githubusercontent.com) — Authorization 헤더 불필요
+        // 캐시 버스팅: 쿼리 파라미터 추가
+        var rawUrl = file.raw_url;
+        var sep = rawUrl.indexOf('?') >= 0 ? '&' : '?';
+        var bustingUrl = rawUrl + sep + '_t=' + Date.now();
+        contentPromise = fetch(bustingUrl, {
+          method: 'GET',
+          cache: 'no-store',
+          mode: 'cors'
+        }).then(function(r2){
+          console.log('[Sync] raw_url 응답:', r2.status, 'content-length:', r2.headers.get('content-length'));
+          if(!r2.ok){
+            // 캐시버스팅 실패 시 원본 URL 재시도
+            console.warn('[Sync] 캐시버스팅 실패, 원본 URL 재시도');
+            return fetch(file.raw_url, {method:'GET', cache:'no-store'}).then(function(r3){
+              if(!r3.ok) throw new Error('raw_url HTTP ' + r3.status);
+              return r3.text();
+            });
+          }
+          return r2.text();
+        }).then(function(text){
+          console.log('[Sync] raw 응답 크기:', text.length, 'bytes');
+          return text;
+        });
+      } else if(file.content){
+        // 폴백: 작은 파일만 (raw_url 없을 때)
+        console.log('[Sync] file.content 사용 (raw_url 없음)');
+        contentPromise = Promise.resolve(file.content);
+      } else {
+        throw new Error('Gist 파일 내용이 비어있습니다');
+      }
+      
+      return contentPromise.then(function(rawContent){
+        console.log('[Sync] 받은 content 길이:', rawContent.length);
+        
+        var backup;
+        try { 
+          backup = JSON.parse(rawContent); 
+        } catch(e){ 
+          // 파싱 실패 시 어디서 잘렸는지 정보 표시
+          var pos = (e.message.match(/position\s+(\d+)/) || [])[1];
+          var fileSize = file.size || rawContent.length;
+          throw new Error('JSON 파싱 실패: ' + e.message + 
+            '\n파일크기: ' + fileSize + 'B / 받은크기: ' + rawContent.length + 'B' +
+            '\ntruncated: ' + (file.truncated?'true':'false') +
+            '\n💡 Gist 데이터가 손상되었을 수 있습니다. 다시 푸시하세요.');
+        }
+        
+        // 확인 다이얼로그 + Gist 메타 표시
+        var meta = '';
       if(backup.exportedAt) meta += '📥 백업 시각: ' + new Date(backup.exportedAt).toLocaleString('ko-KR') + '\n';
       if(gist.updated_at) meta += '📡 Gist 갱신: ' + new Date(gist.updated_at).toLocaleString('ko-KR') + '\n';
       if(backup.keyCount) meta += '📊 키 개수: ' + backup.keyCount + '개\n';
       meta += '\n';
       if(!confirm('⚠ Gist의 데이터로 현재 데이터를 덮어쓰시겠습니까?\n\n' + meta + '새로고침 후 적용됩니다.\n\n💡 백업 시각이 예상보다 옛날이면 다른 컴퓨터에서 푸시가 안 된 것일 수 있습니다.')) return;
       
-      var result = applyBackup(backup);
-      syncSettings.lastPullAt = Date.now();
-      saveSyncSettings();
-      syncToast('✅ 풀 성공! ' + result.applied + '개 키 적용. 새로고침합니다...', 'ok');
-      setTimeout(function(){ location.reload(); }, 1500);
+        var result = applyBackup(backup);
+        syncSettings.lastPullAt = Date.now();
+        saveSyncSettings();
+        syncToast('✅ 풀 성공! ' + result.applied + '개 키 적용. 새로고침합니다...', 'ok');
+        setTimeout(function(){ location.reload(); }, 1500);
+      });  // contentPromise.then 닫기
     }).catch(function(err){
       var msg = err.message || '';
       if(msg.indexOf('403') !== -1){
@@ -14454,11 +14539,31 @@ function forceIsolationReset(){
     }).then(function(gist){
       var file = gist.files['brandoskit-data.json'];
       if(!file) file = gist.files[Object.keys(gist.files)[0]];
-      if(!file || !file.content) throw new Error('Gist 파일 없음');
+      if(!file) throw new Error('Gist 파일 없음');
       
+      // truncated 처리
+      var contentP;
+      if(file.raw_url){
+        // raw_url 무조건 사용 (가장 안전)
+        var rawUrl2 = file.raw_url;
+        var sep2 = rawUrl2.indexOf('?') >= 0 ? '&' : '?';
+        contentP = fetch(rawUrl2 + sep2 + '_t=' + Date.now(), {
+          cache: 'no-store',
+          mode: 'cors'
+        }).then(function(r2){
+          if(!r2.ok) throw new Error('raw_url HTTP ' + r2.status);
+          return r2.text();
+        });
+      } else if(file.content){
+        contentP = Promise.resolve(file.content);
+      } else {
+        throw new Error('파일 내용 없음');
+      }
+      
+      return contentP.then(function(rawContent){
       var backup;
-      try { backup = JSON.parse(file.content); }
-      catch(e){ throw new Error('JSON 파싱 실패'); }
+      try { backup = JSON.parse(rawContent); }
+      catch(e){ throw new Error('JSON 파싱 실패: ' + e.message); }
       
       // 요약 정보
       var report = [];
@@ -14523,6 +14628,7 @@ function forceIsolationReset(){
       h += '</div>';
       modal.innerHTML = h;
       document.body.appendChild(modal);
+      });  // contentP.then 닫기
     }).catch(function(err){
       syncToast('❌ Gist 조회 실패: ' + err.message, 'err');
     });
@@ -15233,6 +15339,68 @@ window.toggleMobileHeaderActions = function(){
   }
   
   console.log('[Ingred] HTML iframe 로더 준비됨');
+})();
+</script>
+
+<!-- ━━━ 🕐 캘린더 리드타임 자동 계산 ━━━ -->
+<script id="cal-leadtime-script">
+(function(){
+  // 사용자가 종료일을 수동으로 변경했는지 추적 (변경 시 리드타임 자동계산 잠시 멈춤)
+  window._calEndManualOverride = false;
+  
+  // 시작일 + 리드타임 → 종료일 계산
+  window.calcLeadtimeEnd_BOS = function(){
+    var startEl = document.getElementById('bos-cal-item-start');
+    var endEl = document.getElementById('bos-cal-item-end');
+    var valEl = document.getElementById('bos-cal-item-leadtime-value');
+    var unitEl = document.getElementById('bos-cal-item-leadtime-unit');
+    if(!startEl || !endEl || !valEl || !unitEl) return;
+    
+    var startStr = startEl.value;
+    var value = parseInt(valEl.value);
+    var unit = unitEl.value || 'week';
+    
+    if(!startStr || !value || value <= 0){
+      // 리드타임 값이 없으면 자동 계산 안 함
+      return;
+    }
+    
+    var startDate = new Date(startStr + 'T00:00:00');
+    if(isNaN(startDate.getTime())) return;
+    
+    var endDate = new Date(startDate);
+    if(unit === 'day'){
+      endDate.setDate(endDate.getDate() + value);
+    } else if(unit === 'week'){
+      endDate.setDate(endDate.getDate() + value * 7);
+    } else if(unit === 'month'){
+      // 월 단위 - setMonth는 자동으로 일자 조정 (예: 1월 31일 + 1월 = 2월 28일/29일)
+      endDate.setMonth(endDate.getMonth() + value);
+    }
+    
+    var y = endDate.getFullYear();
+    var m = String(endDate.getMonth() + 1).padStart(2, '0');
+    var d = String(endDate.getDate()).padStart(2, '0');
+    var endStr = y + '-' + m + '-' + d;
+    
+    endEl.value = endStr;
+    window._calEndManualOverride = false; // 자동 계산으로 채웠으니 플래그 리셋
+  };
+  
+  // 사용자가 종료일을 직접 변경했을 때
+  window.onCalEndManualChange_BOS = function(){
+    var endEl = document.getElementById('bos-cal-item-end');
+    var valEl = document.getElementById('bos-cal-item-leadtime-value');
+    if(!endEl || !valEl) return;
+    
+    // 종료일을 수동으로 변경하면 리드타임 값 비움 (충돌 방지)
+    // 단, 비어있는 상태로 둘 때는 그대로
+    if(endEl.value && valEl.value){
+      // 사용자가 의도적으로 종료일을 바꾼 것 - 리드타임 비움
+      valEl.value = '';
+      window._calEndManualOverride = true;
+    }
+  };
 })();
 </script>
 </body>
