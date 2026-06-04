@@ -524,11 +524,19 @@ body.edit-mode-on .tab-btn .tab-name-edit{
  .nav-brand{flex-direction:column;align-items:stretch;border-right:none;border-bottom:1px solid rgba(255,255,255,.12);min-width:unset;padding:8px 12px}
  
  /* 햄버거 버튼 표시 */
- #mobile-header-toggle{display:inline-flex !important;align-items:center;justify-content:center}
+ #mobile-header-toggle{display:inline-flex !important;align-items:center;justify-content:center;transition:transform .2s}
  
  /* 기본 상태: 헤더 액션 영역 숨김 (햄버거로 토글) */
  .hub-top-actions{display:none !important;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1)}
  .hub-top-actions.mobile-open{display:flex !important}
+ 
+ /* ━━ 까만 헤더 전체 접기/펼치기 (탭 + 실행취소 + 저장 + 제품 + 설정) ━━ */
+ /* body.mobile-nav-collapsed 일 때: 헤더 펼침 영역 모두 숨김 (TETRARIX + ☰만 보임) */
+ body.mobile-nav-collapsed .nav-tabs-wrap{display:none !important}
+ body.mobile-nav-collapsed .undo-bar{display:none !important}
+ body.mobile-nav-collapsed .hub-top-actions{display:none !important}
+ /* 접힘 상태에서 nav-brand 의 border-bottom 제거 (선이 떠 있는 느낌 방지) */
+ body.mobile-nav-collapsed .nav-brand{border-bottom:none}
  
  /* 브랜드 OS 배지는 모바일에서 숨김 (공간 절약) */
  .brand-os-badge{display:none !important}
@@ -11963,6 +11971,7 @@ function forceIsolationReset(){
         <div style="display:flex;align-items:center;gap:6px">
           <span style="font-size:11px;color:var(--mu);font-weight:600">🔀 정렬</span>
           <select id="bos-cal-sort" onchange="changeCalSort_BOS(this.value)" style="padding:5px 8px;border:1px solid var(--bd);border-radius:5px;font-size:11px;background:#fff;font-family:inherit;cursor:pointer">
+            <option value="manual">✋ 수동 정렬 (드래그앤드롭)</option>
             <option value="date_asc">📅 날짜순 (오래된 것부터)</option>
             <option value="date_desc" selected>📅 날짜 역순 (최근 것부터)</option>
             <option value="category">📂 카테고리별</option>
@@ -12167,7 +12176,7 @@ function forceIsolationReset(){
     </div>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">📂 카테고리</label>
-      <select id="bos-cal-item-category" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit;background:#fff">
+      <select id="bos-cal-item-category" onchange="onCalCategoryChange_BOS(this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit;background:#fff">
         <option value="">— 카테고리 선택 —</option>
         <option value="기획">🎯 기획</option>
         <option value="샘플의뢰">🧪 샘플의뢰</option>
@@ -12208,8 +12217,17 @@ function forceIsolationReset(){
     </div>
 
     <div style="margin-bottom:14px">
-      <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">색상</label>
-      <div class="cal-color-picker-bos" id="bos-cal-color-picker"></div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:6px">
+        색상
+        <span id="bos-cal-color-from-cat" style="display:none;font-size:9px;color:#1565C0;background:#E3F2FD;padding:1px 6px;border-radius:8px;font-weight:500">카테고리 자동</span>
+      </label>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div class="cal-color-picker-bos" id="bos-cal-color-picker" style="flex:1;min-width:0"></div>
+        <!-- 자유 색상 선택 버튼 -->
+        <button type="button" onclick="openCalColorPaletteModal_BOS()" title="더 많은 색 / 사용자 정의 색" style="display:flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--bd);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;color:var(--tx);font-family:inherit;white-space:nowrap">
+          🎨 더 많은 색
+        </button>
+      </div>
       <input type="hidden" id="bos-cal-item-color" value="#C8A45A">
     </div>
     <div style="margin-bottom:18px">
@@ -12338,18 +12356,18 @@ function forceIsolationReset(){
   
   // 카테고리 정의 (전역) - 워크플로우 순서대로
   var CAL_CATEGORIES_BOS = [
-    {key:'기획', emoji:'🎯'},
-    {key:'샘플의뢰', emoji:'🧪'},
-    {key:'사양픽스', emoji:'📋'},
-    {key:'생산', emoji:'🏭'},
-    {key:'패키지 디자인', emoji:'📦'},
-    {key:'상세페이지 디자인', emoji:'🎨'},
-    {key:'광고 영상 제작', emoji:'🎬'},
-    {key:'웹사이트 세팅', emoji:'💻'},
-    {key:'런칭', emoji:'🚀'},
-    {key:'협찬 마케팅', emoji:'🤝'},
-    {key:'공동 구매', emoji:'🛒'},
-    {key:'기타', emoji:'📌'}
+    {key:'기획',           emoji:'🎯', color:'#2563EB'},  // 블루
+    {key:'샘플의뢰',        emoji:'🧪', color:'#7A4AA8'},  // 보라
+    {key:'사양픽스',        emoji:'📋', color:'#3a8a8a'},  // 청록
+    {key:'생산',           emoji:'🏭', color:'#D2691E'},  // 진오렌지
+    {key:'패키지 디자인',    emoji:'📦', color:'#A87C4A'},  // 카키
+    {key:'상세페이지 디자인', emoji:'🎨', color:'#C0392B'},  // 레드
+    {key:'광고 영상 제작',   emoji:'🎬', color:'#8A5A3A'},  // 다크브라운
+    {key:'웹사이트 세팅',    emoji:'💻', color:'#1A6B4A'},  // 다크그린
+    {key:'런칭',           emoji:'🚀', color:'#C8A45A'},  // 골드
+    {key:'협찬 마케팅',     emoji:'🤝', color:'#5A8A4A'},  // 그린
+    {key:'공동 구매',       emoji:'🛒', color:'#E67E22'},  // 오렌지
+    {key:'기타',           emoji:'📌', color:'#7F8C8D'}   // 그레이
   ];
   
   // 현재 정렬·필터 상태
@@ -12443,7 +12461,8 @@ function forceIsolationReset(){
     CAL_CATEGORIES_BOS.forEach(function(c, i){ catOrder[c.key] = i; });
     catOrder['미분류'] = 999;
     
-    items.sort(function(a, b){
+    // 수동 정렬 모드면 calData_BOS.items 배열 순서 그대로 사용 (sort 건너뜀)
+    if(currentSort !== 'manual') items.sort(function(a, b){
       var sa = a.startDate || '9999-12-31';
       var sb = b.startDate || '9999-12-31';
       if(currentSort === 'date_asc'){
@@ -12502,7 +12521,14 @@ function forceIsolationReset(){
         catBadge = '<span class="cal-item-cat-bos" style="display:inline-block;padding:1px 7px;background:#F0F4F8;border:1px solid #D5DEE8;border-radius:9px;font-size:9px;font-weight:600;color:#2563EB;margin-right:6px">' + emoji + ' ' + escapeHtml_BOS(item.category) + '</span>';
       }
       
-      return '<div class="cal-item-card-bos" onclick="editCalendarItem_BOS(\'' + item.id + '\')">'
+      return '<div class="cal-item-card-bos" draggable="true" data-item-id="' + item.id + '" '
+        + 'ondragstart="onCalCardDragStart_BOS(event,\'' + item.id + '\')" '
+        + 'ondragover="onCalCardDragOver_BOS(event)" '
+        + 'ondragleave="onCalCardDragLeave_BOS(event)" '
+        + 'ondrop="onCalCardDrop_BOS(event,\'' + item.id + '\')" '
+        + 'ondragend="onCalCardDragEnd_BOS(event)" '
+        + 'onclick="if(!event.target.closest(\'.cal-card-drag-handle\'))editCalendarItem_BOS(\'' + item.id + '\')">'
+        + '<span class="cal-card-drag-handle" title="드래그하여 순서 변경" style="cursor:grab;color:var(--mu);font-size:13px;padding:4px 6px;user-select:none;align-self:center" onclick="event.stopPropagation()">⋮⋮</span>'
         + '<div class="cal-item-color-bos" style="background:' + item.color + '"></div>'
         + '<div class="cal-item-body-bos">'
           + '<div class="cal-item-title-bos">' + catBadge + escapeHtml_BOS(item.title) + '</div>'
@@ -12568,7 +12594,15 @@ function forceIsolationReset(){
         var s = new Date(item.startDate + 'T00:00:00');
         var diffDays = Math.floor((date - s) / 86400000);
         var weekNum = Math.floor(diffDays / 7) + 1;
-        return {weekNum: weekNum, color: item.color, title: item.title};
+        var dayNum = diffDays + 1;  // 시작일 포함 (1일째부터)
+        return {
+          weekNum: weekNum, 
+          dayNum: dayNum, 
+          color: item.color, 
+          title: item.title, 
+          id: item.id,
+          category: item.category || ''
+        };
       });
       
       var bgStyle = '';
@@ -12587,7 +12621,9 @@ function forceIsolationReset(){
       
       var badgesHtml = weekBadges.length > 0
         ? '<div class="cal-cell-badges-bos">' + weekBadges.map(function(b){
-            return '<span class="cal-cell-week-bos" style="background:' + b.color + '" title="' + escapeAttr_BOS(b.title) + ' - ' + b.weekNum + '주차">' + b.weekNum + '</span>';
+            return '<span class="cal-cell-week-bos" style="background:' + b.color + ';cursor:pointer" '
+              + 'onclick="event.stopPropagation();editCalendarItem_BOS(\'' + b.id + '\')" '
+              + 'title="' + escapeAttr_BOS(b.title) + ' - ' + b.weekNum + '주차 (클릭하여 편집)">' + b.weekNum + '</span>';
           }).join('') + '</div>'
         : '';
       
@@ -12595,7 +12631,22 @@ function forceIsolationReset(){
       weekBadges.forEach(function(b){ tipParts.push(b.title + ': ' + b.weekNum + '주차'); });
       var tipText = tipParts.join('\n');
       
-      cells += '<div class="cal-cell-bos ' + (isToday?'today':'') + ' ' + dayClass + '" style="' + bgStyle + '" title="' + escapeAttr_BOS(tipText) + '">'
+      // 셀 ISO 날짜 (YYYY-MM-DD)
+      var cellDateIso = year + '-' + String(monthIdx+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      // 셀 데이터 (툴팁용 JSON) - 따옴표 안전
+      var cellItemsData = JSON.stringify(weekBadges.map(function(b){
+        return {title:b.title, color:b.color, week:b.weekNum, day:b.dayNum, cat:b.category||''};
+      }));
+      var hasItemsClass = weekBadges.length > 0 ? ' has-items' : '';
+      
+      cells += '<div class="cal-cell-bos ' + (isToday?'today':'') + ' ' + dayClass + hasItemsClass + '" '
+        + 'style="' + bgStyle + ';cursor:pointer" '
+        + 'data-cell-date="' + cellDateIso + '" '
+        + 'data-cell-items="' + escapeAttr_BOS(cellItemsData) + '" '
+        + 'onclick="onCalCellClick_BOS(\'' + cellDateIso + '\', event)" '
+        + 'onmouseenter="onCalCellHover_BOS(this, event)" '
+        + 'onmouseleave="onCalCellLeave_BOS()" '
+        + 'onmousemove="onCalCellMove_BOS(event)">'
         + '<span class="cal-cell-day-bos">' + d + '</span>'
         + badgesHtml
         + '</div>';
@@ -15091,15 +15142,77 @@ body.edit-mode-on #edit-mode-indicator{
 <script id="mobile-header-toggle-script">
 // 📱 모바일 헤더 토글
 window.toggleMobileHeaderActions = function(){
+  // 모바일 헤더 전체 토글 (탭 + 실행취소/저장/제품 + 설정/편집 모두)
+  var body = document.body;
   var actions = document.getElementById('hub-top-actions');
   var btn = document.getElementById('mobile-header-toggle');
-  if(!actions) return;
-  var isOpen = actions.classList.toggle('mobile-open');
+  
+  // 토글: collapsed 클래스 추가/제거
+  var willCollapse = !body.classList.contains('mobile-nav-collapsed');
+  body.classList.toggle('mobile-nav-collapsed', willCollapse);
+  
+  // hub-top-actions의 mobile-open 클래스도 동기화 (펼침 시 보이게)
+  if(actions){
+    if(willCollapse) actions.classList.remove('mobile-open');
+    else actions.classList.add('mobile-open');
+  }
+  
+  // 햄버거 아이콘 변경
   if(btn){
-    btn.innerHTML = isOpen ? '✕' : '☰';
-    btn.setAttribute('aria-label', isOpen ? '헤더 메뉴 접기' : '헤더 메뉴 펼치기');
+    btn.innerHTML = willCollapse ? '☰' : '✕';
+    btn.setAttribute('aria-label', willCollapse ? '메뉴 펼치기' : '메뉴 접기');
+    btn.setAttribute('title', willCollapse ? '메뉴 펼치기' : '메뉴 접기');
+  }
+  
+  // 상태 저장 (다음 방문 시 복원)
+  try { 
+    localStorage.setItem('bos_mobile_nav_collapsed', willCollapse ? '1' : '0'); 
+  } catch(e){}
+};
+
+// 페이지 로드 시 모바일 상태 복원 (기본값: 접힘 - 모바일 공간 확보)
+window.initMobileNavState = function(){
+  try {
+    if(window.innerWidth > 768) return;  // 데스크톱은 적용 안 함
+    
+    var v = localStorage.getItem('bos_mobile_nav_collapsed');
+    // 기본값: 접힘 (v가 null이면 collapsed로 시작 - 모바일 화면 절약)
+    var shouldCollapse = (v === null || v === '1');
+    
+    var body = document.body;
+    var actions = document.getElementById('hub-top-actions');
+    var btn = document.getElementById('mobile-header-toggle');
+    
+    if(shouldCollapse){
+      body.classList.add('mobile-nav-collapsed');
+      if(actions) actions.classList.remove('mobile-open');
+      if(btn){ btn.innerHTML = '☰'; btn.setAttribute('title', '메뉴 펼치기'); }
+    } else {
+      body.classList.remove('mobile-nav-collapsed');
+      if(actions) actions.classList.add('mobile-open');
+      if(btn){ btn.innerHTML = '✕'; btn.setAttribute('title', '메뉴 접기'); }
+    }
+  } catch(e){
+    console.warn('[Mobile Nav] 상태 복원 실패:', e);
   }
 };
+
+// 페이지 로드 후 자동 호출
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', window.initMobileNavState);
+} else {
+  setTimeout(window.initMobileNavState, 50);
+}
+
+// 화면 회전/리사이즈 시에도 상태 재적용 (데스크톱↔모바일 전환 대응)
+window.addEventListener('resize', function(){
+  // 데스크톱 → 모바일 전환 시에만 다시 적용
+  if(window.innerWidth <= 768) window.initMobileNavState();
+  else {
+    // 데스크톱이 되면 클래스 제거 (영향 안 끼치게)
+    document.body.classList.remove('mobile-nav-collapsed');
+  }
+});
 </script>
 
 <!-- ━━━ 🧪 성분 컨셉 HTML 로더 (t10 서브탭) ━━━ -->
@@ -15401,6 +15514,1044 @@ window.toggleMobileHeaderActions = function(){
       window._calEndManualOverride = true;
     }
   };
+})();
+</script>
+
+<!-- ━━━ 📅 캘린더 카드 드래그앤드롭 ━━━ -->
+<script id="cal-card-dnd-script">
+(function(){
+  var _draggedCalCardId = null;
+  
+  window.onCalCardDragStart_BOS = function(e, itemId){
+    _draggedCalCardId = itemId;
+    e.dataTransfer.effectAllowed = 'move';
+    e.currentTarget.style.opacity = '0.4';
+    // 드래그 중인 카드 식별용 데이터
+    try { e.dataTransfer.setData('text/plain', itemId); } catch(err){}
+  };
+  
+  window.onCalCardDragOver_BOS = function(e){
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    var card = e.currentTarget;
+    // 드래그 중인 카드 본인이면 스킵
+    if(card.getAttribute('data-item-id') === _draggedCalCardId) return;
+    card.style.background = '#FFF8E1';
+    card.style.borderColor = '#FFB300';
+    card.style.transform = 'scale(1.01)';
+    card.style.transition = 'all .12s';
+  };
+  
+  window.onCalCardDragLeave_BOS = function(e){
+    var card = e.currentTarget;
+    card.style.background = '';
+    card.style.borderColor = '';
+    card.style.transform = '';
+  };
+  
+  window.onCalCardDrop_BOS = function(e, dropId){
+    e.preventDefault();
+    var card = e.currentTarget;
+    card.style.background = '';
+    card.style.borderColor = '';
+    card.style.transform = '';
+    
+    if(!_draggedCalCardId || _draggedCalCardId === dropId) return;
+    if(!calData_BOS || !Array.isArray(calData_BOS.items)) return;
+    
+    // 배열에서 드래그 항목과 드롭 위치 찾기
+    var items = calData_BOS.items;
+    var fromIdx = items.findIndex(function(i){ return i.id === _draggedCalCardId; });
+    var toIdx = items.findIndex(function(i){ return i.id === dropId; });
+    if(fromIdx < 0 || toIdx < 0) return;
+    
+    // 배열 순서 변경
+    var moved = items.splice(fromIdx, 1)[0];
+    items.splice(toIdx, 0, moved);
+    
+    // 정렬 모드를 'manual' 로 자동 전환 (사용자가 수동 정렬했으므로)
+    if(!calData_BOS.settings) calData_BOS.settings = {};
+    calData_BOS.settings.sort = 'manual';
+    
+    _draggedCalCardId = null;
+    
+    // 저장 + UI 갱신
+    if(typeof saveCalData_BOS === 'function') saveCalData_BOS();
+    if(typeof renderCalendarItems_BOS === 'function') renderCalendarItems_BOS();
+    if(typeof renderCalendarGrid_BOS === 'function') renderCalendarGrid_BOS();
+    
+    // 정렬 select UI 동기화 (재렌더에서 처리되지만 보강)
+    var sortSel = document.getElementById('bos-cal-sort');
+    if(sortSel) sortSel.value = 'manual';
+    
+    // 토스트
+    if(typeof showToast === 'function'){
+      showToast('✋ 수동 정렬로 전환되었습니다');
+    }
+  };
+  
+  window.onCalCardDragEnd_BOS = function(e){
+    e.currentTarget.style.opacity = '';
+    _draggedCalCardId = null;
+    // 모든 카드 시각 효과 리셋
+    document.querySelectorAll('.cal-item-card-bos').forEach(function(c){
+      c.style.background = '';
+      c.style.borderColor = '';
+      c.style.transform = '';
+    });
+  };
+  
+  console.log('[Cal] 카드 드래그앤드롭 준비됨');
+})();
+</script>
+
+<!-- ━━━ 📅 캘린더 셀 마우스오버 툴팁 + 클릭 추가 ━━━ -->
+<style id="cal-tooltip-style">
+.cal-cell-bos.has-items:hover{
+  box-shadow: 0 0 0 2px rgba(33,150,243,.4) inset;
+}
+.cal-cell-bos:not(.has-items):hover{
+  background:#FFF8E1 !important;
+  box-shadow: 0 0 0 1px #FFB300 inset;
+}
+.cal-cell-bos.empty{cursor:default !important}
+.cal-cell-bos.empty:hover{background:transparent !important;box-shadow:none !important}
+
+#cal-tooltip-bos{
+  position:fixed;
+  background:rgba(26,25,22,.96);
+  color:#fff;
+  padding:9px 13px;
+  border-radius:8px;
+  font-size:11.5px;
+  pointer-events:none;
+  z-index:10000;
+  box-shadow:0 6px 20px rgba(0,0,0,.4);
+  max-width:340px;
+  min-width:180px;
+  display:none;
+  line-height:1.45;
+  font-family:'Pretendard',-apple-system,sans-serif;
+}
+#cal-tooltip-bos .tip-date-bos{
+  font-size:10px;
+  color:rgba(255,255,255,.55);
+  margin-bottom:5px;
+  padding-bottom:5px;
+  border-bottom:1px solid rgba(255,255,255,.12);
+  font-family:'Roboto Mono',monospace;
+}
+#cal-tooltip-bos .tip-item-bos{
+  display:flex;
+  gap:7px;
+  align-items:center;
+  padding:3px 0;
+}
+#cal-tooltip-bos .tip-item-bos + .tip-item-bos{
+  border-top:1px dashed rgba(255,255,255,.1);
+  margin-top:2px;
+  padding-top:5px;
+}
+#cal-tooltip-bos .tip-dot-bos{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  flex-shrink:0;
+  box-shadow:0 0 0 1px rgba(255,255,255,.2);
+}
+#cal-tooltip-bos .tip-title-bos{
+  flex:1;
+  font-weight:500;
+}
+#cal-tooltip-bos .tip-meta-bos{
+  color:rgba(255,255,255,.65);
+  font-size:10.5px;
+  white-space:nowrap;
+  font-family:'Roboto Mono',monospace;
+}
+#cal-tooltip-bos .tip-cat-bos{
+  font-size:9.5px;
+  color:rgba(135,206,250,.85);
+  background:rgba(33,150,243,.15);
+  padding:1px 5px;
+  border-radius:8px;
+  margin-left:4px;
+}
+#cal-tooltip-bos .tip-add-hint-bos{
+  color:rgba(255,255,255,.7);
+  font-size:11px;
+  text-align:center;
+  padding:2px 0;
+}
+
+/* 모바일에선 툴팁 위치 다르게 */
+@media (max-width: 768px){
+  #cal-tooltip-bos{max-width:280px;font-size:11px}
+}
+</style>
+
+<script id="cal-hover-click-script">
+(function(){
+  // ━━ 툴팁 요소 보장 ━━
+  function ensureCalTipEl(){
+    var tip = document.getElementById('cal-tooltip-bos');
+    if(!tip){
+      tip = document.createElement('div');
+      tip.id = 'cal-tooltip-bos';
+      document.body.appendChild(tip);
+    }
+    return tip;
+  }
+  
+  // ━━ 위치 계산 (화면 가장자리 고려) ━━
+  function positionCalTip(tip, event){
+    var x = event.clientX + 14;
+    var y = event.clientY + 14;
+    var rect = tip.getBoundingClientRect();
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    // 오른쪽 잘림 방지
+    if(x + rect.width + 10 > vw) x = event.clientX - rect.width - 14;
+    // 아래쪽 잘림 방지
+    if(y + rect.height + 10 > vh) y = event.clientY - rect.height - 14;
+    // 음수 방지
+    if(x < 5) x = 5;
+    if(y < 5) y = 5;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  
+  // ━━ 날짜 포맷 (YYYY-MM-DD → 2026년 6월 4일 (월)) ━━
+  var dayNames = ['일','월','화','수','목','금','토'];
+  function fmtCellDate(iso){
+    var parts = iso.split('-');
+    if(parts.length !== 3) return iso;
+    var d = new Date(parts[0]+'-'+parts[1]+'-'+parts[2]+'T00:00:00');
+    if(isNaN(d.getTime())) return iso;
+    return parts[0] + '년 ' + parseInt(parts[1]) + '월 ' + parseInt(parts[2]) + '일 (' + dayNames[d.getDay()] + ')';
+  }
+  
+  // ━━ 셀 마우스오버 - 풍부한 툴팁 ━━
+  window.onCalCellHover_BOS = function(cell, event){
+    if(!cell || cell.classList.contains('empty')) return;
+    
+    var dateIso = cell.getAttribute('data-cell-date') || '';
+    var itemsRaw = cell.getAttribute('data-cell-items') || '[]';
+    
+    var items = [];
+    try { items = JSON.parse(itemsRaw); } catch(e){ items = []; }
+    
+    var tip = ensureCalTipEl();
+    var html = '';
+    
+    // 날짜 헤더
+    if(dateIso) html += '<div class="tip-date-bos">' + fmtCellDate(dateIso) + '</div>';
+    
+    if(items.length === 0){
+      // 빈 날 - 추가 안내
+      html += '<div class="tip-add-hint-bos">＋ 클릭하여 항목 추가</div>';
+    } else {
+      // 항목 리스트 - 카테고리 먼저, 그 다음 제목
+      items.forEach(function(it){
+        // 카테고리 (있을 때) - 첫 줄에 강조 표시
+        if(it.cat){
+          html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">';
+          html += '<span class="tip-dot-bos" style="background:' + (it.color||'#888') + '"></span>';
+          html += '<span class="tip-cat-bos" style="font-size:10.5px;color:rgba(135,206,250,.95);background:rgba(33,150,243,.18);padding:2px 7px;border-radius:9px;font-weight:600">📂 ' + escapeHtmlSafe(it.cat) + '</span>';
+          html += '<span class="tip-meta-bos" style="margin-left:auto">' + it.week + '주차 · ' + it.day + '일째</span>';
+          html += '</div>';
+          // 제목은 그 아래 들여쓰기
+          html += '<div style="padding-left:17px;font-weight:500;line-height:1.45;margin-bottom:4px">' + escapeHtmlSafe(it.title || '(제목 없음)') + '</div>';
+        } else {
+          // 카테고리 없으면 기존 스타일
+          html += '<div class="tip-item-bos">';
+          html += '<span class="tip-dot-bos" style="background:' + (it.color||'#888') + '"></span>';
+          html += '<span class="tip-title-bos">' + escapeHtmlSafe(it.title || '(제목 없음)') + '</span>';
+          html += '<span class="tip-meta-bos">' + it.week + '주차 · ' + it.day + '일째</span>';
+          html += '</div>';
+        }
+      });
+      // 항목 있어도 추가 가능 힌트
+      html += '<div style="border-top:1px solid rgba(255,255,255,.12);margin-top:6px;padding-top:5px;font-size:10px;color:rgba(255,255,255,.5);text-align:center">＋ 빈 영역 클릭하여 새 항목 추가</div>';
+    }
+    
+    tip.innerHTML = html;
+    tip.style.display = 'block';
+    positionCalTip(tip, event);
+  };
+  
+  // ━━ 마우스 이동 시 툴팁 위치 따라가기 ━━
+  window.onCalCellMove_BOS = function(event){
+    var tip = document.getElementById('cal-tooltip-bos');
+    if(!tip || tip.style.display === 'none') return;
+    positionCalTip(tip, event);
+  };
+  
+  // ━━ 마우스 떠나면 툴팁 숨김 ━━
+  window.onCalCellLeave_BOS = function(){
+    var tip = document.getElementById('cal-tooltip-bos');
+    if(tip) tip.style.display = 'none';
+  };
+  
+  // ━━ 셀 클릭 - 빈 셀이면 새 항목 추가 / 그 외엔 새 항목 추가 (시작일 자동) ━━
+  window.onCalCellClick_BOS = function(dateIso, event){
+    // 배지(주차 숫자) 클릭이면 이미 stopPropagation 처리됨 - 여기까지 안 옴
+    // 셀의 빈 영역 클릭 시 → 새 항목 추가
+    if(typeof window.addCalendarItem_BOS !== 'function') return;
+    
+    // 툴팁 숨기기
+    var tip = document.getElementById('cal-tooltip-bos');
+    if(tip) tip.style.display = 'none';
+    
+    // 새 항목 추가 모달 열기
+    window.addCalendarItem_BOS();
+    
+    // 시작일 input에 클릭한 날짜 자동 설정
+    setTimeout(function(){
+      var startInput = document.getElementById('bos-cal-item-start');
+      if(startInput && dateIso){
+        startInput.value = dateIso;
+        // change 이벤트 발화 (혹시 리드타임 자동계산 등 다른 핸들러 동작)
+        try { startInput.dispatchEvent(new Event('change', {bubbles: true})); } catch(e){}
+      }
+      // 제목 입력칸에 자동 포커스
+      var titleInput = document.getElementById('bos-cal-item-title');
+      if(titleInput) titleInput.focus();
+    }, 50);
+  };
+  
+  // HTML escape 헬퍼
+  function escapeHtmlSafe(s){
+    if(s === null || s === undefined) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  
+  console.log('[Cal] 셀 마우스오버 툴팁 + 클릭 추가 준비됨');
+})();
+</script>
+
+<!-- ━━━ 📅 카테고리 자동 색상 + 색상 팔레트 모달 ━━━ -->
+<style id="cal-color-palette-style">
+#cal-color-palette-modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  z-index:9500;
+  align-items:center;
+  justify-content:center;
+}
+#cal-color-palette-modal .cp-card{
+  background:#fff;
+  border-radius:14px;
+  padding:22px;
+  max-width:540px;
+  width:94%;
+  max-height:88vh;
+  overflow-y:auto;
+  box-shadow:0 10px 40px rgba(0,0,0,.3);
+}
+#cal-color-palette-modal .cp-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+  padding-bottom:12px;
+  border-bottom:1px solid #E8E6E0;
+}
+#cal-color-palette-modal .cp-title{
+  font-size:15px;
+  font-weight:700;
+  color:#1A1916;
+}
+#cal-color-palette-modal .cp-close{
+  background:none;
+  border:none;
+  font-size:22px;
+  cursor:pointer;
+  color:#7A7870;
+  line-height:1;
+  padding:0;
+}
+#cal-color-palette-modal .cp-section{
+  margin-bottom:18px;
+}
+#cal-color-palette-modal .cp-section-title{
+  font-size:11px;
+  font-weight:700;
+  color:#7A7870;
+  margin-bottom:8px;
+  letter-spacing:.3px;
+}
+#cal-color-palette-modal .cp-grid{
+  display:grid;
+  grid-template-columns:repeat(10, 1fr);
+  gap:6px;
+}
+#cal-color-palette-modal .cp-swatch{
+  aspect-ratio:1;
+  border-radius:6px;
+  cursor:pointer;
+  border:2px solid transparent;
+  transition:transform .12s, border-color .12s;
+  position:relative;
+}
+#cal-color-palette-modal .cp-swatch:hover{
+  transform:scale(1.15);
+  border-color:#1A1916;
+}
+#cal-color-palette-modal .cp-swatch.selected{
+  border-color:#1A1916;
+  box-shadow:0 0 0 2px #fff inset;
+}
+#cal-color-palette-modal .cp-swatch.selected::after{
+  content:'✓';
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-weight:700;
+  font-size:13px;
+  text-shadow:0 0 3px rgba(0,0,0,.6);
+}
+#cal-color-palette-modal .cp-custom-row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  background:#FAFAF8;
+  padding:12px 14px;
+  border-radius:8px;
+  border:1px solid #E8E6E0;
+}
+#cal-color-palette-modal .cp-custom-row input[type="color"]{
+  width:60px;
+  height:40px;
+  border:1px solid #E8E6E0;
+  border-radius:6px;
+  cursor:pointer;
+  padding:2px;
+  background:#fff;
+}
+#cal-color-palette-modal .cp-custom-row input[type="text"]{
+  flex:1;
+  padding:9px 12px;
+  border:1px solid #E8E6E0;
+  border-radius:6px;
+  font-family:'Roboto Mono',monospace;
+  font-size:13px;
+  text-transform:uppercase;
+}
+#cal-color-palette-modal .cp-preview{
+  width:40px;
+  height:40px;
+  border-radius:8px;
+  border:1px solid #E8E6E0;
+  flex-shrink:0;
+}
+#cal-color-palette-modal .cp-actions{
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  margin-top:8px;
+}
+#cal-color-palette-modal .cp-btn{
+  padding:9px 18px;
+  border-radius:6px;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:inherit;
+  border:1px solid var(--bd);
+  background:#fff;
+  color:#1A1916;
+}
+#cal-color-palette-modal .cp-btn.primary{
+  background:#1A6B4A;
+  color:#fff;
+  border-color:#1A6B4A;
+}
+
+/* ━━ 포토샵 스타일 SV + Hue 픽커 ━━ */
+#cal-color-palette-modal .cp-precision-wrap{
+  display:flex;
+  gap:14px;
+  align-items:stretch;
+  user-select:none;
+  -webkit-user-select:none;
+}
+#cal-color-palette-modal .cp-sv-square{
+  flex:1;
+  min-width:200px;
+  height:200px;
+  position:relative;
+  cursor:crosshair;
+  background:hsl(40, 100%, 50%);
+  border-radius:6px;
+  overflow:hidden;
+  border:1px solid #E8E6E0;
+  touch-action:none;
+}
+#cal-color-palette-modal .cp-sv-overlay-white{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to right, rgba(255,255,255,1), rgba(255,255,255,0));
+  pointer-events:none;
+}
+#cal-color-palette-modal .cp-sv-overlay-black{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,1));
+  pointer-events:none;
+}
+#cal-color-palette-modal .cp-sv-cursor{
+  position:absolute;
+  width:14px;
+  height:14px;
+  border:2px solid #fff;
+  border-radius:50%;
+  box-shadow:0 0 0 1px rgba(0,0,0,.7), 0 1px 4px rgba(0,0,0,.4);
+  transform:translate(-50%, -50%);
+  pointer-events:none;
+  left:80%;
+  top:25%;
+  transition:left .04s, top .04s;
+}
+#cal-color-palette-modal .cp-hue-slider{
+  width:26px;
+  height:200px;
+  background:linear-gradient(to bottom,
+    hsl(0,100%,50%) 0%,
+    hsl(60,100%,50%) 17%,
+    hsl(120,100%,50%) 33%,
+    hsl(180,100%,50%) 50%,
+    hsl(240,100%,50%) 67%,
+    hsl(300,100%,50%) 83%,
+    hsl(360,100%,50%) 100%);
+  cursor:ns-resize;
+  position:relative;
+  border-radius:6px;
+  border:1px solid #E8E6E0;
+  flex-shrink:0;
+  touch-action:none;
+}
+#cal-color-palette-modal .cp-hue-thumb{
+  position:absolute;
+  left:-3px;
+  right:-3px;
+  height:6px;
+  background:rgba(255,255,255,.95);
+  border:1px solid rgba(0,0,0,.6);
+  border-radius:3px;
+  box-shadow:0 1px 3px rgba(0,0,0,.3);
+  pointer-events:none;
+  top:11%;
+  transform:translateY(-50%);
+}
+</style>
+
+<!-- 색상 팔레트 모달 -->
+<div id="cal-color-palette-modal" onclick="if(event.target===this)closeCalColorPaletteModal_BOS()">
+  <div class="cp-card">
+    <div class="cp-head">
+      <div>
+        <div class="cp-title">🎨 색상 선택</div>
+        <div style="font-size:10.5px;color:#7A7870;margin-top:3px">팔레트에서 고르거나 직접 색을 지정할 수 있습니다</div>
+      </div>
+      <button class="cp-close" onclick="closeCalColorPaletteModal_BOS()">×</button>
+    </div>
+    
+    <!-- 자주 쓰는 색 -->
+    <div class="cp-section">
+      <div class="cp-section-title">⭐ 추천 색상 (카테고리 컬러)</div>
+      <div class="cp-grid" id="cp-recommended-grid"></div>
+    </div>
+    
+    <!-- 확장 팔레트 -->
+    <div class="cp-section">
+      <div class="cp-section-title">🌈 확장 팔레트</div>
+      <div class="cp-grid" id="cp-extended-grid"></div>
+    </div>
+    
+    <!-- 정밀 픽커 (포토샵 스타일) -->
+    <div class="cp-section">
+      <div class="cp-section-title">🎯 정밀 색상 선택 (마우스로 자유롭게)</div>
+      <div class="cp-precision-wrap">
+        <!-- SV 사각형 (채도/명도) -->
+        <div class="cp-sv-square" id="cp-sv-square">
+          <div class="cp-sv-overlay-white"></div>
+          <div class="cp-sv-overlay-black"></div>
+          <div class="cp-sv-cursor" id="cp-sv-cursor"></div>
+        </div>
+        <!-- Hue 슬라이더 (색상환) -->
+        <div class="cp-hue-slider" id="cp-hue-slider">
+          <div class="cp-hue-thumb" id="cp-hue-thumb"></div>
+        </div>
+      </div>
+      
+      <!-- 미리보기 + 헥스 입력 -->
+      <div class="cp-custom-row" style="margin-top:12px">
+        <div class="cp-preview" id="cp-preview"></div>
+        <div style="display:flex;flex-direction:column;gap:4px;flex:1">
+          <label style="font-size:9px;color:#7A7870;font-weight:600">HEX</label>
+          <input type="text" id="cp-custom-color-text" value="#C8A45A" oninput="onCpCustomHexChange_BOS(this.value)" placeholder="#RRGGBB" maxlength="7">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;width:60px">
+          <label style="font-size:9px;color:#7A7870;font-weight:600">RGB</label>
+          <div id="cp-rgb-display" style="font-family:'Roboto Mono',monospace;font-size:10.5px;color:#7A7870;line-height:1.6;text-align:center;background:#fff;border:1px solid #E8E6E0;border-radius:6px;padding:7px 4px">200,164,90</div>
+        </div>
+        <input type="color" id="cp-custom-color-picker" value="#C8A45A" oninput="onCpCustomColorChange_BOS(this.value)" title="시스템 색상 픽커 (옵션)">
+      </div>
+      <div style="font-size:10px;color:#999;margin-top:6px;line-height:1.5">
+        💡 좌측 사각형에서 마우스로 채도·명도, 우측 막대에서 색상(Hue)을 드래그하여 자유롭게 선택
+      </div>
+    </div>
+    
+    <div class="cp-actions">
+      <button class="cp-btn" onclick="closeCalColorPaletteModal_BOS()">취소</button>
+      <button class="cp-btn primary" onclick="applyCalColorFromPalette_BOS()">✓ 이 색상 적용</button>
+    </div>
+  </div>
+</div>
+
+<script id="cal-cat-color-script">
+(function(){
+  // ━━ 확장 팔레트 색 (40가지) ━━
+  var EXTENDED_PALETTE_BOS = [
+    // Row 1 - Reds & Oranges
+    '#FF6B6B','#FF8E53','#FF7B7B','#E74C3C','#C0392B','#D2691E','#E67E22','#FF9F40','#FFBE76','#FFD68A',
+    // Row 2 - Yellows & Greens
+    '#F1C40F','#C8A45A','#8FBC8F','#5A8A4A','#1A6B4A','#16A085','#2ECC71','#27AE60','#229954','#7F8C8D',
+    // Row 3 - Blues
+    '#3498DB','#2980B9','#2563EB','#5DADE2','#85C1E2','#3a8a8a','#34495E','#5D6D7E','#7B8FA1','#A6BFD0',
+    // Row 4 - Purples & Pinks
+    '#9B59B6','#7A4AA8','#8E44AD','#AF7AC5','#D7BDE2','#E91E63','#EC407A','#F06292','#A87C4A','#8A5A3A'
+  ];
+  
+  var _selectedPaletteColor = '#C8A45A';
+  var _userChangedColor = false;  // 사용자가 색을 수동 변경했는지 추적
+  
+  // ━━ 카테고리 변경 → 기본 색 자동 설정 ━━
+  window.onCalCategoryChange_BOS = function(catKey){
+    if(!catKey){
+      // 카테고리 해제 - 배지 숨김, 색은 그대로
+      var badge = document.getElementById('bos-cal-color-from-cat');
+      if(badge) badge.style.display = 'none';
+      return;
+    }
+    
+    // 사용자가 이미 수동으로 색을 변경했다면 자동 변경 안 함
+    if(_userChangedColor){
+      // 그래도 배지는 표시 (현재 색이 카테고리 기본인지 사용자 정의인지)
+      return;
+    }
+    
+    var catInfo = (CAL_CATEGORIES_BOS || []).find(function(c){ return c.key === catKey; });
+    if(!catInfo || !catInfo.color) return;
+    
+    // 색상 자동 설정
+    var colorInput = document.getElementById('bos-cal-item-color');
+    if(colorInput) colorInput.value = catInfo.color;
+    
+    // 팔레트 픽커 갱신
+    if(typeof renderColorPicker_BOS === 'function') renderColorPicker_BOS(catInfo.color);
+    
+    // "카테고리 자동" 배지 표시
+    var badge = document.getElementById('bos-cal-color-from-cat');
+    if(badge) badge.style.display = 'inline-block';
+  };
+  
+  // ━━ selectCalColor_BOS 오버라이드: 사용자 수동 선택 표시 ━━
+  var _origSelectCalColor = window.selectCalColor_BOS;
+  window.selectCalColor_BOS = function(color){
+    _userChangedColor = true;
+    var badge = document.getElementById('bos-cal-color-from-cat');
+    if(badge) badge.style.display = 'none';
+    if(_origSelectCalColor) _origSelectCalColor(color);
+  };
+  
+  // ━━ addCalendarItem_BOS / editCalendarItem_BOS 호출 시 플래그 초기화 ━━
+  var _origAddCal = window.addCalendarItem_BOS;
+  if(_origAddCal){
+    window.addCalendarItem_BOS = function(){
+      _userChangedColor = false;
+      _origAddCal.apply(this, arguments);
+    };
+  }
+  var _origEditCal = window.editCalendarItem_BOS;
+  if(_origEditCal){
+    window.editCalendarItem_BOS = function(itemId){
+      // 편집 시는 이미 색이 정해진 상태 - 사용자 변경으로 간주
+      _userChangedColor = true;
+      var badge = document.getElementById('bos-cal-color-from-cat');
+      if(badge) badge.style.display = 'none';
+      _origEditCal.call(this, itemId);
+    };
+  }
+  
+  // ━━ 색상 팔레트 모달 ━━
+  window.openCalColorPaletteModal_BOS = function(){
+    var currentColor = (document.getElementById('bos-cal-item-color') || {}).value || '#C8A45A';
+    _selectedPaletteColor = currentColor;
+    
+    // 추천 색상 그리드 (카테고리 컬러)
+    var recGrid = document.getElementById('cp-recommended-grid');
+    if(recGrid){
+      recGrid.innerHTML = (CAL_CATEGORIES_BOS || []).map(function(cat){
+        var sel = cat.color.toLowerCase() === currentColor.toLowerCase() ? 'selected' : '';
+        return '<div class="cp-swatch ' + sel + '" data-color="' + cat.color + '" '
+          + 'style="background:' + cat.color + '" '
+          + 'title="' + cat.emoji + ' ' + cat.key + '" '
+          + 'onclick="onCpSwatchClick_BOS(\'' + cat.color + '\')"></div>';
+      }).join('');
+    }
+    
+    // 확장 팔레트
+    var extGrid = document.getElementById('cp-extended-grid');
+    if(extGrid){
+      extGrid.innerHTML = EXTENDED_PALETTE_BOS.map(function(c){
+        var sel = c.toLowerCase() === currentColor.toLowerCase() ? 'selected' : '';
+        return '<div class="cp-swatch ' + sel + '" data-color="' + c + '" '
+          + 'style="background:' + c + '" '
+          + 'title="' + c + '" '
+          + 'onclick="onCpSwatchClick_BOS(\'' + c + '\')"></div>';
+      }).join('');
+    }
+    
+    // 사용자 정의 영역 초기화
+    var customPicker = document.getElementById('cp-custom-color-picker');
+    var customText = document.getElementById('cp-custom-color-text');
+    var preview = document.getElementById('cp-preview');
+    if(customPicker) customPicker.value = currentColor;
+    if(customText) customText.value = currentColor.toUpperCase();
+    if(preview) preview.style.background = currentColor;
+    
+    // ━━ 포토샵 스타일 픽커 동기화 (모달 열 때) ━━
+    if(typeof window.cpSyncFromHex_BOS === 'function'){
+      window.cpSyncFromHex_BOS(currentColor);
+    }
+    // 모달 표시
+    document.getElementById('cal-color-palette-modal').style.display = 'flex';
+    // 드래그 핸들러 바인딩 (한 번만 - 중복 방지)
+    if(typeof window.cpInitDragHandlers_BOS === 'function' && !window._cpDragInited){
+      window.cpInitDragHandlers_BOS();
+      window._cpDragInited = true;
+    }
+  };
+  
+  window.closeCalColorPaletteModal_BOS = function(){
+    document.getElementById('cal-color-palette-modal').style.display = 'none';
+  };
+  
+  window.onCpSwatchClick_BOS = function(color){
+    _selectedPaletteColor = color;
+    // 모든 swatch에서 selected 제거 후 클릭한 것에 추가
+    document.querySelectorAll('#cal-color-palette-modal .cp-swatch').forEach(function(el){
+      el.classList.toggle('selected', el.getAttribute('data-color').toLowerCase() === color.toLowerCase());
+    });
+    // 사용자 정의 영역도 동기화
+    var customPicker = document.getElementById('cp-custom-color-picker');
+    var customText = document.getElementById('cp-custom-color-text');
+    var preview = document.getElementById('cp-preview');
+    if(customPicker) customPicker.value = color;
+    if(customText) customText.value = color.toUpperCase();
+    if(preview) preview.style.background = color;
+  };
+  
+  window.onCpCustomColorChange_BOS = function(color){
+    _selectedPaletteColor = color;
+    var customText = document.getElementById('cp-custom-color-text');
+    var preview = document.getElementById('cp-preview');
+    if(customText) customText.value = color.toUpperCase();
+    if(preview) preview.style.background = color;
+    // 팔레트 swatch에서 선택 해제 (사용자 정의니까)
+    document.querySelectorAll('#cal-color-palette-modal .cp-swatch.selected').forEach(function(el){
+      if(el.getAttribute('data-color').toLowerCase() !== color.toLowerCase()){
+        el.classList.remove('selected');
+      }
+    });
+    // 같은 색이 팔레트에 있으면 selected 표시
+    document.querySelectorAll('#cal-color-palette-modal .cp-swatch').forEach(function(el){
+      if(el.getAttribute('data-color').toLowerCase() === color.toLowerCase()){
+        el.classList.add('selected');
+      }
+    });
+  };
+  
+  window.onCpCustomHexChange_BOS = function(text){
+    text = text.trim();
+    // # 자동 추가
+    if(text.length > 0 && text[0] !== '#') text = '#' + text;
+    // 유효성 검사 (#RRGGBB or #RGB)
+    if(/^#[0-9A-Fa-f]{6}$/.test(text) || /^#[0-9A-Fa-f]{3}$/.test(text)){
+      _selectedPaletteColor = text;
+      var customPicker = document.getElementById('cp-custom-color-picker');
+      var preview = document.getElementById('cp-preview');
+      if(customPicker) customPicker.value = text;
+      if(preview) preview.style.background = text;
+    }
+  };
+  
+  window.applyCalColorFromPalette_BOS = function(){
+    // 선택된 색을 항목 색상으로 설정
+    if(typeof selectCalColor_BOS === 'function'){
+      selectCalColor_BOS(_selectedPaletteColor);
+    } else {
+      var colorInput = document.getElementById('bos-cal-item-color');
+      if(colorInput) colorInput.value = _selectedPaletteColor;
+      if(typeof renderColorPicker_BOS === 'function') renderColorPicker_BOS(_selectedPaletteColor);
+    }
+    // 사용자 변경으로 표시 (자동 카테고리 색 덮어쓰기 방지)
+    _userChangedColor = true;
+    var badge = document.getElementById('bos-cal-color-from-cat');
+    if(badge) badge.style.display = 'none';
+    closeCalColorPaletteModal_BOS();
+  };
+  
+  console.log('[Cal] 카테고리 자동 색상 + 팔레트 모달 준비됨');
+})();
+</script>
+
+<!-- ━━━ 🎨 포토샵 스타일 색상 픽커 (SV + Hue 드래그) ━━━ -->
+<script id="cal-precision-picker-script">
+(function(){
+  // ━━ 현재 HSV 상태 (전역 - 모달 안에서만 사용) ━━
+  var _hsv = { h: 40, s: 100, v: 79 };  // 기본 #C8A45A 근처
+  
+  // ━━ HSV → RGB 변환 ━━
+  function hsvToRgb(h, s, v){
+    s = s / 100;
+    v = v / 100;
+    var c = v * s;
+    var x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    var m = v - c;
+    var r, g, b;
+    if(h < 60){ r = c; g = x; b = 0; }
+    else if(h < 120){ r = x; g = c; b = 0; }
+    else if(h < 180){ r = 0; g = c; b = x; }
+    else if(h < 240){ r = 0; g = x; b = c; }
+    else if(h < 300){ r = x; g = 0; b = c; }
+    else { r = c; g = 0; b = x; }
+    return {
+      r: Math.round((r + m) * 255),
+      g: Math.round((g + m) * 255),
+      b: Math.round((b + m) * 255)
+    };
+  }
+  
+  // ━━ RGB → HSV 변환 ━━
+  function rgbToHsv(r, g, b){
+    r = r / 255; g = g / 255; b = b / 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var d = max - min;
+    var h, s = max === 0 ? 0 : d / max, v = max;
+    if(d === 0) h = 0;
+    else if(max === r) h = ((g - b) / d) % 6;
+    else if(max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60;
+    if(h < 0) h += 360;
+    return { h: h, s: s * 100, v: v * 100 };
+  }
+  
+  // ━━ RGB → HEX ━━
+  function rgbToHex(r, g, b){
+    var toHex = function(n){ var h = n.toString(16); return h.length === 1 ? '0' + h : h; };
+    return '#' + toHex(r) + toHex(g) + toHex(b);
+  }
+  
+  // ━━ HEX → RGB ━━
+  function hexToRgb(hex){
+    hex = hex.replace('#', '');
+    if(hex.length === 3) hex = hex.split('').map(function(c){return c+c;}).join('');
+    if(!/^[0-9A-Fa-f]{6}$/.test(hex)) return null;
+    return {
+      r: parseInt(hex.substr(0, 2), 16),
+      g: parseInt(hex.substr(2, 2), 16),
+      b: parseInt(hex.substr(4, 2), 16)
+    };
+  }
+  
+  // ━━ 현재 HSV로부터 모든 UI 동기화 ━━
+  function updateUiFromHsv(skipHex){
+    var rgb = hsvToRgb(_hsv.h, _hsv.s, _hsv.v);
+    var hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+    
+    // SV 사각형 배경색 (현재 Hue)
+    var svSquare = document.getElementById('cp-sv-square');
+    if(svSquare) svSquare.style.background = 'hsl(' + _hsv.h + ', 100%, 50%)';
+    
+    // SV 커서 위치 (s = 가로, v = 세로 반대)
+    var cursor = document.getElementById('cp-sv-cursor');
+    if(cursor){
+      cursor.style.left = _hsv.s + '%';
+      cursor.style.top = (100 - _hsv.v) + '%';
+    }
+    
+    // Hue 슬라이더 thumb 위치
+    var thumb = document.getElementById('cp-hue-thumb');
+    if(thumb) thumb.style.top = (_hsv.h / 360 * 100) + '%';
+    
+    // 미리보기
+    var preview = document.getElementById('cp-preview');
+    if(preview) preview.style.background = hex;
+    
+    // HTML5 color picker
+    var sysPicker = document.getElementById('cp-custom-color-picker');
+    if(sysPicker) sysPicker.value = hex;
+    
+    // HEX 입력 (자기 자신이 변경한 경우 스킵)
+    if(!skipHex){
+      var hexInput = document.getElementById('cp-custom-color-text');
+      if(hexInput) hexInput.value = hex.toUpperCase();
+    }
+    
+    // RGB 표시
+    var rgbDisp = document.getElementById('cp-rgb-display');
+    if(rgbDisp) rgbDisp.textContent = rgb.r + ',' + rgb.g + ',' + rgb.b;
+    
+    // 외부에서 사용하는 _selectedPaletteColor 업데이트 (기존 함수와 연동)
+    if(typeof window._cpSetSelectedColor === 'function'){
+      window._cpSetSelectedColor(hex);
+    } else {
+      // 직접 변수 접근 - 외부 scope의 _selectedPaletteColor
+      // 안전하게 swatch 동기화만
+      document.querySelectorAll('#cal-color-palette-modal .cp-swatch').forEach(function(el){
+        el.classList.toggle('selected', el.getAttribute('data-color').toLowerCase() === hex.toLowerCase());
+      });
+    }
+  }
+  
+  // ━━ HEX 외부에서 들어왔을 때 HSV 동기화 ━━
+  window.cpSyncFromHex_BOS = function(hexColor){
+    var rgb = hexToRgb(hexColor);
+    if(!rgb) return;
+    var hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+    _hsv = hsv;
+    updateUiFromHsv();
+  };
+  
+  // ━━ 마우스/터치 좌표를 요소 내 [0..1] 비율로 ━━
+  function getRelativePos(event, el){
+    var rect = el.getBoundingClientRect();
+    var x, y;
+    if(event.touches && event.touches.length){
+      x = event.touches[0].clientX;
+      y = event.touches[0].clientY;
+    } else {
+      x = event.clientX;
+      y = event.clientY;
+    }
+    return {
+      x: Math.max(0, Math.min(1, (x - rect.left) / rect.width)),
+      y: Math.max(0, Math.min(1, (y - rect.top) / rect.height))
+    };
+  }
+  
+  // ━━ SV 사각형 드래그 ━━
+  function handleSvMove(event){
+    var sv = document.getElementById('cp-sv-square');
+    if(!sv) return;
+    var pos = getRelativePos(event, sv);
+    _hsv.s = pos.x * 100;
+    _hsv.v = (1 - pos.y) * 100;
+    updateUiFromHsv();
+    if(event.cancelable) event.preventDefault();
+  }
+  
+  // ━━ Hue 슬라이더 드래그 ━━
+  function handleHueMove(event){
+    var hue = document.getElementById('cp-hue-slider');
+    if(!hue) return;
+    var pos = getRelativePos(event, hue);
+    _hsv.h = pos.y * 360;
+    updateUiFromHsv();
+    if(event.cancelable) event.preventDefault();
+  }
+  
+  // ━━ 드래그 시작 / 끝 ━━
+  var _dragTarget = null;  // 'sv' or 'hue' or null
+  
+  function onPointerDown(event, target){
+    _dragTarget = target;
+    if(target === 'sv') handleSvMove(event);
+    else if(target === 'hue') handleHueMove(event);
+  }
+  
+  function onPointerMove(event){
+    if(!_dragTarget) return;
+    if(_dragTarget === 'sv') handleSvMove(event);
+    else if(_dragTarget === 'hue') handleHueMove(event);
+  }
+  
+  function onPointerUp(){
+    _dragTarget = null;
+  }
+  
+  // ━━ 드래그 핸들러 바인딩 (모달 처음 열 때 한 번만) ━━
+  window.cpInitDragHandlers_BOS = function(){
+    var svSquare = document.getElementById('cp-sv-square');
+    var hueSlider = document.getElementById('cp-hue-slider');
+    
+    if(svSquare){
+      svSquare.addEventListener('mousedown', function(e){ onPointerDown(e, 'sv'); });
+      svSquare.addEventListener('touchstart', function(e){ onPointerDown(e, 'sv'); }, {passive:false});
+    }
+    if(hueSlider){
+      hueSlider.addEventListener('mousedown', function(e){ onPointerDown(e, 'hue'); });
+      hueSlider.addEventListener('touchstart', function(e){ onPointerDown(e, 'hue'); }, {passive:false});
+    }
+    // 전역 mousemove/mouseup - 드래그가 사각형 밖으로 나가도 추적
+    document.addEventListener('mousemove', onPointerMove);
+    document.addEventListener('touchmove', onPointerMove, {passive:false});
+    document.addEventListener('mouseup', onPointerUp);
+    document.addEventListener('touchend', onPointerUp);
+    document.addEventListener('touchcancel', onPointerUp);
+  };
+  
+  // ━━ 기존 onCpSwatchClick / 헥스 입력 / HTML5 color picker 연동 ━━
+  // 이들 함수가 호출되면 HSV도 동기화되도록 보강
+  
+  // onCpSwatchClick_BOS 가 이미 정의되어 있음 - 그것이 _selectedPaletteColor 변경 후 호출하지 않을 수도
+  // 그래서 외부에서 색 변경 시 HSV 동기화 헬퍼 노출 (위에 cpSyncFromHex_BOS 로 노출됨)
+  
+  // 기존 onCpCustomColorChange_BOS / onCpCustomHexChange_BOS / onCpSwatchClick_BOS 가 끝나고
+  // HSV 픽커도 갱신되도록 래핑
+  
+  // onCpSwatchClick_BOS 래핑
+  var _origSwatchClick = window.onCpSwatchClick_BOS;
+  if(_origSwatchClick){
+    window.onCpSwatchClick_BOS = function(color){
+      _origSwatchClick(color);
+      window.cpSyncFromHex_BOS(color);
+    };
+  }
+  
+  // onCpCustomColorChange_BOS (HTML5 color picker 변경) 래핑
+  var _origCustomChange = window.onCpCustomColorChange_BOS;
+  if(_origCustomChange){
+    window.onCpCustomColorChange_BOS = function(color){
+      _origCustomChange(color);
+      window.cpSyncFromHex_BOS(color);
+    };
+  }
+  
+  // onCpCustomHexChange_BOS (헥스 텍스트 변경) 래핑
+  var _origHexChange = window.onCpCustomHexChange_BOS;
+  if(_origHexChange){
+    window.onCpCustomHexChange_BOS = function(text){
+      _origHexChange(text);
+      // 유효한 헥스일 때만 HSV 동기화
+      var t = text.trim();
+      if(t.length > 0 && t[0] !== '#') t = '#' + t;
+      if(/^#[0-9A-Fa-f]{6}$/.test(t) || /^#[0-9A-Fa-f]{3}$/.test(t)){
+        window.cpSyncFromHex_BOS(t);
+      }
+    };
+  }
+  
+  console.log('[Cal] 포토샵 스타일 정밀 색상 픽커 준비됨');
 })();
 </script>
 </body>
