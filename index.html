@@ -1586,18 +1586,18 @@ body.edit-mode-on .tab-btn .tab-name-edit{
           </div>
         </div>
         
-        <!-- 💳 결제수수료 + 기타 수수료 + 기타 비용 입력 -->
+        <!-- 💳 판매결제수수료 + 광고채널수수료 + 기타 비용 입력 -->
         <div style="margin-bottom:12px;padding:10px 12px;background:#FFFDE7;border:1px solid #FFE082;border-radius:8px">
           <div style="font-size:11px;font-weight:600;color:#8B5E00;margin-bottom:8px">💳 수수료 + 기타비용 (END ROAS에 반영)</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
             <div style="display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:10px;color:var(--mu)" title="PG/카드 결제수수료 (보통 2.9~3.5%)">💳 결제수수료 (%)</span>
+              <span style="font-size:10px;color:var(--mu)" title="PG/카드 판매 결제수수료 (보통 2.9~3.5%)">💳 판매결제수수료 (%)</span>
               <input type="number" id="roas-payfee" step="0.1" placeholder="3.3" oninput="calcROAS2()" 
                 value="3.3"
                 style="width:60px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:10px;color:var(--mu)" title="채널수수료, 플랫폼수수료 등 기타 수수료 합">📊 기타 수수료 (%)</span>
+              <span style="font-size:10px;color:var(--mu)" title="메타/구글 등 광고채널 수수료 (애드 플랫폼 수수료)">📊 광고채널수수료 (%)</span>
               <input type="number" id="roas-etcfee" step="0.1" placeholder="0" oninput="calcROAS2()" 
                 style="width:60px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
             </div>
@@ -1715,7 +1715,7 @@ body.edit-mode-on .tab-btn .tab-name-edit{
       <!-- 단품 정보 표시 -->
       <div style="margin-top:14px;padding:10px 12px;background:#FFFDE7;border:1px solid #FFE082;border-radius:6px;font-size:11px;color:#8B5E00;line-height:1.7">
         <b>💡 자동 연동되는 항목 (ROAS 탭에서 입력)</b><br>
-        <span id="roasset-base-info">— 결제수수료 0% · 기타수수료 0% · 단품원가 0원 · 박스 0원 · 부자재 0원 · 합포장 0원</span>
+        <span id="roasset-base-info">— 판매결제수수료 0% · 광고채널수수료 0% · 단품원가 0원 · 박스 0원 · 부자재 0원 · 합포장 0원</span>
       </div>
     </div>
   </div>
@@ -3448,20 +3448,44 @@ function renderInventory(){
  const priceEl=document.getElementById('roas-price2');
  if(priceEl) autoPrice=parseFloat(priceEl.value)||0;
  if(!autoPrice && inv.price) autoPrice=inv.price;
- // 3) 생산 원가 (단위당): cogsData 합계 × 1.1 (VAT)
+ // 3) 생산 원가 (단위당): ROAS 탭의 roasData 우선, 없으면 cogsData × 1.1 (VAT)
  let unitCost=0;
- if(typeof cogsData!=='undefined' && Array.isArray(cogsData)){
-  const totalUnit=cogsData.reduce((s,r)=>s+((r.unitPrice||r.amount)||0),0);
-  unitCost=Math.round(totalUnit*1.1);
+ // ROAS 탭의 사용자가 입력한 원가 (roasData)
+ let _roasDataCost = 0;
+ if(typeof roasData !== 'undefined' && Array.isArray(roasData)){
+   roasData.forEach(function(r){
+     if(r.amount) _roasDataCost += r.amount;
+     else if(r.pct && autoPrice) _roasDataCost += (autoPrice * r.pct / 100);
+   });
+ }
+ if(_roasDataCost > 0){
+   unitCost = Math.round(_roasDataCost);
+ } else if(typeof cogsData!=='undefined' && Array.isArray(cogsData)){
+   const totalUnit=cogsData.reduce((s,r)=>s+((r.unitPrice||r.amount)||0),0);
+   unitCost=Math.round(totalUnit*1.1);
  }
 
- // ━━━ 사용자 입력값 (저장된 값 우선) ━━━
+ // ━━━ 사용자 입력값 (ROAS 탭 입력값 우선) ━━━
  const stock = (inv.stock!==undefined)?inv.stock:autoStock;         // 총 재고
  const targetQty = (inv.targetQty!==undefined)?inv.targetQty:Math.min(autoStock, Math.round(autoStock*0.5)); // 3개월 목표 (기본 재고의 50%)
- const price = (inv.price!==undefined)?inv.price:autoPrice;
- const channelFee = (inv.channelFee!==undefined)?inv.channelFee:10.8;
- const pgFee = (inv.pgFee!==undefined)?inv.pgFee:2.9;
- const shipPerUnit = (inv.shipPerUnit!==undefined)?inv.shipPerUnit:3000;
+ // ★ price: ROAS 탭 입력이 있으면 무조건 우선 (옛 inv.price에 박힌 값 무시)
+ const price = autoPrice > 0 ? autoPrice : (inv.price!==undefined ? inv.price : 0);
+ // ★ 수수료/배송비도 ROAS 탭 입력 우선 (옛 inv 값에 박힌 것 무시)
+ // ROAS 탭의 기타수수료(roas-etcfee) → channelFee
+ const _roasEtcEl = document.getElementById('roas-etcfee');
+ const _roasEtcVal = _roasEtcEl && _roasEtcEl.value !== '' ? (parseFloat(_roasEtcEl.value)||0) : null;
+ const channelFee = _roasEtcVal !== null ? _roasEtcVal : 
+                    (inv.channelFee!==undefined ? inv.channelFee : 10.8);
+ // ROAS 탭의 결제수수료(roas-payfee) → pgFee
+ const _roasPayEl = document.getElementById('roas-payfee');
+ const _roasPayVal = _roasPayEl && _roasPayEl.value !== '' ? (parseFloat(_roasPayEl.value)||0) : null;
+ const pgFee = _roasPayVal !== null ? _roasPayVal : 
+               (inv.pgFee!==undefined ? inv.pgFee : 2.9);
+ // ROAS 탭의 무료배송비(roas-shipfee) → shipPerUnit
+ const _roasShipEl = document.getElementById('roas-shipfee');
+ const _roasShipVal = _roasShipEl && _roasShipEl.value !== '' ? (parseFloat(_roasShipEl.value)||0) : null;
+ const shipPerUnit = _roasShipVal !== null && _roasShipVal > 0 ? _roasShipVal : 
+                     (inv.shipPerUnit!==undefined ? inv.shipPerUnit : 3000);
  const targetROAS = (inv.targetROAS!==undefined)?inv.targetROAS:300;
  const opexPerUnit = (inv.opexPerUnit!==undefined)?inv.opexPerUnit:0;
  const opexTotal = (inv.opexTotal!==undefined)?inv.opexTotal:0;
@@ -3517,10 +3541,10 @@ function renderInventory(){
  h+=inpCell('총 재고 수량 (개)','stock',stock,'생산 탭 "충진" 자동',CLR.blue);
  h+=inpCell('3개월 목표 판매 (개)','targetQty',targetQty,'재무계산 기준 수량',CLR.green);
  h+=inpCell('판매가 (원)','price',price,'ROAS 탭 판매가 자동');
- h+=inpCell('채널 수수료 (%)','channelFee',channelFee,'쿠팡 10.8 · NSS 3.74');
+ h+=inpCell('광고채널수수료 (%)','channelFee',channelFee,'쿠팡 10.8 · NSS 3.74');
  h+='</div>';
  h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px">';
- h+=inpCell('결제 수수료 (%)','pgFee',pgFee,'PG 일반 2.9');
+ h+=inpCell('판매결제수수료 (%)','pgFee',pgFee,'PG 일반 2.9');
  h+=inpCell('택배비 (원/건)','shipPerUnit',shipPerUnit,'편의점·우체국');
  h+=inpCell('목표 ROAS (%)','targetROAS',targetROAS,'광고비 = 매출/ROAS×100');
  h+=inpCell('개당 판관비 (원)','opexPerUnit',opexPerUnit,'포장재·부자재');
@@ -3568,8 +3592,8 @@ function renderInventory(){
  h+='<thead><tr style="background:var(--bg);border-bottom:1px solid var(--bd);color:var(--mu);font-size:10px"><th style="padding:6px 12px;text-align:left">단계</th><th style="padding:6px 12px;text-align:right">금액</th><th style="padding:6px 12px;text-align:right;width:80px">비율</th><th style="padding:6px 12px;text-align:left;color:var(--mu)">계산</th></tr></thead>';
  h+='<tbody>';
  h+=wrow('💰 예상 매출 (Gross Revenue)',grossRevenue,grossRevenue,CLR.blue,'목표 '+N(saleQty)+'개 × '+N(price)+'원',true);
- h+=wrow('  ー 채널 수수료 ('+channelFee+'%)',-channelFeeAmt,grossRevenue,CLR.red,'매출 × '+channelFee+'%');
- h+=wrow('  ー 결제 수수료 ('+pgFee+'%)',-pgFeeAmt,grossRevenue,CLR.red,'매출 × '+pgFee+'%');
+ h+=wrow('  ー 광고채널수수료 ('+channelFee+'%)',-channelFeeAmt,grossRevenue,CLR.red,'매출 × '+channelFee+'%');
+ h+=wrow('  ー 판매결제수수료 ('+pgFee+'%)',-pgFeeAmt,grossRevenue,CLR.red,'매출 × '+pgFee+'%');
  h+=wrow('  ー 택배비',-shipTotal,grossRevenue,CLR.red,N(saleQty)+'개 × '+N(shipPerUnit)+'원');
  h+=wrow('📦 순매출 (Net Revenue)',netRevenue,grossRevenue,CLR.blue,'매출 − 수수료 − 택배',true);
  h+=wrow('  ー 생산 원가 (COGS, VAT포함)',-cogsTotal,grossRevenue,CLR.red,N(saleQty)+'개 × '+N(unitCost)+'원');
@@ -3774,10 +3798,22 @@ function getInventoryBase(){
  const finalChannelFee = etcfeePctEl && etcfeePctEl.value !== '' ? etcfeePct : 
                          (inv.channelFee!==undefined ? inv.channelFee : 10.8);
  
+ // ━━ 우선순위 통일: ROAS 탭 입력값이 있으면 무조건 우선 ━━
+ // (이전 inventoryData에 박혀있는 옛 값을 덮어쓰기)
+ const finalPrice = autoPrice > 0 ? autoPrice : 
+                    (inv.price !== undefined ? inv.price : 0);
+ // 시나리오/감도/통합매출 모두 ROAS 탭과 동기화
+ console.log('[getInventoryBase] price 결정:', {
+   roasPrice: autoPrice,
+   invPrice: inv.price,
+   final: finalPrice,
+   unitCost: unitCost
+ });
+ 
  return {
   stock: inv.stock!==undefined?inv.stock:autoStock,
   targetQty: inv.targetQty!==undefined?inv.targetQty:Math.round(autoStock*0.5),
-  price: inv.price!==undefined?inv.price:autoPrice,
+  price: finalPrice,
   unitCost: unitCost,
   channelFee: finalChannelFee,
   pgFee: finalPgFee,
@@ -3808,7 +3844,7 @@ function renderScenarioCompare(){
 
  // ━━ ROAS 탭의 추가비용 정보 (사용자 인지용) ━━
  const _scInfoBox = (base.packagingPerUnit > 0 || (base.payfeePct && base.payfeePct !== 2.9) || (base.etcfeePct && base.etcfeePct !== 10.8)) 
-  ? '<div style="background:#FFFDE7;border:1px solid #FFE082;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#8B5E00;line-height:1.7"><b>💡 ROAS 탭 연동:</b> 결제수수료 <b>'+(base.pgFee||0)+'%</b> · 기타수수료 <b>'+(base.channelFee||0)+'%</b> · 단위당 포장비 <b>'+(base.packagingPerUnit||0).toLocaleString('ko-KR')+'원</b> · 단위당 배송비 <b>'+(base.shipPerUnit||0).toLocaleString('ko-KR')+'원</b> (ROAS 탭 변경 시 자동 반영)</div>'
+  ? '<div style="background:#FFFDE7;border:1px solid #FFE082;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#8B5E00;line-height:1.7"><b>💡 ROAS 탭 연동:</b> 판매결제수수료 <b>'+(base.pgFee||0)+'%</b> · 광고채널수수료 <b>'+(base.channelFee||0)+'%</b> · 단위당 포장비 <b>'+(base.packagingPerUnit||0).toLocaleString('ko-KR')+'원</b> · 단위당 배송비 <b>'+(base.shipPerUnit||0).toLocaleString('ko-KR')+'원</b> (ROAS 탭 변경 시 자동 반영)</div>'
   : '';
  
  // 시나리오 파라미터 (사용자 조정 가능)
@@ -3879,7 +3915,7 @@ function renderScenarioCompare(){
  scenarios.forEach(s=>h+='<td style="padding:5px 6px;text-align:center"><input type="number" value="'+s.roas+'" onchange="updateScenario(\''+s.key+'_roas\',this.value)" style="width:70px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:center"></td>');
  h+='</tr>';
  // 수수료 배수
- h+='<tr style="border-bottom:.5px dashed var(--bd)"><td style="padding:5px 6px">채널 수수료 × 배수</td>';
+ h+='<tr style="border-bottom:.5px dashed var(--bd)"><td style="padding:5px 6px">광고채널수수료 × 배수</td>';
  scenarios.forEach(s=>h+='<td style="padding:5px 6px;text-align:center"><input type="number" step="0.05" value="'+s.channelBoost+'" onchange="updateScenario(\''+s.key+'_channel\',this.value)" style="width:70px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:center"><div style="font-size:9px;color:var(--mu)">'+(base.channelFee*s.channelBoost).toFixed(1)+'%</div></td>');
  h+='</tr>';
  // 판관비 배수
@@ -4267,7 +4303,7 @@ function renderROASSensitivity(){
  const base=getInventoryBase();
 
  const _sensInfoBox = (base.packagingPerUnit > 0 || (base.payfeePct && base.payfeePct !== 2.9) || (base.etcfeePct && base.etcfeePct !== 10.8)) 
-  ? '<div style="background:#FFFDE7;border:1px solid #FFE082;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#8B5E00;line-height:1.7"><b>💡 ROAS 탭 연동:</b> 결제수수료 <b>'+(base.pgFee||0)+'%</b> · 기타수수료 <b>'+(base.channelFee||0)+'%</b> · 단위당 포장비 <b>'+(base.packagingPerUnit||0).toLocaleString('ko-KR')+'원</b> · 단위당 배송비 <b>'+(base.shipPerUnit||0).toLocaleString('ko-KR')+'원</b> (ROAS 탭 변경 시 자동 반영)</div>'
+  ? '<div style="background:#FFFDE7;border:1px solid #FFE082;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#8B5E00;line-height:1.7"><b>💡 ROAS 탭 연동:</b> 판매결제수수료 <b>'+(base.pgFee||0)+'%</b> · 광고채널수수료 <b>'+(base.channelFee||0)+'%</b> · 단위당 포장비 <b>'+(base.packagingPerUnit||0).toLocaleString('ko-KR')+'원</b> · 단위당 배송비 <b>'+(base.shipPerUnit||0).toLocaleString('ko-KR')+'원</b> (ROAS 탭 변경 시 자동 반영)</div>'
   : ''; const sens = (typeof sensitivityData!=='undefined'&&sensitivityData)?sensitivityData:{};
  const targetQty = sens.qty!==undefined?sens.qty:base.targetQty;
 
@@ -6050,7 +6086,7 @@ function calcROAS2(){
   if(r.amount) totalCost+=r.amount;
   else if(r.pct&&price) totalCost+=(price*r.pct/100);
  });
- // ━━━ 결제수수료 + 기타수수료 + 기타비용 추가 반영 ━━━
+ // ━━━ 판매결제수수료 + 광고채널수수료 + 기타비용 추가 반영 ━━━
  var payfeePct = parseFloat(document.getElementById('roas-payfee')?.value)||0;
  var etcfeePct = parseFloat(document.getElementById('roas-etcfee')?.value)||0;
  var boxCost = parseFloat(document.getElementById('roas-box')?.value)||0;
@@ -6123,24 +6159,31 @@ function calcROAS2(){
   else{evVAT.textContent=endROAS_VAT+'%';evVAT.style.color=endROAS_VAT<=300?'#BF360C':'var(--amber)';}
  }
 
- // ━━ 시나리오/감도/통합/현금흐름 탭들 즉시 반영 ━━
- if(typeof renderCashflowChart === 'function' && document.getElementById('cashflow-tab-panel')?.style.display !== 'none'){
-  if(typeof flushCashflowRender === 'function') flushCashflowRender();
-  else renderCashflowChart();
- }
- if(typeof renderScenarioCompare === 'function' && document.getElementById('scenario-tab-panel')?.style.display !== 'none'){
-  renderScenarioCompare();
- }
- if(typeof renderROASSensitivity === 'function' && document.getElementById('sensitivity-tab-panel')?.style.display !== 'none'){
-  renderROASSensitivity();
- }
- if(typeof renderIntegratedFinance === 'function' && document.getElementById('integrated-tab-panel')?.style.display !== 'none'){
-  renderIntegratedFinance();
- }
- // ━━ END ROAS 세트 탭도 갱신 ━━
- if(typeof calcRoasSet === 'function' && document.getElementById('roasset-tab-panel')?.style.display !== 'none'){
-  calcRoasSet();
- }
+ // ━━ 시나리오/감도/통합/현금흐름/재고자산 모두 즉시 반영 (display 체크 제거 - 항상 갱신) ━━
+ // 어느 탭에 가있어도 ROAS 값 변경 시 다른 탭 데이터도 즉시 최신화
+ try { 
+   if(typeof renderCashflowChart === 'function'){
+     if(typeof flushCashflowRender === 'function') flushCashflowRender();
+     else renderCashflowChart();
+   }
+ } catch(e){ console.warn('[ROAS Trigger] cashflow:', e.message); }
+ try { 
+   if(typeof renderScenarioCompare === 'function') renderScenarioCompare(); 
+ } catch(e){ console.warn('[ROAS Trigger] scenario:', e.message); }
+ try { 
+   if(typeof renderROASSensitivity === 'function') renderROASSensitivity(); 
+ } catch(e){ console.warn('[ROAS Trigger] sensitivity:', e.message); }
+ try { 
+   if(typeof renderIntegratedFinance === 'function') renderIntegratedFinance(); 
+ } catch(e){ console.warn('[ROAS Trigger] integrated:', e.message); }
+ // ★ 재고자산 탭도 갱신 (이전엔 누락되어 있었음!)
+ try { 
+   if(typeof renderInventory === 'function') renderInventory(); 
+ } catch(e){ console.warn('[ROAS Trigger] inventory:', e.message); }
+ // END ROAS 세트 탭
+ try { 
+   if(typeof calcRoasSet === 'function') calcRoasSet(); 
+ } catch(e){ console.warn('[ROAS Trigger] roasset:', e.message); }
 }
 
 
@@ -6177,7 +6220,7 @@ function calcRoasSet(){
  // 정보 표시 박스
  var infoEl = document.getElementById('roasset-base-info');
  if(infoEl){
-  infoEl.innerHTML = '• 결제수수료 <b>'+payfeePct+'%</b> · 기타수수료 <b>'+etcfeePct+'%</b> · 단품원가 <b>'+N(unitPureCost)+'원</b>'
+  infoEl.innerHTML = '• 판매결제수수료 <b>'+payfeePct+'%</b> · 광고채널수수료 <b>'+etcfeePct+'%</b> · 단품원가 <b>'+N(unitPureCost)+'원</b>'
    + ' · 택배상자 <b>'+N(boxCost)+'원</b> · 포장부자재 <b>'+N(extraMaterial)+'원</b> · 합포장비 <b>'+N(wrapCost)+'원</b>';
  }
  
@@ -6185,7 +6228,7 @@ function calcRoasSet(){
  function calcSet(qty, price, shipCost){
   // 비용 구성:
   // - 제품 원가 × qty
-  // - 결제수수료 + 기타수수료 (세트 판매가 기준)
+  // - 판매결제수수료 + 광고채널수수료 (세트 판매가 기준)
   // - 박스 (세트당 1개) + 합포장비 (세트당 1) + 부자재 × qty (제품마다 부착)
   // - 무료배송비 (세트당 1)
   var productCost = unitPureCost * qty;
@@ -6246,7 +6289,7 @@ function calcRoasSet(){
   // 비용 구성 디테일
   html += '<div style="font-size:10px;color:var(--mu);line-height:1.8;margin-bottom:10px">';
   html += '• 제품원가('+s.qty+'개): <b style="color:var(--tx)">'+N(r.productCost)+'원</b><br>';
-  html += '• 결제수수료('+payfeePct+'%): <b style="color:var(--tx)">'+N(r.payfeeAmt)+'원</b><br>';
+  html += '• 판매결제수수료('+payfeePct+'%): <b style="color:var(--tx)">'+N(r.payfeeAmt)+'원</b><br>';
   if(etcfeePct>0) html += '• 기타수수료('+etcfeePct+'%): <b style="color:var(--tx)">'+N(r.etcfeeAmt)+'원</b><br>';
   html += '• 포장(박스+합포장+부자재×'+s.qty+'): <b style="color:var(--tx)">'+N(r.packaging)+'원</b><br>';
   html += '• 무료배송비: <b style="color:var(--tx)">'+N(r.shipCost)+'원</b><br>';
@@ -11616,6 +11659,16 @@ function forceIsolationReset(){
   </div>
 </div>
 <div id="t13" class="tab-pane">
+  <!-- 서브탭 -->
+  <div class="hbar" style="padding:8px 18px 0">
+    <div style="display:flex;gap:4px;flex-wrap:wrap">
+      <button class="stab active" id="t13-sub-existing-btn" onclick="showDetailSubTab(\'existing\')">📝 상세페이지 기획</button>
+      <button class="stab" id="t13-sub-html-btn" onclick="showDetailSubTab(\'html\')">🌐 HTML 출력</button>
+    </div>
+  </div>
+  
+  <!-- 서브탭 1: 기존 상세페이지 기획 -->
+  <div id="t13-sub-existing">
   <div class="hbar">
     <div style="font-size:12px;font-weight:500">상세페이지 기획 — 행동경제학 & 설득의 심리학 기반</div>
     <button class="btn pri" onclick="saveDetailPage()">저장</button>
@@ -11679,6 +11732,47 @@ function forceIsolationReset(){
           <div id="draft-wrap" style="padding:10px 14px"></div>
         </div>
 
+      </div>
+    </div>
+  </div>
+  </div>  <!-- 기존 콘텐츠 wrapper #t13-sub-existing 닫기 -->
+  
+  <!-- 서브탭 2: HTML 출력 (외부 HTML 파일 iframe 로더) -->
+  <div id="t13-sub-html" style="display:none;padding:14px 18px">
+    
+    <!-- 안내 -->
+    <div style="background:#F0F4F8;border:1px solid #B5C9E8;border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:11px;color:#1A3FAA;line-height:1.7">
+      💡 <b>외부 HTML 파일을 탭 안에서 직접 보기</b> (같은 GitHub 저장소에 업로드한 파일)<br>
+      <span style="color:var(--mu)">예: 같은 폴더에 <code style="background:#fff;padding:1px 4px;border-radius:3px">detailpage.html</code>을 두면 <code style="background:#fff;padding:1px 4px;border-radius:3px">./detailpage.html</code>로 접근.<br>제품별로 여러 파일 운영 시 폴더 정리 권장: <code style="background:#fff;padding:1px 4px;border-radius:3px">./detail/제품명.html</code></span>
+    </div>
+    
+    <!-- 등록된 파일 리스트 -->
+    <div class="section" style="margin-bottom:14px">
+      <div class="sec-head">
+        <h3>📚 등록된 HTML 파일</h3>
+        <button class="btn" onclick="addDetailHtmlFile()" style="font-size:11px;padding:4px 10px">+ 파일 등록</button>
+      </div>
+      <div class="sec-body" style="padding:10px 14px">
+        <div id="detail-html-files-list" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+    </div>
+    
+    <!-- iframe 뷰어 -->
+    <div class="section">
+      <div class="sec-head" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <h3 id="detail-html-current-title" style="margin:0">🌐 상세페이지 출력</h3>
+        <span id="detail-html-current-url" style="font-family:var(--mn);font-size:10px;color:var(--mu);background:var(--bg);padding:2px 6px;border-radius:3px"></span>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn" onclick="reloadDetailHtmlIframe()" title="iframe 새로고침" style="font-size:11px;padding:4px 9px">🔄 새로고침</button>
+          <button class="btn" onclick="openDetailHtmlInNewTab()" title="새 탭에서 큰 화면으로 보기" style="font-size:11px;padding:4px 9px">↗ 새 탭에서 열기</button>
+          <button class="btn" onclick="toggleDetailHtmlFullscreen()" title="전체화면 모드" style="font-size:11px;padding:4px 9px">⛶ 전체화면</button>
+        </div>
+      </div>
+      <div class="sec-body" style="padding:0">
+        <iframe id="detail-html-iframe" src="about:blank" 
+                style="width:100%;height:900px;border:none;display:block;background:#fff"
+                title="상세페이지 출력"
+                onload="onDetailHtmlIframeLoad()"></iframe>
       </div>
     </div>
   </div>
@@ -13573,7 +13667,9 @@ function forceIsolationReset(){
     'bos_edit_mode_v1',        // 편집 모드 상태
     'tetrarix_injected_v1',    // TETRARIX 데이터 주입 플래그
     'bos_ingred_files_v1',     // 🧪 성분 컨셉 HTML 파일 목록
-    'bos_ingred_current_v1'    // 🧪 성분 컨셉 현재 선택 인덱스
+    'bos_ingred_current_v1',   // 🧪 성분 컨셉 현재 선택 인덱스
+    'bos_detailhtml_files_v1', // 🌐 상세페이지 HTML 파일 목록
+    'bos_detailhtml_current_v1'// 🌐 상세페이지 HTML 현재 선택 인덱스
   ];
   
   // ━━ 동적 키 prefix (제품별 데이터: epitect-v7__제품ID) ━━
@@ -16699,6 +16795,238 @@ window.getBosFilename = function(ext, screenName){
 };
 
 console.log('[Filename] getBosFilename 헬퍼 준비됨');
+</script>
+
+<!-- ━━━ 🌐 상세페이지 HTML 출력 로더 (t13 서브탭) ━━━ -->
+<script id="detail-html-loader-script">
+(function(){
+  var LS_KEY = 'bos_detailhtml_files_v1';
+  var LS_CURRENT = 'bos_detailhtml_current_v1';
+  
+  function loadDetailHtmlFiles(){
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if(raw) return JSON.parse(raw);
+    } catch(e){}
+    // 기본값
+    return [
+      {name:'상세페이지', url:'./detailpage.html'}
+    ];
+  }
+  
+  function saveDetailHtmlFiles(files){
+    try { localStorage.setItem(LS_KEY, JSON.stringify(files)); } catch(e){}
+  }
+  
+  function loadCurrentIndex(){
+    try {
+      var v = localStorage.getItem(LS_CURRENT);
+      return v ? parseInt(v) || 0 : 0;
+    } catch(e){ return 0; }
+  }
+  
+  function saveCurrentIndex(idx){
+    try { localStorage.setItem(LS_CURRENT, String(idx)); } catch(e){}
+  }
+  
+  window.renderDetailHtmlFiles = function(){
+    var listEl = document.getElementById('detail-html-files-list');
+    if(!listEl) return;
+    var files = loadDetailHtmlFiles();
+    var current = loadCurrentIndex();
+    
+    if(files.length === 0){
+      listEl.innerHTML = '<div style="padding:14px;text-align:center;color:var(--mu);font-size:12px">등록된 파일이 없습니다. <b>+ 파일 등록</b> 버튼을 눌러 추가하세요.</div>';
+      return;
+    }
+    
+    listEl.innerHTML = files.map(function(f, i){
+      var isActive = i === current;
+      var escName = (f.name||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+      var escUrl = (f.url||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+      return '<div style="display:flex;gap:6px;align-items:center;padding:8px 10px;border:1px solid ' + (isActive?'#2563EB':'var(--bd)') + ';border-radius:6px;background:' + (isActive?'#F0F4F8':'var(--sur)') + ';transition:.15s">'
+        + '<input value="' + escName + '" placeholder="제품명 / 라벨" onchange="updateDetailHtmlFile(' + i + ',\'name\',this.value)" style="flex:1;min-width:120px;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:12px;font-weight:' + (isActive?'600':'400') + ';background:var(--bg)">'
+        + '<input value="' + escUrl + '" placeholder="./detailpage.html 또는 ./detail/제품.html" onchange="updateDetailHtmlFile(' + i + ',\'url\',this.value)" style="flex:2;min-width:200px;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:11px;font-family:var(--mn);background:var(--bg)">'
+        + '<button onclick="selectDetailHtmlFile(' + i + ')" title="이 파일 로드" style="background:' + (isActive?'#2563EB':'var(--sur)') + ';color:' + (isActive?'#fff':'var(--tx)') + ';border:1px solid ' + (isActive?'#2563EB':'var(--bd)') + ';border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600;white-space:nowrap">' + (isActive?'✓ 사용 중':'▶ 로드') + '</button>'
+        + '<button onclick="deleteDetailHtmlFile(' + i + ')" title="삭제" style="background:none;border:1px solid var(--bd);border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;color:#C0392B">✕</button>'
+        + '</div>';
+    }).join('');
+  };
+  
+  window.addDetailHtmlFile = function(){
+    var files = loadDetailHtmlFiles();
+    files.push({name:'새 파일', url:'./'});
+    saveDetailHtmlFiles(files);
+    renderDetailHtmlFiles();
+  };
+  
+  window.updateDetailHtmlFile = function(idx, key, val){
+    var files = loadDetailHtmlFiles();
+    if(!files[idx]) return;
+    files[idx][key] = val;
+    saveDetailHtmlFiles(files);
+    if(idx === loadCurrentIndex() && key === 'url') reloadCurrentIframe();
+    if(idx === loadCurrentIndex() && key === 'name') updateIframeTitle();
+  };
+  
+  window.deleteDetailHtmlFile = function(idx){
+    if(!confirm('이 파일 등록을 삭제하시겠습니까?\n(실제 파일은 안 지워집니다)')) return;
+    var files = loadDetailHtmlFiles();
+    files.splice(idx, 1);
+    saveDetailHtmlFiles(files);
+    var current = loadCurrentIndex();
+    if(current >= files.length) saveCurrentIndex(Math.max(0, files.length - 1));
+    renderDetailHtmlFiles();
+    reloadCurrentIframe();
+  };
+  
+  window.selectDetailHtmlFile = function(idx){
+    saveCurrentIndex(idx);
+    renderDetailHtmlFiles();
+    reloadCurrentIframe();
+  };
+  
+  function reloadCurrentIframe(){
+    var files = loadDetailHtmlFiles();
+    var current = loadCurrentIndex();
+    var file = files[current];
+    var iframe = document.getElementById('detail-html-iframe');
+    if(!iframe) return;
+    if(!file || !file.url || file.url === './' || file.url.trim() === ''){
+      iframe.src = 'about:blank';
+      updateIframeTitle();
+      return;
+    }
+    iframe.src = file.url;
+    updateIframeTitle();
+  }
+  
+  function updateIframeTitle(){
+    var files = loadDetailHtmlFiles();
+    var current = loadCurrentIndex();
+    var file = files[current];
+    var titleEl = document.getElementById('detail-html-current-title');
+    var urlEl = document.getElementById('detail-html-current-url');
+    if(file){
+      if(titleEl) titleEl.textContent = '🌐 ' + (file.name || '상세페이지 출력');
+      if(urlEl) urlEl.textContent = file.url || '';
+    } else {
+      if(titleEl) titleEl.textContent = '🌐 상세페이지 출력';
+      if(urlEl) urlEl.textContent = '';
+    }
+  }
+  
+  window.reloadDetailHtmlIframe = function(){
+    var iframe = document.getElementById('detail-html-iframe');
+    if(!iframe) return;
+    iframe.src = 'about:blank';
+    setTimeout(function(){
+      var files = loadDetailHtmlFiles();
+      var file = files[loadCurrentIndex()];
+      iframe.src = file ? (file.url || 'about:blank') : 'about:blank';
+    }, 50);
+  };
+  
+  window.openDetailHtmlInNewTab = function(){
+    var files = loadDetailHtmlFiles();
+    var file = files[loadCurrentIndex()];
+    if(!file || !file.url || file.url === './'){
+      alert('먼저 파일을 등록하고 선택하세요.');
+      return;
+    }
+    window.open(file.url, '_blank', 'noopener');
+  };
+  
+  window.toggleDetailHtmlFullscreen = function(){
+    var iframe = document.getElementById('detail-html-iframe');
+    if(!iframe) return;
+    if(document.fullscreenElement){
+      document.exitFullscreen();
+    } else if(iframe.requestFullscreen){
+      iframe.requestFullscreen();
+    } else if(iframe.webkitRequestFullscreen){
+      iframe.webkitRequestFullscreen();
+    } else {
+      alert('이 브라우저는 전체화면을 지원하지 않습니다.');
+    }
+  };
+  
+  // iframe 자동 높이 조정
+  window.onDetailHtmlIframeLoad = function(){
+    var iframe = document.getElementById('detail-html-iframe');
+    if(!iframe || iframe.src === 'about:blank' || !iframe.src) return;
+    try {
+      var doc = iframe.contentDocument || iframe.contentWindow.document;
+      if(!doc || !doc.body) return;
+      var resize = function(){
+        try {
+          var h = Math.max(
+            doc.body.scrollHeight,
+            doc.body.offsetHeight,
+            doc.documentElement.scrollHeight,
+            doc.documentElement.offsetHeight
+          );
+          iframe.style.height = Math.max(600, h + 30) + 'px';
+        } catch(e){}
+      };
+      resize();
+      if(window.ResizeObserver){
+        var ro = new ResizeObserver(resize);
+        ro.observe(doc.body);
+      }
+      setTimeout(resize, 200);
+      setTimeout(resize, 800);
+      setTimeout(resize, 2000);
+    } catch(e){
+      console.log('[Detail HTML] iframe 자동 높이 조정 불가 (CORS):', e.message);
+    }
+  };
+  
+  // 서브탭 전환
+  window.showDetailSubTab = function(name){
+    var existingBtn = document.getElementById('t13-sub-existing-btn');
+    var htmlBtn = document.getElementById('t13-sub-html-btn');
+    var existingPane = document.getElementById('t13-sub-existing');
+    var htmlPane = document.getElementById('t13-sub-html');
+    if(name === 'html'){
+      if(existingBtn) existingBtn.classList.remove('active');
+      if(htmlBtn) htmlBtn.classList.add('active');
+      if(existingPane) existingPane.style.display = 'none';
+      if(htmlPane) htmlPane.style.display = '';
+      renderDetailHtmlFiles();
+      reloadCurrentIframe();
+    } else {
+      if(existingBtn) existingBtn.classList.add('active');
+      if(htmlBtn) htmlBtn.classList.remove('active');
+      if(existingPane) existingPane.style.display = '';
+      if(htmlPane) htmlPane.style.display = 'none';
+    }
+  };
+  
+  // showTab('t13') 호출 시 처음 진입 시 초기화
+  var _origShowTab = window.showTab;
+  if(typeof _origShowTab === 'function'){
+    var _alreadyWrapped = window.showTab._t13Wrapped;
+    if(!_alreadyWrapped){
+      var _prevShowTab = window.showTab;
+      window.showTab = function(){
+        _prevShowTab.apply(this, arguments);
+        if(arguments[0] === 't13'){
+          setTimeout(function(){
+            var htmlPane = document.getElementById('t13-sub-html');
+            if(htmlPane && htmlPane.style.display !== 'none'){
+              renderDetailHtmlFiles();
+              reloadCurrentIframe();
+            }
+          }, 50);
+        }
+      };
+      window.showTab._t13Wrapped = true;
+    }
+  }
+  
+  console.log('[Detail HTML] iframe 로더 준비됨');
+})();
 </script>
 </body>
 </html>
