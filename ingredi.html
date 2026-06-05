@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TX MELA REPAIR v13.8 · 트라나마카C · 작업 페이지 v5</title>
+<title>TX MELA REPAIR v13.9 · 트라마카C · 작업 페이지 v7</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
@@ -46,11 +46,11 @@ html, body { font-family: 'Pretendard Variable', Pretendard, -apple-system, sans
 .signature-banner { background: linear-gradient(135deg, var(--wine) 0%, var(--wine-light) 100%); color: white; padding: 24px 28px; border-radius: var(--radius-xl); margin-bottom: 28px; }
 .signature-banner h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
 .signature-banner .sub { font-size: 13px; opacity: 0.85; margin-bottom: 16px; }
-.tranamaca-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 12px; }
-@media (max-width: 700px) { .tranamaca-grid { grid-template-columns: repeat(2, 1fr); } }
+.tranamaca-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; }
+@media (max-width: 600px) { .tranamaca-grid { grid-template-columns: repeat(2, 1fr); } }
 .tranamaca-cell { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 12px 10px; text-align: center; backdrop-filter: blur(8px); }
 .tranamaca-cell .letter { font-size: 28px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
-.tranamaca-cell .name { font-size: 11px; opacity: 0.85; margin-bottom: 4px; }
+.tranamaca-cell .name { font-size: 10.5px; opacity: 0.85; margin-bottom: 4px; line-height: 1.4; }
 .tranamaca-cell .pct { font-size: 13px; font-weight: 700; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px; display: inline-block; }
 .overview { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 24px; margin-bottom: 36px; }
 .overview-title { font-size: 13px; font-weight: 500; color: var(--text-mute); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
@@ -189,6 +189,60 @@ html, body { font-family: 'Pretendard Variable', Pretendard, -apple-system, sans
 .board-chip .chip-del { background: none; border: none; color: inherit; opacity: 0.5; font-size: 14px; cursor: pointer; padding: 0; }
 .add-board-btn { padding: 8px 14px; background: none; border: 1px dashed var(--border-strong); border-radius: 20px; font-size: 13px; color: var(--text-mute); cursor: pointer; }
 .board-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; padding: 12px 16px; background: var(--wine-bg); border-radius: var(--radius); font-size: 13px; color: var(--wine); }
+
+/* ===== Card Modal ===== */
+.modal-overlay { position: fixed; inset: 0; background: rgba(31, 8, 8, 0.55); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; animation: fadeIn 0.2s ease-out; }
+.modal-overlay.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-card { background: var(--surface); border-radius: var(--radius-xl); width: 100%; max-width: 640px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 24px 60px rgba(31, 8, 8, 0.35); animation: slideUp 0.25s ease-out; }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-head { padding: 20px 28px; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, var(--wine) 0%, var(--wine-light) 100%); color: white; display: flex; justify-content: space-between; align-items: center; }
+.modal-title { font-size: 16px; font-weight: 600; letter-spacing: 0.3px; }
+.modal-mode-badge { display: inline-block; font-size: 10px; padding: 2px 8px; background: rgba(255,255,255,0.18); border-radius: 10px; margin-left: 8px; letter-spacing: 0.5px; }
+.modal-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; line-height: 1; padding: 0; opacity: 0.7; transition: opacity 0.15s; }
+.modal-close:hover { opacity: 1; }
+.modal-body { padding: 24px 28px; overflow-y: auto; flex: 1; }
+.form-grid { display: grid; gap: 16px; }
+.form-row { display: grid; gap: 6px; }
+.form-row.two-col { grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-row.two-col .form-field { display: grid; gap: 6px; }
+.form-label { font-size: 11px; font-weight: 600; color: var(--text-sub); letter-spacing: 0.5px; text-transform: uppercase; }
+.form-label.required::after { content: ' *'; color: var(--danger); }
+.form-input, .form-textarea, .form-select {
+  width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 6px;
+  font-family: inherit; font-size: 13px; color: var(--text); background: var(--surface);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: var(--wine); box-shadow: 0 0 0 3px rgba(92, 46, 46, 0.08); }
+.form-textarea { min-height: 60px; resize: vertical; line-height: 1.5; }
+.form-radio-group { display: flex; gap: 8px; }
+.form-radio { flex: 1; }
+.form-radio input { display: none; }
+.form-radio label { display: block; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 13px; font-weight: 500; text-align: center; cursor: pointer; transition: all 0.15s; }
+.form-radio input:checked + label { background: var(--wine-bg); border-color: var(--wine); color: var(--wine); font-weight: 600; }
+.form-radio.derma input:checked + label { background: var(--derma-bg); border-color: var(--derma); color: var(--derma); }
+.form-radio.nature input:checked + label { background: var(--nature-bg); border-color: var(--nature); color: var(--nature); }
+.form-check-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.form-check { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--border); border-radius: 16px; cursor: pointer; font-size: 12px; user-select: none; transition: all 0.15s; }
+.form-check input { width: 14px; height: 14px; accent-color: var(--wine); cursor: pointer; }
+.form-check:has(input:checked) { background: var(--wine-bg); border-color: var(--wine); color: var(--wine); font-weight: 600; }
+.form-hint { font-size: 11px; color: var(--text-mute); margin-top: 2px; }
+.modal-foot { padding: 16px 28px; border-top: 1px solid var(--border); background: var(--bg); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.modal-foot-info { font-size: 11px; color: var(--text-mute); }
+.modal-foot-buttons { display: flex; gap: 8px; }
+.btn { padding: 9px 18px; border-radius: 6px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; }
+.btn-secondary { background: var(--surface); color: var(--text-sub); border-color: var(--border); }
+.btn-secondary:hover { background: var(--bg); border-color: var(--border-strong); }
+.btn-primary { background: var(--wine); color: white; }
+.btn-primary:hover { background: var(--wine-light); transform: translateY(-1px); }
+.btn-danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-bg); }
+.btn-danger:hover { background: var(--danger); color: white; }
+@media (max-width: 600px) {
+  .modal-card { max-height: 95vh; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .form-row.two-col { grid-template-columns: 1fr; }
+  .modal-foot { flex-wrap: wrap; }
+}
+
 @media print {
   .tab-btn, .card-controls, .add-card-btn, .add-item-btn, .item-del, .drag-handle { display: none !important; }
   .tab-content { display: block !important; page-break-before: always; }
@@ -199,8 +253,8 @@ html, body { font-family: 'Pretendard Variable', Pretendard, -apple-system, sans
 <div class="container">
 
 <header class="page-head">
-<div class="page-title"><span class="brand-mark">TETRARIX v13.8</span>TX MELA REPAIR<span class="signature-mark">트라나마카C</span></div>
-<div class="page-sub">함량 컨트롤 11종 · 라멜라 Active 3:1:1:1 · 4×4 시스템</div>
+<div class="page-title"><span class="brand-mark">TETRARIX v13.9</span>TX MELA REPAIR<span class="signature-mark">트라마카C</span></div>
+<div class="page-sub">트라마카C · 식약처 미백 단일 신고 · 자연 비타민C 시스템 · 4×4 시스템</div>
 </header>
 
 <nav class="tabs">
@@ -212,19 +266,18 @@ html, body { font-family: 'Pretendard Variable', Pretendard, -apple-system, sans
 <section id="tab1" class="tab-content active">
 
 <div class="signature-banner">
-<h2>💎 트라나마카C — 5종 시그너처 분자</h2>
-<div class="sub">식약처 미백 + 노벨상 메커니즘 + 차세대 항당화 분자 + 비타민C 안정형 시스템</div>
+<h2>💎 트라마카C — 4중 시그너처 컴플렉스</h2>
+<div class="sub">식약처 미백 단일 + 노벨상 DNA 복구 + 항당화 + 자연 비타민C 3대륙</div>
 <div class="tranamaca-grid">
 <div class="tranamaca-cell"><div class="letter">트라</div><div class="name">트라넥삼산</div><div class="pct">5.0%</div></div>
-<div class="tranamaca-cell"><div class="letter">나</div><div class="name">나이아신아마이드</div><div class="pct">4.0%</div></div>
-<div class="tranamaca-cell"><div class="letter">마</div><div class="name">마이크로코쿠스용해물</div><div class="pct">1.0%</div></div>
-<div class="tranamaca-cell"><div class="letter">카</div><div class="name">카르노신</div><div class="pct">1.0%</div></div>
-<div class="tranamaca-cell"><div class="letter">C</div><div class="name">비타민C 시스템</div><div class="pct">6%+</div></div>
+<div class="tranamaca-cell"><div class="letter">마</div><div class="name">나이아신아<u>마</u>이드 + <u>마</u>이크로코쿠스</div><div class="pct">5.0%</div></div>
+<div class="tranamaca-cell"><div class="letter">카</div><div class="name"><u>카</u>르노신 + <u>카</u>카두 플럼</div><div class="pct">1.3%</div></div>
+<div class="tranamaca-cell"><div class="letter">C</div><div class="name">자연 비타민C 3종</div><div class="pct">1.1%</div></div>
 </div>
 </div>
 
 <div class="edit-hint">
-<strong>편집 가이드</strong> · 🟢 더마 카드 (초록 left border) · 🟡 자연 카드 (노랑 left border) · LOCK 표시 = 함량 컨트롤 11종 · 드래그 이동 가능
+<strong>편집 가이드</strong> · 🟢 더마 카드 (초록 left border) · 🟡 자연 카드 (노랑 left border) · LOCK 표시 = 함량 컨트롤 8종 · 드래그 이동 가능
 </div>
 
 <div class="overview">
@@ -261,13 +314,109 @@ html, body { font-family: 'Pretendard Variable', Pretendard, -apple-system, sans
 </section>
 
 </div>
+
+<!-- ===== Card Modal ===== -->
+<div class="modal-overlay" id="card-modal">
+  <div class="modal-card" role="dialog" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">성분 추가<span class="modal-mode-badge" id="modal-mode">신규</span></div>
+      <button class="modal-close" onclick="closeCardModal()" title="닫기">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-row two-col">
+          <div class="form-field">
+            <label class="form-label">단계</label>
+            <select class="form-select" id="f-stage">
+              <option value="s1-1">1-1 SHIELD · DEFEND</option>
+              <option value="s1-2">1-2 SHIELD · BLOCK</option>
+              <option value="s1-3">1-3 SHIELD · INHIBIT</option>
+              <option value="s1-4">1-4 SHIELD · PROTECT</option>
+              <option value="s2">2 CLEAR · 자가포식</option>
+              <option value="s3">3 HYDRATE · 보습</option>
+              <option value="s4">4 FORTIFY · 라멜라</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">분류</label>
+            <div class="form-radio-group">
+              <div class="form-radio derma">
+                <input type="radio" id="f-cat-derma" name="f-category" value="derma" checked>
+                <label for="f-cat-derma">🟢 더마</label>
+              </div>
+              <div class="form-radio nature">
+                <input type="radio" id="f-cat-nature" name="f-category" value="nature">
+                <label for="f-cat-nature">🟡 자연</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label required">성분명 (한글)</label>
+          <input type="text" class="form-input" id="f-name" placeholder="예: 카카두 플럼" required>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">학명 / INCI / CAS / KCID</label>
+          <input type="text" class="form-input" id="f-cas" placeholder="예: Terminalia ferdinandiana · Terminalia Ferdinandiana Fruit Extract · KCID 등재">
+        </div>
+
+        <div class="form-row two-col">
+          <div class="form-field">
+            <label class="form-label">함량 (%)</label>
+            <input type="text" class="form-input" id="f-pct" placeholder="예: 1.00% LOCK 또는 제조사 결정">
+          </div>
+          <div class="form-field">
+            <label class="form-label">원산지 (자연 한정)</label>
+            <input type="text" class="form-input" id="f-origin" placeholder="예: 한국 한라산 1,500m+">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">역할 / 메커니즘</label>
+          <textarea class="form-textarea" id="f-role" placeholder="예: ★ 안토시아닌·강력 항산화·UV 보호"></textarea>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">근거 / 임상</label>
+          <textarea class="form-textarea" id="f-basis" placeholder="예: Babizhayev 2010 1% 12주 AGE -27%"></textarea>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">주의 / 충돌</label>
+          <textarea class="form-textarea" id="f-notes" placeholder="예: 40°C 이하·차광·EDTA 동반"></textarea>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">태그</label>
+          <div class="form-check-group">
+            <label class="form-check"><input type="checkbox" id="f-tag-lock"><span>🔒 LOCK (함량 확정)</span></label>
+            <label class="form-check"><input type="checkbox" id="f-tag-hero"><span>★ HERO</span></label>
+            <label class="form-check"><input type="checkbox" id="f-tag-new"><span>NEW</span></label>
+          </div>
+          <div class="form-hint">LOCK = 함량 컨트롤 / HERO = 단계 대표 / NEW = 신규 추가</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <div class="modal-foot-info" id="modal-info">필수 *: 성분명만 입력하면 저장 가능</div>
+      <div class="modal-foot-buttons">
+        <button class="btn btn-secondary" onclick="closeCardModal()">취소</button>
+        <button class="btn btn-primary" onclick="saveCardModal()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ===== /Card Modal ===== -->
+
 <div class="save-indicator" id="save-indicator">저장됨</div>
 
 <script>
 const STAGES_INIT = [
   {key:"s1-1", badge:"1-1 SHIELD", title:"UV 방어·DNA 복구", sub:"DEFEND", mech:"무기 차단 (TiO2·ZnO·식약처 자외선 차단) + <b>마이크로코쿠스용해물의 Photolyase 효소가 UV-DNA(CPD)를 직접 복구</b>. 시로미 한라산 안토시아닌으로 자유라디칼 1차 소거. <b>방어 + 복구 듀얼</b>."},
-  {key:"s1-2", badge:"1-2 SHIELD", title:"멜라닌 생성 억제", sub:"BLOCK", mech:"<b>트라넥삼산 5% LOCK</b>이 플라스민·α-MSH·MITF 차단. 알파-비사보롤 0.5%·알파-알부틴이 MITF 직접 억제. 시스테인HCL·B6·퀴노아의 페오멜라닌 전환 트리오 (트란시노 II 60년 매핑)."},
-  {key:"s1-3", badge:"1-3 SHIELD", title:"합성 차단 + 전달 차단", sub:"INHIBIT", mech:"<b>나이아신아마이드 4%</b> PAR-2 멜라노솜 전달 차단 + <b>비타민C 안정형 5종 시스템</b> (MAP 2% + 3-O-에틸 1% + 시스테인) + 코직애씨드 Cu 킬레이션 + 펩타이드 + 바쿠치올 식물 레티노이드. 시벅손 자연 비타민C+오메가-7로 자연 시너지."},
+  {key:"s1-2", badge:"1-2 SHIELD", title:"멜라닌 생성 억제", sub:"BLOCK", mech:"<b>트라넥삼산 5%</b>가 플라스민·α-MSH·MITF 차단 (개별 인정형 미백). 시스테인HCL·B6·퀴노아의 페오멜라닌 전환 트리오 (트란시노 II 60년 매핑)."},
+  {key:"s1-3", badge:"1-3 SHIELD", title:"합성 차단 + 전달 차단", sub:"INHIBIT", mech:"<b>나이아신아마이드 4% (식약처 미백 단일 신고 hero)</b> PAR-2 멜라노솜 전달 차단 + <b>자연 비타민C 3종 시스템</b> (시벅손 0.5% + 카카두 플럼 0.3% + 로즈힙 0.3% — 3대륙 자연 자산) + 코직애씨드 Cu 킬레이션 + 데카펩타이드-12 + 바쿠치올 식물 레티노이드."},
   {key:"s1-4", badge:"1-4 SHIELD", title:"항산화·항당화 (재발 방지)", sub:"PROTECT", mech:"<b>카르노신 1% LOCK</b>으로 AGEs(당화 색소) 직접 차단 — 35-45세 호르몬형 기미 정확 매핑. CoQ10·설련화·6대륙 베리 컴플렉스(마퀴·월귤·골든·베이베리·블루베리·클라우드베리)로 누적 항산화."},
   {key:"s2", badge:"2단계 CLEAR", title:"멜라닌 청소 & 턴오버", sub:"CLEAR", mech:"<b>2016 Ohsumi 자가포식 노벨 매핑</b> — 사카로마이세스·갈락토미세스 + 트레할로스 + 부활초의 4중 자가포식 + 락토바이오닉/말토바이오닉 PHA 듀얼 박피 + 아데노신 식약처 주름."},
   {key:"s3", badge:"3단계 HYDRATE", title:"수분 공급 — HA 8종 + 엑토인", sub:"HYDRATE", mech:"<b>HA 8중 다층 보습</b> + 엑토인 (호염성 박테리아 보호 분자·민감 진정) + 베타-글루칸 + 판테놀 + 스쿠알란 + 실리카. *35-45세 시술 누적 민감 피부* 정확 매핑."},
@@ -276,54 +425,49 @@ const STAGES_INIT = [
 
 const INGREDIENTS_INIT = {
   "s1-1-derma":[
-    {name:"마이크로코쿠스용해물",cas:"Micrococcus Lysate · 미생물",badge:"derma",isLock:true,rows:[["역할","Photolyase 효소·UV-DNA(CPD) 직접 복구"],["함량","1.00% LOCK"],["노벨","<span class=\"tag-nobel\">★ 2015 Sancar 노벨</span>"],["주의","40°C 이하·차광"]]},
-    {name:"티타늄디옥사이드",cas:"TiO2 · CAS 13463-67-7",badge:"derma",rows:[["역할","무기 UV-A·B 차단"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["식약처","자외선 차단 등재"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"징크옥사이드",cas:"ZnO · CAS 1314-13-2",badge:"derma",rows:[["역할","UV-A long + 항균·진정"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["식약처","자외선 차단 등재"]]}
+    {name:"마이크로코쿠스용해물",cas:"Micrococcus Lysate · 미생물 (Sancar Nobel)",badge:"derma",isLock:true,rows:[["역할","Photolyase 효소·UV-DNA(CPD) 직접 복구"],["함량","1.00% LOCK"],["노벨","<span class=\"tag-nobel\">★ 2015 Sancar 노벨</span>"],["주의","40°C 이하·차광"]]},
+    {name:"티타늄디옥사이드",cas:"TiO2 · CAS 13463-67-7",badge:"derma",rows:[["역할","무기 UV-A·B 차단"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["식약처","자외선 차단"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
+    {name:"징크옥사이드",cas:"ZnO · CAS 1314-13-2",badge:"derma",rows:[["역할","UV-A long + 항균·진정"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["식약처","자외선 차단"]]}
   ],
   "s1-1-nature":[
     {name:"시로미 추출물",cas:"Empetrum nigrum · Empetrum Nigrum Fruit Extract",badge:"nature",isHero:true,origin:"한국 한라산 1,500m+ 고산",rows:[["역할","★ 안토시아닌·강력 항산화·UV 보호"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["anchor","🇰🇷 한국 자생"]]},
-    {name:"남극이끼 추출물",cas:"Deschampsia antarctica · Deschampsia Antarctica Extract",badge:"nature",origin:"남극 — 2종 자생 현화식물",rows:[["역할","극한 UV-B·DNA 복구·SOD/CAT 강화"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["노벨","<span class=\"tag-nobel\">★ Sancar 식물 photolyase 매핑</span>"]]},
+    {name:"남극이끼 추출물",cas:"Deschampsia antarctica · Deschampsia Antarctica Extract",badge:"nature",origin:"남극 — 2종 자생 현화식물",rows:[["역할","극한 UV-B·DNA 복구·SOD/CAT"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["노벨","<span class=\"tag-nobel\">★ Sancar 식물 photolyase</span>"]]},
     {name:"토코페롤 (비타민E)",cas:"Tocopherol · CAS 59-02-9",badge:"nature",rows:[["역할","지용성 비타민E·산화방지"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]}
   ],
   "s1-2-derma":[
-    {name:"트라넥삼산",cas:"Tranexamic Acid · CAS 1197-18-8",badge:"derma",isLock:true,rows:[["역할","★ 플라스민 차단·α-MSH·MITF 억제"],["함량","5.00% LOCK"],["식약처","미백 LOCK"],["임상","Wu 2012·Hsiao 2017 5% 12주 -30~50%"]]},
-    {name:"알파-비사보롤",cas:"Alpha-Bisabolol · CAS 515-69-5",badge:"derma",isLock:true,rows:[["역할","MITF 직접 억제·합성 마스터 차단"],["함량","0.50% LOCK (1→0.5% 축소)"],["식약처","미백 등재"],["임상","Lee 2010 0.5% 4주 -28%"]]},
-    {name:"알파-알부틴",cas:"Alpha-Arbutin · CAS 84380-01-8",badge:"derma",rows:[["역할","티로시나아제 안정형 차단·β형 10배"],["함량","<span class=\"tag-mfg\">제조사 결정 (한도 2%)</span>"],["식약처","미백 등재"]]},
+    {name:"트라넥삼산",cas:"Tranexamic Acid · CAS 1197-18-8 · USP/EP 99%",badge:"derma",isLock:true,rows:[["역할","★ 플라스민 차단·α-MSH·MITF 억제"],["함량","5.00% LOCK"],["식약처","<span class=\"tag-warn\">개별 인정형 (고시 외) — OEM 협의</span>"],["임상","Wu 2012·Hsiao 2017 5% 12주 -30~50%"],["침투","리포좀 캡슐화 요청"]]},
     {name:"시스테인HCL",cas:"Cysteine HCl · CAS 52-89-1 (KCID 1514)",badge:"derma",rows:[["역할","자유 -SH·페오멜라닌 전환"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["주의","<span class=\"tag-warn\">미백 광고 X·산화 빠름·EDTA</span>"]]},
-    {name:"피리독신HCL (B6)",cas:"Pyridoxine HCl · CAS 58-56-0",badge:"derma",rows:[["역할","PLP·CBS/CSE 효소 보조·시스테인 자가 합성"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["근거","트란시노 II 6mg/일 매핑"]]}
+    {name:"피리독신HCL (B6)",cas:"Pyridoxine HCl · CAS 58-56-0",badge:"derma",rows:[["역할","PLP·CBS/CSE 효소 보조·시스테인 합성"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["근거","트란시노 II 6mg/일"]]}
   ],
   "s1-2-nature":[
     {name:"퀴노아 추출물",cas:"Chenopodium quinoa · Chenopodium Quinoa Seed Extract",badge:"nature",isHero:true,origin:"남미 안데스 3,000-4,000m",rows:[["역할","★ B6+메티오닌+시스테인+9EAA+사포닌 5-in-1"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["권위","<span class=\"tag-nobel\">UNESCO 2013</span>"]]}
   ],
   "s1-3-derma":[
-    {name:"나이아신아마이드 (B3)",cas:"Niacinamide · CAS 98-92-0",badge:"derma",isLock:true,rows:[["역할","★ PAR-2 차단·멜라노솜 전달·NAD+"],["함량","4.00% LOCK (5→4% 축소)"],["식약처","미백 등재"],["임상","Hakozaki 2002 -35~68%"]]},
-    {name:"MAP (마그네슘아스코빌포스페이트)",cas:"Magnesium Ascorbyl Phosphate · CAS 113170-55-1",badge:"derma",isLock:true,rows:[["역할","비타민C 안정형·티로시나아제 억제·콜라겐"],["함량","2.00% LOCK (3→2% 축소)"],["식약처","미백 등재"],["주의","<span class=\"tag-warn\">pH 6.5-7.5·PHA와 분리</span>"]]},
-    {name:"3-O-에틸 아스코빅애시드",cas:"3-O-Ethyl Ascorbic Acid · CAS 86404-04-8",badge:"derma",isLock:true,rows:[["역할","비타민C 에틸 안정·침투 우수"],["함량","1.00% LOCK"],["식약처","미백 등재"]]},
-    {name:"코직애씨드 (다이팔미테이트)",cas:"Kojic Acid Dipalmitate · CAS 79725-98-7",badge:"derma",isNew:true,rows:[["역할","Cu 킬레이션·티로시나아제 강력 차단"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["임상","Garcia 1996 2% 12주 -42%"],["주의","식약처 미백 X·간접 표현"]]},
+    {name:"나이아신아마이드 (B3)",cas:"Niacinamide · CAS 98-92-0",badge:"derma",isLock:true,isHero:true,rows:[["역할","★ PAR-2 차단·멜라노솜 전달·NAD+"],["함량","4.00% LOCK"],["식약처","<span class=\"tag-lock\">★ 미백 단일 신고 hero</span>"],["임상","Hakozaki 2002 -35~68%"]]},
+    {name:"코직애씨드 (다이팔미테이트)",cas:"Kojic Acid Dipalmitate · CAS 79725-98-7",badge:"derma",isNew:true,rows:[["역할","★ Cu 킬레이션·티로시나아제 강력 차단"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["임상","Garcia 1996 2% 12주 -42%"],["주의","식약처 미백 X·간접 표현"]]},
     {name:"글루타치온",cas:"Glutathione (GSH) · CAS 70-18-8",badge:"derma",rows:[["역할","γ-Glu-Cys-Gly·자유 -SH·환원·항산화"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["주의","<span class=\"tag-warn\">산화 빠름·헤드라인 X</span>"]]},
     {name:"바쿠치올",cas:"Bakuchiol · CAS 10309-37-2 · (+)-(S)",badge:"derma",rows:[["역할","식물성 레티노이드·콜라겐·MMP 억제"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["임상","Dhaliwal 2018 BJD -59%"]]},
-    {name:"데카펩타이드-12 (Lumixyl)",cas:"Decapeptide-12 · CAS 736149-89-8",badge:"derma",rows:[["역할","티로시나아제 직접 억제·미백 펩타이드"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["임상","Hantash 2009 -38%"]]}
+    {name:"데카펩타이드-12 (Lumixyl)",cas:"Decapeptide-12 · CAS 736149-89-8",badge:"derma",rows:[["역할","티로시나아제 직접 억제·미백 펩타이드"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["임상","Hantash 2009 -38%"],["침투","리포좀 필수"]]}
   ],
   "s1-3-nature":[
-    {name:"시벅손 추출물",cas:"Hippophae rhamnoides · Hippophae Rhamnoides Fruit Extract (Palmitoleic 373-49-9)",badge:"nature",isHero:true,origin:"시베리아·티베트 4,000m 고산",rows:[["역할","★ 비타민C 자연 + 오메가-7·장벽 회복"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["narrative","러시아 우주비행사 영양"]]}
+    {name:"시벅손 추출물 ★",cas:"Hippophae rhamnoides · Hippophae Rhamnoides Fruit Extract",badge:"nature",isHero:true,isLock:true,origin:"시베리아·티베트 4,000m 고산",rows:[["역할","★ 자연 비타민C 400-1,500mg + 오메가-7"],["함량","0.50% LOCK · 자연 비타민C hero"],["narrative","러시아 우주비행사 영양"],["안정성","폴리페놀 자체 buffer"]]},
+    {name:"카카두 플럼 ★NEW",cas:"Terminalia ferdinandiana · Terminalia Ferdinandiana Fruit Extract",badge:"nature",isHero:true,isNew:true,origin:"🇦🇺 호주 노던 테리토리·어보리진 5만년",rows:[["역할","★ 세계 1위 비타민C 3,000-5,000mg (오렌지 100배)"],["함량","0.30% (안정성 균형)"],["narrative","Superfood #1·Vogue 다수 보도"],["주의","산화·갈변 가능·동결건조 분말·EDTA·N2 충진"]]},
+    {name:"로즈힙 ★NEW",cas:"Rosa canina · Rosa Canina Fruit Extract",badge:"nature",isNew:true,origin:"🇪🇺 유럽 (영국·독일·동유럽)",rows:[["역할","유럽 클래식 비타민C 426-1,250mg"],["함량","0.30%"],["narrative","비타민C + 카로테노이드 + 라이코펜"],["안정성","⭐⭐⭐⭐ 폴리페놀 안정"]]}
   ],
   "s1-4-derma":[
-    {name:"카르노신",cas:"L-Carnosine · CAS 305-84-0",badge:"derma",isLock:true,rows:[["역할","★ β-알라닌+히스티딘·항당화 AGEs 차단"],["함량","1.00% LOCK"],["임상","Babizhayev 2010 1% 12주 AGE -27%"],["타깃","35-45세 호르몬형 기미·당화 색소"]]},
-    {name:"코엔자임Q10 (유비퀴논)",cas:"Ubiquinone · CAS 303-98-0",badge:"derma",rows:[["역할","미토콘드리아 항산화·세포 에너지"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["주의","40°C 이하·차광"]]}
+    {name:"카르노신",cas:"L-Carnosine · CAS 305-84-0",badge:"derma",isLock:true,rows:[["역할","★ β-알라닌+히스티딘·항당화 AGEs 차단"],["함량","1.00% LOCK"],["임상","Babizhayev 2010 1% 12주 AGE -27%"],["타깃","35-45세 호르몬형 기미·당화"]]},
+    {name:"코엔자임Q10 (유비퀴논)",cas:"Ubiquinone · CAS 303-98-0",badge:"derma",rows:[["역할","미토콘드리아 항산화·세포 에너지"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["주의","40°C 이하·차광"],["침투","나노에멀젼 권장"]]}
   ],
   "s1-4-nature":[
-    {name:"베리 컴플렉스 4종 ★",cas:"마퀴베리·월귤(링곤)·골든베리·베이베리잎",badge:"nature",isHero:true,origin:"칠레·시베리아·페루 안데스·동아시아 (4대륙)",rows:[["역할","★ 안토시아닌 multi·델피니딘·아부틴·위타놀라이드"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["KCID","마퀴 7461 / 월귤 7492 ✓"]]},
+    {name:"베리 컴플렉스 4종 ★",cas:"마퀴베리·월귤(링곤)·골든베리·베이베리잎",badge:"nature",isHero:true,origin:"칠레·시베리아·페루 안데스·동아시아 (4대륙)",rows:[["역할","★ 안토시아닌·델피니딘·아부틴·위타놀라이드"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["KCID","마퀴 7461 / 월귤 7492 ✓"]]},
     {name:"마퀴베리 (아리스토텔리아 킬렌시스)",cas:"Aristotelia chilensis · Fruit Extract · KCID 7461",badge:"nature",origin:"칠레 파타고니아·Mapuche 4,000년",rows:[["역할","델피니딘 ORAC 최강 (29,000)"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
-    {name:"월귤추출물 (링곤베리)",cas:"Vaccinium vitis-idaea · Fruit Extract · KCID 7492",badge:"nature",origin:"시베리아·핀란드·한국 백두산",rows:[["역할","자연 아부틴 + 안토시아닌 + 폴리페놀"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["한방","동의보감 등재 (월귤)"]]},
-    {name:"골든베리 (잉카베리)",cas:"Physalis peruviana · Fruit Extract",badge:"nature",origin:"페루 안데스 1,500-3,000m·잉카 5,000년",rows:[["역할","위타놀라이드·카로테노이드"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
-    {name:"베이베리잎추출물",cas:"Myrica rubra · Leaf Extract",badge:"nature",origin:"동아시아 산악",rows:[["역할","항염·플라보노이드"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
     {name:"빌베리잎 추출물",cas:"Vaccinium myrtillus · Leaf Extract",badge:"nature",origin:"북유럽·북미 야생",rows:[["역할","안토시아닌·미르틸린·항산화"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["주의","블루베리잎 X·빌베리잎이 정확"]]},
-    {name:"클라우드베리 추출물",cas:"Rubus chamaemorus · Fruit Extract",badge:"nature",origin:"핀란드 라플란드 늪지 -30°C",rows:[["역할","비타민C·엘라긴산·안토시아닌"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["주의","<span class=\"tag-warn\">⚠ KCID 미등재 — OEM 확인 필요</span>"]]},
+    {name:"골든베리 (잉카베리)",cas:"Physalis peruviana · Fruit Extract",badge:"nature",origin:"페루 안데스 1,500-3,000m·잉카 5,000년",rows:[["역할","위타놀라이드·카로테노이드"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
     {name:"설련화 추출물",cas:"Saussurea involucrata · Syringin CAS 118-34-3",badge:"nature",origin:"티베트 4,500-5,000m 영구동토",rows:[["역할","시린진·강력 항산화·콜라겐"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]}
   ],
   "s2-derma":[
-    {name:"아데노신",cas:"Adenosine · CAS 58-61-7",badge:"derma",rows:[["역할","★ 주름 개선·콜라겐 합성·섬유아세포"],["함량","<span class=\"tag-mfg\">제조사 결정 (식약처 0.04% 정확치)</span>"],["식약처","주름 등재"]]},
-    {name:"락토바이오닉애시드 (PHA)",cas:"Lactobionic Acid · CAS 96-82-2",badge:"derma",rows:[["역할","유산균 발효 PHA·각질 분해·턴오버"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["임상","Edison 2004 자극 0.2/10"],["주의","pH 3.5-4.5·MAP와 분리"]]},
+    {name:"아데노신",cas:"Adenosine · CAS 58-61-7",badge:"derma",rows:[["역할","★ 주름 개선·콜라겐·섬유아세포"],["함량","<span class=\"tag-mfg\">식약처 0.04% 정확치</span>"],["식약처","주름 등재 (단일 신고)"]]},
+    {name:"락토바이오닉애시드 (PHA)",cas:"Lactobionic Acid · CAS 96-82-2",badge:"derma",rows:[["역할","유산균 발효 PHA·각질 분해·턴오버"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["임상","Edison 2004 자극 0.2/10"],["주의","pH 3.5-4.5"]]},
     {name:"말토바이오닉애시드",cas:"Maltobionic Acid · CAS 17103-22-1",badge:"derma",rows:[["역할","맥아 발효 PHA·보습+박피"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
     {name:"알란토인",cas:"Allantoin · CAS 97-59-6",badge:"derma",rows:[["역할","각질 정상화·재생·진정"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]}
   ],
@@ -337,19 +481,19 @@ const INGREDIENTS_INIT = {
     {name:"히알루론산 8종 시스템",cas:"Sodium Hyaluronate 외 7종 · 9067-32-7 외",badge:"derma",rows:[["역할","분자량 다른 8종·표층·중층·심층 보습"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["narrative","HA 8중 시스템"]]},
     {name:"엑토인",cas:"Ectoin · CAS 96702-03-3",badge:"derma",rows:[["역할","극한 수분 보호·민감 진정·UV 보호"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["출처","Halomonas elongata 호염성 박테리아"]]},
     {name:"베타-글루칸",cas:"Beta-Glucan · CAS 9012-72-0",badge:"derma",rows:[["역할","면역·진정·HA 20% 보습력"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
-    {name:"판테놀 (B5)",cas:"D-Panthenol · CAS 16485-10-2",badge:"derma",rows:[["역할","판토텐산 전구체·보습·재생"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["근거","트란시노 II 판토텐 매핑"]]},
+    {name:"판테놀 (B5)",cas:"D-Panthenol · CAS 16485-10-2",badge:"derma",rows:[["역할","판토텐산 전구체·보습·재생"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
     {name:"스쿠알란",cas:"Squalane · CAS 111-01-3",badge:"derma",rows:[["역할","자가 emollient·항산화"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["출처","올리브·사탕수수 비건"]]},
     {name:"실리카 (에어로젤)",cas:"Silica · CAS 7631-86-9",badge:"derma",rows:[["역할","매트·확산광·텍스처"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]}
   ],
   "s3-nature":[
-    {name:"드라세나스투키수 (시그너처)",cas:"Sansevieria trifasciata Leaf Water (= 상아산세베리아수)",badge:"nature",isHero:true,origin:"동아프리카·아라비아 호른",rows:[["역할","★ 시그너처 워터·CAM 식물 자가 정수·사포닌·다당류"],["함량","<span class=\"tag-mfg\">정제수 대체·제조사 결정</span>"],["narrative","NASA 공기정화 식물"]]}
+    {name:"드라세나스투키수 (시그너처)",cas:"Sansevieria trifasciata Leaf Water (= 상아산세베리아수)",badge:"nature",isHero:true,origin:"동아프리카·아라비아 호른",rows:[["역할","★ 시그너처 워터·CAM 식물 자가 정수·사포닌"],["함량","<span class=\"tag-mfg\">정제수 대체 30-40%</span>"],["narrative","NASA 공기정화 식물"]]}
   ],
   "s4-derma":[
-    {name:"세라마이드 NP ★ Active 3:1:1:1",cas:"Ceramide NP · CAS 100403-19-8",badge:"derma",isLock:true,rows:[["역할","★ 라멜라 Active [3]·과립층 모방"],["함량","0.30% LOCK"],["임상","Mao-Qiang 1995 매핑 TEWL -45%"],["주의","50°C 이하 후첨가"]]},
-    {name:"콜레스테롤",cas:"Cholesterol · CAS 57-88-5",badge:"derma",isLock:true,rows:[["역할","라멜라 [1] Chol"],["함량","0.10% LOCK"]]},
+    {name:"세라마이드 NP ★ Active 3:1:1:1",cas:"Ceramide NP · CAS 100403-19-8",badge:"derma",isLock:true,rows:[["역할","★ 라멜라 Active [3]·과립층 모방"],["함량","0.30% LOCK"],["임상","Mao-Qiang 1995 TEWL -45%"],["주의","50°C 이하 후첨가"]]},
+    {name:"콜레스테롤",cas:"Cholesterol · CAS 57-88-5 (식물성/합성 grade)",badge:"derma",isLock:true,rows:[["역할","라멜라 [1] Chol"],["함량","0.10% LOCK"],["주의","Lanolin-free·식물성·합성만"]]},
     {name:"스테아릭애시드",cas:"Stearic Acid · CAS 57-11-4",badge:"derma",isLock:true,rows:[["역할","라멜라 [1] · 지방산"],["함량","0.10% LOCK"]]},
     {name:"팔미틱애시드",cas:"Palmitic Acid · CAS 57-10-3",badge:"derma",isLock:true,rows:[["역할","라멜라 [1] · 지방산 (Active 3:1:1:1)"],["함량","0.10% LOCK"]]},
-    {name:"피토스핑고신",cas:"Phytosphingosine · CAS 554-62-1",badge:"derma",rows:[["역할","라멜라 보조·항균·각질 분화"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["비고","스핑고신 대체 (안정성↑)"]]}
+    {name:"피토스핑고신",cas:"Phytosphingosine · CAS 554-62-1",badge:"derma",rows:[["역할","라멜라 보조·항균·각질 분화"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]}
   ],
   "s4-nature":[]
 };
@@ -361,10 +505,11 @@ const RULES_INIT = [
     {marker:"no", text:"\"L-시스테인으로 기미 옅게\" — KCID 배합목적 위반"},
     {marker:"no", text:"\"코직산 미백 효과\" — 코직산은 식약처 미백 미등재"},
     {marker:"no", text:"\"○○% 색소 감소\" 비포·애프터 과장 (입증 자료 X)"},
+    {marker:"no", text:"\"MAP/3-O-에틸/비사보롤/알부틴 미백\" — v13.9 처방에 미사용·표기 X"},
     {marker:"no", text:"\"DNA 재생/복구\" 등 의약품 영역 표현"}
   ]},
   {id:"safe", iconType:"safe", title:"안전한 회피 표현 (식약처 미백 등재 기반)", items:[
-    {marker:"yes", text:"\"기미 개선 (식약처 미백 기능성)\" — 트라넥삼산/나이아신/MAP/3-O-에틸/비사보롤/알파-알부틴 6종"},
+    {marker:"yes", text:"\"기미 개선 (식약처 미백 기능성)\" — 나이아신아마이드 4% <b>단일 신고 hero</b> (미백 고시 다른 성분 모두 제거)"},
     {marker:"yes", text:"\"주름 개선 (식약처 주름개선 기능성)\" — 아데노신"},
     {marker:"yes", text:"\"멜라닌 합성 신호 차단\"·\"MITF 억제\"·\"PAR-2 차단\" — 분자 메커니즘"},
     {marker:"yes", text:"\"비타민C 안정형 5종 시스템\" — 성분 표현"},
@@ -377,7 +522,7 @@ const RULES_INIT = [
     {marker:"caution", text:"<b>글루타치온</b> — 산화 빠름 · 헤드라인 X · 라벨 후반부"},
     {marker:"caution", text:"<b>코직애씨드</b> — 식약처 미백 미등재 · 직접 미백 클레임 X · 메커니즘 표현만"},
     {marker:"caution", text:"<b>나이아신 4%</b> — pH 5+ 필수 + EDTA"},
-    {marker:"caution", text:"<b>MAP 2%</b> — pH 6.5-7.5 · PHA와 분리 첨가"},
+    {marker:"caution", text:"<b>카카두 플럼·시벅손·로즈힙</b> — 자연 비타민C·동결건조·EDTA·N2 충진·안정성 +2주 테스트"},
     {marker:"caution", text:"<b>카르노신 1%</b> — 40°C 이하·EDTA·알루미늄 튜브"},
     {marker:"caution", text:"<b>Cer NP Active 3:1:1:1</b> — 50°C 이하 후첨가"}
   ]}
@@ -391,10 +536,10 @@ function defaultBoardSections() {
       {value:"youtube", label:"유튜브"}, {value:"blog", label:"블로그"},
       {value:"naver", label:"네이버 검색"}, {value:"kakao", label:"카카오"}
     ], selected:[], memo:""},
-    {id:"priority"+Date.now()+1, type:"memo", title:"강조 성분 우선순위 (트라나마카C)", placeholder:"1순위: 트라넥삼산 5% (식약처 미백)\n2순위: 나이아신아마이드 4% (식약처 미백)\n3순위: 카르노신 1% (항당화)\n4순위: 마이크로코쿠스용해물 1% (DNA 복구)\n5순위: 비타민C 5종 시스템", memo:""},
+    {id:"priority"+Date.now()+1, type:"memo", title:"강조 성분 우선순위 (트라마카C)", placeholder:"트라(넥삼산) 5% — 식약처 미백 LOCK\n마 — 나이아신아마이드 4% + 마이크로코쿠스 1% 듀얼\n카(르노신) 1% — 항당화 hero\nC — 비타민C 5종 안정형", memo:""},
     {id:"copy"+Date.now()+2, type:"memo", title:"주요 카피", placeholder:"헤드라인: \n서브: \n클로징: ", memo:""},
     {id:"todo"+Date.now()+3, type:"todo", title:"TO DO", items:[
-      {text:"트라나마카C 시그너처 카피 작성", done:false},
+      {text:"트라마카C 시그너처 카피 작성", done:false},
       {text:"4×4 시스템 카로셀 디자인", done:false},
       {text:"라멜라 Active 3:1:1:1 카피 검토", done:false}
     ]}
@@ -404,11 +549,11 @@ function defaultBoardSections() {
 const MARKETING_INIT = {
   activeBoardId: "board-default",
   boards: [
-    { id: "board-default", name: "v13.8 트라나마카C 광고", sections: defaultBoardSections() }
+    { id: "board-default", name: "v13.8 트라마카C 광고", sections: defaultBoardSections() }
   ]
 };
 
-const STORAGE_KEY = 'tx-mela-v13-8-v5';
+const STORAGE_KEY = 'tx-mela-v13-9-v7';
 function loadState() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; } }
 function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); flashSave(); }
 function flashSave() { const el = document.getElementById('save-indicator'); el.classList.add('show'); clearTimeout(window._saveT); window._saveT = setTimeout(() => el.classList.remove('show'), 1000); }
@@ -433,10 +578,10 @@ function renderStages() {
         <div class="mech-box ${stg.key}"><span class="mech-label">작용 원리</span>${stg.mech}</div>
         <div class="subsection-title derma">🟢 더마 액티브</div>
         <div class="card-grid" data-section-key="${dermaKey}">${renderCards(dermaKey, ingredients[dermaKey] || [])}</div>
-        <button class="add-card-btn" onclick="addCard('${dermaKey}')">+ 더마 성분 추가</button>
+        <button class="add-card-btn" onclick="openCardModal('${dermaKey}')">+ 더마 성분 추가</button>
         <div class="subsection-title nature">🟡 자연 서포트</div>
         <div class="card-grid" data-section-key="${natureKey}">${renderCards(natureKey, ingredients[natureKey] || [])}</div>
-        <button class="add-card-btn" onclick="addCard('${natureKey}')">+ 자연 성분 추가</button>
+        <button class="add-card-btn" onclick="openCardModal('${natureKey}')">+ 자연 성분 추가</button>
       </div>
     </div>`;
   });
@@ -458,6 +603,7 @@ function renderCards(sectionKey, items) {
     return `<div class="ingredient-card${extraClass}" data-section="${sectionKey}" data-idx="${i}">
       <span class="drag-handle">⋮⋮</span>
       <div class="card-controls">
+        <button class="ctrl-btn" onclick="openCardModal('${sectionKey}', ${i})" title="수정">✎</button>
         <button class="ctrl-btn delete" onclick="deleteCard('${sectionKey}', ${i})" title="삭제">×</button>
       </div>
       <div class="card-head">
@@ -479,19 +625,164 @@ function deleteCard(sectionKey, idx) {
   renderStages(); initSortable();
 }
 
-function addCard(sectionKey) {
-  const name = prompt('성분명 (한글):');
-  if (!name) return;
-  const cas = prompt('학명 / INCI / CAS:') || '';
-  const isDerma = sectionKey.endsWith('-derma');
-  const newCard = { name, cas, badge: isDerma ? 'derma' : 'nature', rows: [['역할','편집'],['함량','제조사 결정']] };
-  if (!isDerma) { const origin = prompt('원산지·추출 지대:') || ''; if (origin) newCard.origin = origin; }
-  const ing = getState('ingredients', INGREDIENTS_INIT);
-  if (!ing[sectionKey]) ing[sectionKey] = [];
-  ing[sectionKey].push(newCard);
-  setState('ingredients', ing);
-  renderStages(); initSortable();
+// ===== Card Modal System =====
+let modalCtx = null;  // {mode: 'add'|'edit', sectionKey, idx}
+
+function openCardModal(sectionKey, idx) {
+  const isEdit = typeof idx === 'number';
+  const stageKey = sectionKey.replace(/-derma$|-nature$/, '');
+  const category = sectionKey.endsWith('-derma') ? 'derma' : 'nature';
+  
+  modalCtx = { mode: isEdit ? 'edit' : 'add', sectionKey, idx, originalStage: stageKey, originalCategory: category };
+  
+  // Title & badge
+  document.getElementById('modal-title').firstChild.textContent = isEdit ? '성분 수정' : '성분 추가';
+  document.getElementById('modal-mode').textContent = isEdit ? '수정' : '신규';
+  document.getElementById('modal-mode').style.background = isEdit ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.18)';
+  
+  // Stage & category
+  document.getElementById('f-stage').value = stageKey;
+  document.querySelector(`input[name="f-category"][value="${category}"]`).checked = true;
+  
+  // Fields
+  let card = null;
+  if (isEdit) {
+    const ing = getState('ingredients', INGREDIENTS_INIT);
+    card = ing[sectionKey] && ing[sectionKey][idx];
+  }
+  
+  document.getElementById('f-name').value = card ? card.name : '';
+  document.getElementById('f-cas').value = card ? card.cas : '';
+  document.getElementById('f-origin').value = card && card.origin ? card.origin : '';
+  document.getElementById('f-tag-lock').checked = !!(card && card.isLock);
+  document.getElementById('f-tag-hero').checked = !!(card && card.isHero);
+  document.getElementById('f-tag-new').checked = !!(card && card.isNew);
+  
+  // Parse rows back to form fields
+  let pct = '', role = '', basis = '', notes = '';
+  if (card && card.rows) {
+    card.rows.forEach(r => {
+      const k = r[0];
+      const v = r[1];
+      if (k === '함량' || k === '한도') pct = stripTags(v);
+      else if (k === '역할' || k === '메커니즘') role = stripTags(v);
+      else if (k === '근거' || k === '임상' || k === '노벨' || k === '식약처' || k === '권위' || k === 'narrative') {
+        basis = (basis ? basis + '\n' : '') + (k + ': ' + stripTags(v));
+      }
+      else if (k === '주의' || k === '충돌' || k === '안전성' || k === '안정성' || k === '침투') {
+        notes = (notes ? notes + '\n' : '') + (k + ': ' + stripTags(v));
+      }
+    });
+  }
+  document.getElementById('f-pct').value = pct;
+  document.getElementById('f-role').value = role;
+  document.getElementById('f-basis').value = basis;
+  document.getElementById('f-notes').value = notes;
+  
+  document.getElementById('card-modal').classList.add('active');
+  setTimeout(() => document.getElementById('f-name').focus(), 80);
 }
+
+function stripTags(html) {
+  if (typeof html !== 'string') return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+}
+
+function closeCardModal() {
+  document.getElementById('card-modal').classList.remove('active');
+  modalCtx = null;
+}
+
+function saveCardModal() {
+  if (!modalCtx) return;
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('성분명을 입력해주세요.'); document.getElementById('f-name').focus(); return; }
+  
+  const stage = document.getElementById('f-stage').value;
+  const category = document.querySelector('input[name="f-category"]:checked').value;
+  const newSectionKey = stage + '-' + category;
+  
+  const card = {
+    name,
+    cas: document.getElementById('f-cas').value.trim(),
+    badge: category,
+  };
+  const origin = document.getElementById('f-origin').value.trim();
+  if (origin) card.origin = origin;
+  
+  const isLock = document.getElementById('f-tag-lock').checked;
+  const isHero = document.getElementById('f-tag-hero').checked;
+  const isNew = document.getElementById('f-tag-new').checked;
+  if (isLock) card.isLock = true;
+  if (isHero) card.isHero = true;
+  if (isNew) card.isNew = true;
+  
+  // Build rows
+  const rows = [];
+  const role = document.getElementById('f-role').value.trim();
+  const pct = document.getElementById('f-pct').value.trim();
+  const basis = document.getElementById('f-basis').value.trim();
+  const notes = document.getElementById('f-notes').value.trim();
+  
+  if (role) rows.push(['역할', role]);
+  if (pct) rows.push(['함량', pct]);
+  if (basis) {
+    basis.split('\n').forEach(line => {
+      const t = line.trim();
+      if (!t) return;
+      const m = t.match(/^([^:]+):\s*(.+)$/);
+      if (m) rows.push([m[1].trim(), m[2].trim()]);
+      else rows.push(['근거', t]);
+    });
+  }
+  if (notes) {
+    notes.split('\n').forEach(line => {
+      const t = line.trim();
+      if (!t) return;
+      const m = t.match(/^([^:]+):\s*(.+)$/);
+      if (m) rows.push([m[1].trim(), m[2].trim()]);
+      else rows.push(['주의', t]);
+    });
+  }
+  card.rows = rows.length ? rows : [['역할', '편집']];
+  
+  // Save
+  const ing = getState('ingredients', INGREDIENTS_INIT);
+  if (!ing[newSectionKey]) ing[newSectionKey] = [];
+  
+  if (modalCtx.mode === 'edit') {
+    const oldKey = modalCtx.sectionKey;
+    const oldIdx = modalCtx.idx;
+    if (oldKey === newSectionKey) {
+      ing[newSectionKey][oldIdx] = card;
+    } else {
+      // Moved between sections
+      ing[oldKey].splice(oldIdx, 1);
+      ing[newSectionKey].push(card);
+    }
+  } else {
+    ing[newSectionKey].push(card);
+  }
+  
+  setState('ingredients', ing);
+  closeCardModal();
+  renderStages();
+  initSortable();
+}
+
+// Close on overlay click or ESC
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('card-modal');
+  if (e.target === modal) closeCardModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('card-modal').classList.contains('active')) closeCardModal();
+});
+
+// Legacy addCard alias (no longer used)
+function addCard(sectionKey) { openCardModal(sectionKey); }
 
 function handleSortEnd(evt) {
   const fromKey = evt.from.dataset.sectionKey;
