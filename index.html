@@ -12367,6 +12367,8 @@ function forceIsolationReset(){
     {key:'공동 구매',       emoji:'🛒', color:'#9B59B6'},  // 1️⃣1️⃣ 자주
     {key:'기타',           emoji:'📌', color:'#7F8C8D'}   // 1️⃣2️⃣ 회색
   ];
+  // ━━ window 에 노출 (다른 IIFE에서 접근 가능하도록) ━━
+  window.CAL_CATEGORIES_BOS = CAL_CATEGORIES_BOS;
   
   // 현재 정렬·필터 상태
   if(!calData_BOS.settings) calData_BOS.settings = {};
@@ -15970,7 +15972,7 @@ window.addEventListener('resize', function(){
 }
 #cal-color-palette-modal .cp-grid{
   display:grid;
-  grid-template-columns:repeat(10, 1fr);
+  grid-template-columns:repeat(9, 1fr);
   gap:6px;
 }
 #cal-color-palette-modal .cp-swatch{
@@ -16203,15 +16205,23 @@ window.addEventListener('resize', function(){
 <script id="cal-cat-color-script">
 (function(){
   // ━━ 확장 팔레트 색 (40가지) ━━
+  // ━━ 빨주노초파남보 7색 × 명도 9단계 = 63색 팔레트 ━━
+  // 각 행: 가장 어두운(왼쪽) → 가장 밝은(오른쪽)
   var EXTENDED_PALETTE_BOS = [
-    // Row 1 - Reds & Oranges
-    '#FF6B6B','#FF8E53','#FF7B7B','#E74C3C','#C0392B','#D2691E','#E67E22','#FF9F40','#FFBE76','#FFD68A',
-    // Row 2 - Yellows & Greens
-    '#F1C40F','#C8A45A','#8FBC8F','#5A8A4A','#1A6B4A','#16A085','#2ECC71','#27AE60','#229954','#7F8C8D',
-    // Row 3 - Blues
-    '#3498DB','#2980B9','#2563EB','#5DADE2','#85C1E2','#3a8a8a','#34495E','#5D6D7E','#7B8FA1','#A6BFD0',
-    // Row 4 - Purples & Pinks
-    '#9B59B6','#7A4AA8','#8E44AD','#AF7AC5','#D7BDE2','#E91E63','#EC407A','#F06292','#A87C4A','#8A5A3A'
+    // 🟥 빨강 (Red) - 명도 9단계
+    '#3D0A0A','#5C0F0F','#8B0000','#B71C1C','#D32F2F','#E74C3C','#EF5350','#EF9A9A','#FFCDD2',
+    // 🟧 주황 (Orange) - 명도 9단계
+    '#3D2410','#5C3517','#8B4513','#BF5700','#D2691E','#E67E22','#FF8C42','#FFAB76','#FFCCA8',
+    // 🟨 노랑 (Yellow) - 명도 9단계
+    '#3D3308','#5C4E0C','#8B6914','#B38600','#D4A017','#F1C40F','#F4D03F','#F7DC6F','#FCF3CF',
+    // 🟩 초록 (Green) - 명도 9단계
+    '#0A2A0F','#0F3D17','#1A6B4A','#1E8449','#27AE60','#52BE80','#7DCEA0','#9ACD32','#C8E6C9',
+    // 🟦 파랑 (Blue) - 명도 9단계
+    '#0A1A3D','#0F2A5C','#1E3A8A','#2563EB','#3498DB','#5DADE2','#85C1E2','#AED6F1','#D6EAF8',
+    // 🟪 남색 (Indigo) - 명도 9단계
+    '#1A0A3D','#2A1052','#3F51B5','#5C6BC0','#7986CB','#9FA8DA','#7A4AA8','#9575CD','#C5CAE9',
+    // 🟫 보라 (Purple) - 명도 9단계
+    '#2D0A3D','#4A1A5C','#6A1B9A','#8E44AD','#9B59B6','#AF7AC5','#BB6BD9','#CE93D8','#E1BEE7'
   ];
   
   var _selectedPaletteColor = '#C8A45A';
@@ -16225,9 +16235,10 @@ window.addEventListener('resize', function(){
       return;
     }
     
-    var catInfo = (CAL_CATEGORIES_BOS || []).find(function(c){ return c.key === catKey; });
+    var cats = (typeof CAL_CATEGORIES_BOS !== 'undefined' && CAL_CATEGORIES_BOS) || window.CAL_CATEGORIES_BOS || [];
+    var catInfo = cats.find(function(c){ return c.key === catKey; });
     if(!catInfo || !catInfo.color){
-      console.warn('[Cat Color] 카테고리 정보 없음:', catKey);
+      console.warn('[Cat Color] 카테고리 정보 없음:', catKey, 'cats.length=', cats.length);
       return;
     }
     
@@ -16283,8 +16294,9 @@ window.addEventListener('resize', function(){
     
     // 추천 색상 그리드 (카테고리 컬러)
     var recGrid = document.getElementById('cp-recommended-grid');
+    var catsForGrid = (typeof CAL_CATEGORIES_BOS !== 'undefined' && CAL_CATEGORIES_BOS) || window.CAL_CATEGORIES_BOS || [];
     if(recGrid){
-      recGrid.innerHTML = (CAL_CATEGORIES_BOS || []).map(function(cat){
+      recGrid.innerHTML = catsForGrid.map(function(cat){
         var sel = cat.color.toLowerCase() === currentColor.toLowerCase() ? 'selected' : '';
         return '<div class="cp-swatch ' + sel + '" data-color="' + cat.color + '" '
           + 'style="background:' + cat.color + '" '
