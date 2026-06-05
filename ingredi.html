@@ -3,360 +3,195 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TX MELA REPAIR CREAM v13.5 · 작업 페이지 v3</title>
+<title>TX MELA REPAIR v13.8 · 트라나마카C · 작업 페이지 v5</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <style>
 :root {
-  --bg: #FAFAF7;
-  --surface: #FFFFFF;
-  --border: #E5E2D8;
-  --border-strong: #B4B2A9;
-  --text: #2C2C2A;
-  --text-sub: #5F5E5A;
-  --text-mute: #888780;
-  --wine: #5C2E2E;
-  --wine-light: #722F37;
-  --wine-bg: #F5EBEB;
-  --s1: #0C447C; --s1-bg: #E6F1FB;
-  --s2: #993C1D; --s2-bg: #FAECE7;
-  --s3: #0F6E56; --s3-bg: #E1F5EE;
-  --s4: #3C3489; --s4-bg: #EEEDFE;
-  --care-water: #185FA5; --care-water-bg: #E6F1FB;
-  --care-barrier: #BA7517; --care-barrier-bg: #FAEEDA;
-  --care-turn: #993556; --care-turn-bg: #FBEAF0;
+  --bg: #FAFAF7; --surface: #FFFFFF;
+  --border: #E5E2D8; --border-strong: #B4B2A9;
+  --text: #2C2C2A; --text-sub: #5F5E5A; --text-mute: #888780;
+  --wine: #5C2E2E; --wine-light: #722F37; --wine-bg: #F5EBEB;
+  --s1-1: #0C447C; --s1-1-bg: #E6F1FB;
+  --s1-2: #993C1D; --s1-2-bg: #FAECE7;
+  --s1-3: #0F6E56; --s1-3-bg: #E1F5EE;
+  --s1-4: #854F0B; --s1-4-bg: #FAEEDA;
+  --s2: #3C3489; --s2-bg: #EEEDFE;
+  --s3: #185FA5; --s3-bg: #E6F1FB;
+  --s4: #993556; --s4-bg: #FBEAF0;
+  --derma: #27AE60; --derma-bg: #D5F5E3;
+  --nature: #D4AC0D; --nature-bg: #FCF3CF;
   --danger: #A32D2D; --danger-bg: #FCEBEB;
   --success: #3B6D11; --success-bg: #EAF3DE;
   --warn: #854F0B; --warn-bg: #FAEEDA;
+  --new: #DAA520; --new-bg: #FFF4D6;
+  --lock: #5C2E2E; --lock-bg: #F5EBEB;
   --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
-html, body {
-  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  font-size: 14px;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
+html, body { font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 .container { max-width: 1280px; margin: 0 auto; padding: 24px 32px; }
 .page-head { padding: 24px 0 16px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
-.page-title { font-size: 24px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+.page-title { font-size: 24px; font-weight: 600; letter-spacing: -0.3px; }
 .page-sub { font-size: 13px; color: var(--text-sub); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
 .brand-mark { display: inline-block; padding: 2px 10px; background: var(--wine); color: white; font-size: 11px; border-radius: 4px; letter-spacing: 1px; font-weight: 500; margin-right: 8px; }
+.signature-mark { display: inline-block; padding: 3px 12px; background: linear-gradient(135deg, var(--wine) 0%, var(--wine-light) 100%); color: white; font-size: 12px; border-radius: 16px; letter-spacing: 0.5px; font-weight: 600; margin-left: 8px; }
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 32px; flex-wrap: wrap; }
-.tab-btn {
-  background: none; border: none; padding: 14px 22px;
-  font-size: 15px; font-weight: 500; color: var(--text-mute);
-  cursor: pointer; border-bottom: 2px solid transparent;
-  margin-bottom: -1px; transition: all 0.15s ease; font-family: inherit;
-}
+.tab-btn { background: none; border: none; padding: 14px 22px; font-size: 15px; font-weight: 500; color: var(--text-mute); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; font-family: inherit; }
 .tab-btn:hover { color: var(--text); }
 .tab-btn.active { color: var(--wine); border-bottom-color: var(--wine); }
-.tab-content { display: none; animation: fadeIn 0.25s ease; }
+.tab-content { display: none; }
 .tab-content.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-.overview {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-xl); padding: 24px; margin-bottom: 36px;
-}
-.overview-title { font-size: 13px; font-weight: 500; color: var(--text-mute); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
-.overview-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-.flow-box { padding: 18px 14px; border-radius: var(--radius); text-align: center; }
-.flow-box .num { font-size: 11px; font-weight: 600; letter-spacing: 1px; opacity: 0.7; }
-.flow-box .ttl-ko { font-size: 16px; font-weight: 600; margin: 6px 0 2px; }
-.flow-box .ttl-en { font-size: 11px; opacity: 0.6; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; }
-.flow-box .desc { font-size: 12px; margin-top: 8px; opacity: 0.8; line-height: 1.5; }
-.flow-box.s1 { background: var(--s1-bg); color: var(--s1); }
+.signature-banner { background: linear-gradient(135deg, var(--wine) 0%, var(--wine-light) 100%); color: white; padding: 24px 28px; border-radius: var(--radius-xl); margin-bottom: 28px; }
+.signature-banner h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.signature-banner .sub { font-size: 13px; opacity: 0.85; margin-bottom: 16px; }
+.tranamaca-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 12px; }
+@media (max-width: 700px) { .tranamaca-grid { grid-template-columns: repeat(2, 1fr); } }
+.tranamaca-cell { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 12px 10px; text-align: center; backdrop-filter: blur(8px); }
+.tranamaca-cell .letter { font-size: 28px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+.tranamaca-cell .name { font-size: 11px; opacity: 0.85; margin-bottom: 4px; }
+.tranamaca-cell .pct { font-size: 13px; font-weight: 700; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px; display: inline-block; }
+.overview { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 24px; margin-bottom: 36px; }
+.overview-title { font-size: 13px; font-weight: 500; color: var(--text-mute); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+.shield-group { background: var(--wine-bg); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; }
+.shield-group-title { font-size: 13px; font-weight: 600; color: var(--wine); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.shield-group-title::before { content: '①'; font-size: 18px; }
+.shield-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.other-flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 4px; }
+@media (max-width: 800px) { .other-flow { grid-template-columns: 1fr; } }
+.flow-box { padding: 14px 12px; border-radius: var(--radius); text-align: center; }
+.flow-box.lg { padding: 18px 14px; }
+.flow-box .num { font-size: 10px; font-weight: 600; letter-spacing: 1px; opacity: 0.7; }
+.flow-box .ttl-ko { font-size: 14px; font-weight: 600; margin: 4px 0 2px; }
+.flow-box.lg .ttl-ko { font-size: 16px; }
+.flow-box .ttl-en { font-size: 10px; opacity: 0.6; font-family: 'JetBrains Mono', monospace; }
+.flow-box .desc { font-size: 11px; margin-top: 6px; opacity: 0.8; }
+.flow-box.s1-1 { background: var(--s1-1-bg); color: var(--s1-1); }
+.flow-box.s1-2 { background: var(--s1-2-bg); color: var(--s1-2); }
+.flow-box.s1-3 { background: var(--s1-3-bg); color: var(--s1-3); }
+.flow-box.s1-4 { background: var(--s1-4-bg); color: var(--s1-4); }
 .flow-box.s2 { background: var(--s2-bg); color: var(--s2); }
 .flow-box.s3 { background: var(--s3-bg); color: var(--s3); }
 .flow-box.s4 { background: var(--s4-bg); color: var(--s4); }
-.stage-section { margin-bottom: 36px; position: relative; }
-.stage-head {
-  display: flex; align-items: baseline; gap: 12px;
-  padding: 16px 20px; border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  border: 1px solid var(--border); border-bottom: none;
-  flex-wrap: wrap;
-}
-.stage-head.s1 { background: var(--s1-bg); }
+.stage-section { margin-bottom: 36px; }
+.stage-head { display: flex; align-items: baseline; gap: 12px; padding: 16px 20px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; border: 1px solid var(--border); border-bottom: none; flex-wrap: wrap; }
+.stage-head.s1-1 { background: var(--s1-1-bg); }
+.stage-head.s1-2 { background: var(--s1-2-bg); }
+.stage-head.s1-3 { background: var(--s1-3-bg); }
+.stage-head.s1-4 { background: var(--s1-4-bg); }
 .stage-head.s2 { background: var(--s2-bg); }
 .stage-head.s3 { background: var(--s3-bg); }
 .stage-head.s4 { background: var(--s4-bg); }
-.stage-head.care-water { background: var(--care-water-bg); }
-.stage-head.care-barrier { background: var(--care-barrier-bg); }
-.stage-head.care-turn { background: var(--care-turn-bg); }
 .stage-badge { padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; color: white; letter-spacing: 0.5px; }
-.stage-badge.s1 { background: var(--s1); }
+.stage-badge.s1-1 { background: var(--s1-1); }
+.stage-badge.s1-2 { background: var(--s1-2); }
+.stage-badge.s1-3 { background: var(--s1-3); }
+.stage-badge.s1-4 { background: var(--s1-4); }
 .stage-badge.s2 { background: var(--s2); }
 .stage-badge.s3 { background: var(--s3); }
 .stage-badge.s4 { background: var(--s4); }
-.stage-badge.care-water { background: var(--care-water); }
-.stage-badge.care-barrier { background: var(--care-barrier); }
-.stage-badge.care-turn { background: var(--care-turn); }
-.stage-title { font-size: 17px; font-weight: 600; color: var(--text); flex: 1; min-width: 200px; }
+.stage-title { font-size: 17px; font-weight: 600; flex: 1; min-width: 200px; }
 .stage-sub { font-size: 13px; color: var(--text-sub); font-family: 'JetBrains Mono', monospace; }
 .stage-body { border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius-lg) var(--radius-lg); padding: 20px; background: var(--surface); }
 .mech-box { padding: 14px 16px; border-radius: var(--radius); margin-bottom: 12px; font-size: 13px; line-height: 1.7; }
-.mech-box.s1 { background: var(--s1-bg); color: var(--s1); }
+.mech-box.s1-1 { background: var(--s1-1-bg); color: var(--s1-1); }
+.mech-box.s1-2 { background: var(--s1-2-bg); color: var(--s1-2); }
+.mech-box.s1-3 { background: var(--s1-3-bg); color: var(--s1-3); }
+.mech-box.s1-4 { background: var(--s1-4-bg); color: var(--s1-4); }
 .mech-box.s2 { background: var(--s2-bg); color: var(--s2); }
 .mech-box.s3 { background: var(--s3-bg); color: var(--s3); }
 .mech-box.s4 { background: var(--s4-bg); color: var(--s4); }
 .mech-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: block; opacity: 0.8; }
-.subsection-title {
-  font-size: 14px; font-weight: 600; color: var(--text);
-  margin: 20px 0 12px; display: flex; align-items: center; gap: 8px;
-}
-.subsection-title::before { content: ''; width: 3px; height: 14px; background: var(--wine); border-radius: 2px; }
-.card-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 12px; margin-bottom: 8px; min-height: 60px;
-}
-.card-grid:empty::before {
-  content: '여기에 카드를 끌어다 놓으세요';
-  grid-column: 1 / -1;
-  text-align: center; padding: 20px;
-  color: var(--text-mute); font-size: 12px;
-  border: 1.5px dashed var(--border-strong); border-radius: var(--radius);
-}
-.ingredient-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 14px 16px; position: relative;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  cursor: grab;
-}
+.subsection-title { font-size: 14px; font-weight: 600; margin: 20px 0 12px; display: flex; align-items: center; gap: 8px; }
+.subsection-title::before { content: ''; width: 3px; height: 14px; border-radius: 2px; }
+.subsection-title.derma::before { background: var(--derma); }
+.subsection-title.nature::before { background: var(--nature); }
+.subsection-title.derma { color: var(--derma); }
+.subsection-title.nature { color: var(--nature); }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 8px; min-height: 60px; }
+.card-grid:empty::before { content: '여기에 카드를 끌어다 놓으세요'; grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--text-mute); font-size: 12px; border: 1.5px dashed var(--border-strong); border-radius: var(--radius); }
+.ingredient-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; position: relative; transition: border-color 0.15s, box-shadow 0.15s; cursor: grab; }
 .ingredient-card:active { cursor: grabbing; }
 .ingredient-card:hover { border-color: var(--border-strong); }
-.sortable-ghost {
-  opacity: 0.35; background: var(--wine-bg) !important;
-  border: 2px dashed var(--wine) !important;
-}
+.ingredient-card.is-derma { border-left: 3px solid var(--derma); }
+.ingredient-card.is-nature { border-left: 3px solid var(--nature); }
+.ingredient-card.is-lock { border-left: 3px solid var(--lock); background: linear-gradient(to right, var(--lock-bg) 0%, var(--surface) 5%); }
+.ingredient-card.is-new { background: linear-gradient(to right, var(--new-bg) 0%, var(--surface) 8%); }
+.sortable-ghost { opacity: 0.35; background: var(--wine-bg) !important; border: 2px dashed var(--wine) !important; }
 .sortable-chosen { box-shadow: 0 8px 24px rgba(92,46,46,0.15); }
-.sortable-drag {
-  cursor: grabbing; box-shadow: 0 12px 32px rgba(0,0,0,0.18);
-  transform: rotate(2deg);
-}
-.card-controls {
-  position: absolute; top: 8px; right: 8px;
-  display: flex; gap: 2px; opacity: 0;
-  transition: opacity 0.15s ease; z-index: 5;
-}
-.ingredient-card:hover .card-controls,
-.rule-card:hover .card-controls,
-.section-card:hover .card-controls { opacity: 1; }
-.ctrl-btn {
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: 4px; width: 24px; height: 24px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; color: var(--text-sub); cursor: pointer;
-  font-family: inherit; padding: 0;
-}
+.sortable-drag { cursor: grabbing; box-shadow: 0 12px 32px rgba(0,0,0,0.18); transform: rotate(2deg); }
+.card-controls { position: absolute; top: 8px; right: 8px; display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s; z-index: 5; }
+.ingredient-card:hover .card-controls, .rule-card:hover .card-controls, .section-card:hover .card-controls { opacity: 1; }
+.ctrl-btn { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text-sub); cursor: pointer; font-family: inherit; padding: 0; }
 .ctrl-btn:hover { background: var(--wine-bg); color: var(--wine); border-color: var(--wine); }
 .ctrl-btn.delete:hover { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
-.drag-handle {
-  position: absolute; top: 8px; left: 8px;
-  font-size: 14px; color: var(--text-mute);
-  opacity: 0; transition: opacity 0.15s ease;
-  pointer-events: none;
-}
+.drag-handle { position: absolute; top: 8px; left: 8px; font-size: 14px; color: var(--text-mute); opacity: 0; transition: opacity 0.15s; pointer-events: none; }
 .ingredient-card:hover .drag-handle { opacity: 0.5; }
-.card-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; padding-right: 100px; padding-left: 20px; }
-.card-name { font-size: 14px; font-weight: 600; color: var(--text); }
-.card-name[contenteditable="true"],
-.card-row dd[contenteditable="true"] { outline: 2px solid var(--wine-light); outline-offset: 2px; border-radius: 3px; }
+.card-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; padding-right: 80px; padding-left: 20px; }
+.card-name { font-size: 14px; font-weight: 600; }
+.hero-tag { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 8px; background: var(--lock); color: white; letter-spacing: 0.5px; margin-left: 4px; vertical-align: middle; }
+.new-tag { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 8px; background: var(--new); color: white; letter-spacing: 0.5px; margin-left: 4px; vertical-align: middle; }
 .card-cas { font-size: 11px; color: var(--text-mute); font-family: 'JetBrains Mono', monospace; word-break: break-all; }
 .card-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; letter-spacing: 0.3px; }
-.card-badge.derma { background: var(--s1-bg); color: var(--s1); }
-.card-badge.nature { background: var(--success-bg); color: var(--success); }
-.card-origin {
-  font-size: 11px; color: var(--success); margin-bottom: 8px;
-  padding: 3px 8px; background: var(--success-bg);
-  border-radius: 4px; display: inline-block; margin-left: 20px;
-}
-.card-row {
-  display: grid; grid-template-columns: 64px minmax(0, 1fr);
-  gap: 8px; font-size: 12px; padding: 3px 0;
-  border-bottom: 1px solid #F5F4EE;
-}
+.card-badge.derma { background: var(--derma-bg); color: var(--derma); }
+.card-badge.nature { background: var(--nature-bg); color: var(--nature); }
+.card-origin { font-size: 11px; color: var(--nature); margin-bottom: 8px; padding: 3px 8px; background: var(--nature-bg); border-radius: 4px; display: inline-block; margin-left: 20px; }
+.card-row { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 8px; font-size: 12px; padding: 3px 0; border-bottom: 1px solid #F5F4EE; }
 .card-row:last-child { border-bottom: none; }
 .card-row dt { color: var(--text-mute); font-weight: 500; }
 .card-row dd { color: var(--text); line-height: 1.55; word-break: keep-all; overflow-wrap: anywhere; }
-.tag-safe { background: var(--success-bg); color: var(--success); padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 500; display: inline-block; }
-.tag-warn { background: var(--warn-bg); color: var(--warn); padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 500; display: inline-block; }
-.tag-danger { background: var(--danger-bg); color: var(--danger); padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 500; display: inline-block; }
+.tag-safe { background: var(--success-bg); color: var(--success); padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+.tag-warn { background: var(--warn-bg); color: var(--warn); padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 500; }
 .tag-nobel { background: #FAEEDA; color: #854F0B; padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 500; }
-.edit-hint {
-  background: var(--wine-bg); border-left: 3px solid var(--wine);
-  border-radius: 0 var(--radius) var(--radius) 0;
-  padding: 12px 16px; font-size: 13px;
-  color: var(--wine); margin-bottom: 24px;
-}
+.tag-lock { background: var(--lock-bg); color: var(--lock); padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+.tag-mfg { background: #F0F0F0; color: #666; padding: 1px 7px; border-radius: 4px; font-size: 11px; font-style: italic; }
+.edit-hint { background: var(--wine-bg); border-left: 3px solid var(--wine); border-radius: 0 var(--radius) var(--radius) 0; padding: 12px 16px; font-size: 13px; color: var(--wine); margin-bottom: 24px; }
 .edit-hint strong { font-weight: 600; }
-.add-card-btn {
-  background: none; border: 1.5px dashed var(--border-strong);
-  border-radius: var(--radius); padding: 12px;
-  width: 100%; text-align: center;
-  font-size: 13px; color: var(--text-mute);
-  cursor: pointer; font-family: inherit;
-  margin-top: 8px; transition: all 0.15s ease;
-}
+.add-card-btn { background: none; border: 1.5px dashed var(--border-strong); border-radius: var(--radius); padding: 12px; width: 100%; text-align: center; font-size: 13px; color: var(--text-mute); cursor: pointer; font-family: inherit; margin-top: 8px; transition: all 0.15s; }
 .add-card-btn:hover { border-color: var(--wine); color: var(--wine); background: var(--wine-bg); }
-.rule-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); padding: 20px 24px;
-  margin-bottom: 16px; position: relative;
-}
-.rule-title {
-  font-size: 16px; font-weight: 600; margin-bottom: 12px;
-  display: flex; align-items: center; gap: 10px; padding-right: 110px;
-}
-.rule-title[contenteditable="true"] { outline: 2px solid var(--wine-light); outline-offset: 2px; border-radius: 3px; padding: 2px 4px; }
-.rule-icon {
-  width: 28px; height: 28px; border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 700; flex-shrink: 0;
-}
+.rule-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 16px; position: relative; }
+.rule-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; padding-right: 110px; }
+.rule-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
 .rule-icon.danger { background: var(--danger-bg); color: var(--danger); }
 .rule-icon.warn { background: var(--warn-bg); color: var(--warn); }
 .rule-icon.safe { background: var(--success-bg); color: var(--success); }
-.rule-icon.info { background: var(--s1-bg); color: var(--s1); }
+.rule-icon.info { background: var(--s1-1-bg); color: var(--s1-1); }
 .rule-list { list-style: none; padding: 0; }
-.rule-list li {
-  padding: 8px 0; border-bottom: 1px solid var(--border);
-  font-size: 13px; line-height: 1.7;
-  display: flex; gap: 10px; align-items: flex-start;
-  position: relative;
-}
+.rule-list li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; line-height: 1.7; display: flex; gap: 10px; align-items: flex-start; }
 .rule-list li:last-child { border-bottom: none; }
 .rule-list .marker { color: var(--text-mute); font-weight: 600; flex-shrink: 0; width: 20px; text-align: center; }
 .rule-list .marker.no { color: var(--danger); }
 .rule-list .marker.yes { color: var(--success); }
 .rule-list .marker.caution { color: var(--warn); }
-.rule-list .marker.num { color: var(--text-mute); font-family: monospace; }
-.rule-list .rule-text { flex: 1; min-width: 0; word-break: keep-all; overflow-wrap: anywhere; }
-.rule-list .rule-text[contenteditable="true"] { outline: 1px solid var(--wine-light); outline-offset: 2px; border-radius: 2px; }
-.rule-list .item-del {
-  background: none; border: none; color: var(--text-mute);
-  cursor: pointer; font-size: 14px; padding: 2px 6px;
-  opacity: 0; transition: opacity 0.15s ease;
-  flex-shrink: 0; align-self: center;
-}
+.rule-list .item-del { background: none; border: none; color: var(--text-mute); cursor: pointer; font-size: 14px; padding: 2px 6px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; align-self: center; }
 .rule-list li:hover .item-del { opacity: 1; }
 .rule-list .item-del:hover { color: var(--danger); }
-.add-item-btn {
-  background: none; border: 1px dashed var(--border-strong);
-  border-radius: 6px; padding: 6px 12px; width: 100%;
-  text-align: left; font-size: 12px; color: var(--text-mute);
-  cursor: pointer; font-family: inherit; margin-top: 8px;
-}
+.add-item-btn { background: none; border: 1px dashed var(--border-strong); border-radius: 6px; padding: 6px 12px; width: 100%; text-align: left; font-size: 12px; color: var(--text-mute); cursor: pointer; font-family: inherit; margin-top: 8px; }
 .add-item-btn:hover { border-color: var(--wine); color: var(--wine); }
-.section-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); padding: 18px 20px;
-  margin-bottom: 16px; position: relative;
-}
-.section-card-title {
-  font-size: 14px; font-weight: 600; margin-bottom: 12px;
-  color: var(--wine); padding-right: 110px;
-}
-.section-card-title[contenteditable="true"] { outline: 2px solid var(--wine-light); outline-offset: 2px; border-radius: 3px; padding: 2px 4px; }
-.todo-item {
-  display: flex; gap: 10px; align-items: flex-start;
-  padding: 8px 0; border-bottom: 1px solid var(--border);
-}
-.todo-item:last-child { border-bottom: none; }
+.section-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; margin-bottom: 16px; position: relative; }
+.section-card-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--wine); padding-right: 110px; }
+.todo-item { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--border); }
 .todo-item input[type="checkbox"] { width: 16px; height: 16px; margin-top: 4px; accent-color: var(--wine); cursor: pointer; flex-shrink: 0; }
-.todo-item .todo-text {
-  font-size: 13px; outline: none; padding: 4px 6px;
-  border-radius: 3px; border: 1px solid transparent;
-  line-height: 1.6; flex: 1; min-width: 0;
-  word-break: keep-all; overflow-wrap: anywhere;
-}
+.todo-item .todo-text { font-size: 13px; outline: none; padding: 4px 6px; border-radius: 3px; border: 1px solid transparent; line-height: 1.6; flex: 1; min-width: 0; word-break: keep-all; }
 .todo-item .todo-text:focus { border-color: var(--wine-light); background: var(--wine-bg); }
 .todo-item input[type="checkbox"]:checked + .todo-text { color: var(--text-mute); text-decoration: line-through; }
-.todo-item .todo-del {
-  background: none; border: none; font-size: 16px;
-  color: var(--text-mute); cursor: pointer;
-  padding: 2px 6px; border-radius: 4px; font-family: inherit;
-  flex-shrink: 0;
-}
-.todo-item .todo-del:hover { background: var(--danger-bg); color: var(--danger); }
-.memo-area {
-  width: 100%; min-height: 120px; padding: 12px 14px;
-  border: 1px solid var(--border); border-radius: var(--radius);
-  font-family: inherit; font-size: 13px; line-height: 1.7;
-  background: var(--surface); resize: vertical; color: var(--text);
-}
-.memo-area:focus { outline: none; border-color: var(--wine); }
+.memo-area { width: 100%; min-height: 120px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius); font-family: inherit; font-size: 13px; line-height: 1.7; background: var(--surface); resize: vertical; color: var(--text); }
 .option-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 12px; }
-.option-pill {
-  padding: 10px 12px; border: 1px solid var(--border);
-  border-radius: var(--radius); font-size: 12px;
-  cursor: pointer; text-align: center; user-select: none;
-  transition: all 0.15s ease; background: var(--surface);
-}
-.option-pill:hover { border-color: var(--wine-light); }
+.option-pill { padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 12px; cursor: pointer; text-align: center; user-select: none; background: var(--surface); }
 .option-pill.selected { background: var(--wine); color: white; border-color: var(--wine); }
-.save-indicator {
-  position: fixed; bottom: 24px; right: 24px;
-  background: var(--text); color: white;
-  padding: 8px 14px; border-radius: 20px; font-size: 12px;
-  opacity: 0; transition: opacity 0.3s ease;
-  pointer-events: none; z-index: 100;
-}
+.save-indicator { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: white; padding: 8px 14px; border-radius: 20px; font-size: 12px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; }
 .save-indicator.show { opacity: 0.9; }
-.section-divider { margin-top: 60px; padding-top: 40px; border-top: 2px solid var(--border); }
-.section-divider .label { font-size: 11px; color: var(--text-mute); letter-spacing: 1.5px; font-weight: 600; margin-bottom: 6px; }
-.section-divider .title { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
-.section-divider .desc { font-size: 13px; color: var(--text-sub); margin-bottom: 28px; }
-.board-tabs {
-  display: flex; gap: 6px; flex-wrap: wrap;
-  margin-bottom: 24px; padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
-}
-.board-chip {
-  padding: 8px 14px; background: var(--surface);
-  border: 1px solid var(--border); border-radius: 20px;
-  font-size: 13px; color: var(--text-sub);
-  cursor: pointer; user-select: none;
-  display: flex; align-items: center; gap: 6px;
-  transition: all 0.15s ease; font-family: inherit;
-  max-width: 220px;
-}
-.board-chip:hover { border-color: var(--wine-light); color: var(--wine); }
+.board-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.board-chip { padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; font-size: 13px; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; gap: 6px; max-width: 240px; }
 .board-chip.active { background: var(--wine); color: white; border-color: var(--wine); }
-.board-chip .chip-name {
-  outline: none; border: none; background: none;
-  font: inherit; color: inherit;
-  padding: 0; max-width: 160px;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.board-chip .chip-name[contenteditable="true"] { background: rgba(255,255,255,0.15); padding: 0 4px; border-radius: 3px; }
-.board-chip .chip-del {
-  background: none; border: none; color: inherit;
-  opacity: 0.5; font-size: 14px; line-height: 1;
-  cursor: pointer; padding: 0; font-family: inherit;
-}
-.board-chip .chip-del:hover { opacity: 1; }
-.add-board-btn {
-  padding: 8px 14px; background: none;
-  border: 1px dashed var(--border-strong); border-radius: 20px;
-  font-size: 13px; color: var(--text-mute);
-  cursor: pointer; font-family: inherit;
-}
-.add-board-btn:hover { border-color: var(--wine); color: var(--wine); background: var(--wine-bg); }
-.board-meta {
-  display: flex; gap: 12px; align-items: center;
-  margin-bottom: 20px; padding: 12px 16px;
-  background: var(--wine-bg); border-radius: var(--radius);
-  font-size: 13px; color: var(--wine);
-}
-.board-meta .meta-icon { font-size: 16px; }
-.board-meta .meta-text { flex: 1; }
+.board-chip .chip-name { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board-chip .chip-del { background: none; border: none; color: inherit; opacity: 0.5; font-size: 14px; cursor: pointer; padding: 0; }
+.add-board-btn { padding: 8px 14px; background: none; border: 1px dashed var(--border-strong); border-radius: 20px; font-size: 13px; color: var(--text-mute); cursor: pointer; }
+.board-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; padding: 12px 16px; background: var(--wine-bg); border-radius: var(--radius); font-size: 13px; color: var(--wine); }
 @media print {
-  .tab-btn, .card-controls, .add-card-btn, .add-item-btn, .todo-del, .item-del, .drag-handle, .add-board-btn, .chip-del { display: none !important; }
+  .tab-btn, .card-controls, .add-card-btn, .add-item-btn, .item-del, .drag-handle { display: none !important; }
   .tab-content { display: block !important; page-break-before: always; }
-  .ingredient-card { cursor: default; }
 }
 </style>
 </head>
@@ -364,49 +199,62 @@ html, body {
 <div class="container">
 
 <header class="page-head">
-<div class="page-title"><span class="brand-mark">TETRARIX</span>TX MELA REPAIR CREAM · 작업 페이지</div>
-<div class="page-sub">v13.5 · RX-001 · 드래그 앤 드롭 + 마케팅 보드</div>
+<div class="page-title"><span class="brand-mark">TETRARIX v13.8</span>TX MELA REPAIR<span class="signature-mark">트라나마카C</span></div>
+<div class="page-sub">함량 컨트롤 11종 · 라멜라 Active 3:1:1:1 · 4×4 시스템</div>
 </header>
 
 <nav class="tabs">
-<button class="tab-btn active" data-tab="tab1">멜라닌 케어 4단계</button>
+<button class="tab-btn active" data-tab="tab1">4단계 메커니즘</button>
 <button class="tab-btn" data-tab="tab2">식약처 광고 리스크</button>
-<button class="tab-btn" data-tab="tab3">마케팅 아이디어 보드</button>
+<button class="tab-btn" data-tab="tab3">마케팅 보드</button>
 </nav>
 
 <section id="tab1" class="tab-content active">
+
+<div class="signature-banner">
+<h2>💎 트라나마카C — 5종 시그너처 분자</h2>
+<div class="sub">식약처 미백 + 노벨상 메커니즘 + 차세대 항당화 분자 + 비타민C 안정형 시스템</div>
+<div class="tranamaca-grid">
+<div class="tranamaca-cell"><div class="letter">트라</div><div class="name">트라넥삼산</div><div class="pct">5.0%</div></div>
+<div class="tranamaca-cell"><div class="letter">나</div><div class="name">나이아신아마이드</div><div class="pct">4.0%</div></div>
+<div class="tranamaca-cell"><div class="letter">마</div><div class="name">마이크로코쿠스용해물</div><div class="pct">1.0%</div></div>
+<div class="tranamaca-cell"><div class="letter">카</div><div class="name">카르노신</div><div class="pct">1.0%</div></div>
+<div class="tranamaca-cell"><div class="letter">C</div><div class="name">비타민C 시스템</div><div class="pct">6%+</div></div>
+</div>
+</div>
+
 <div class="edit-hint">
-<strong>편집 가이드</strong> · 카드를 <b>드래그</b>해서 다른 Stage·CARE로 이동 가능. hover 시 우상단 ✎× 버튼 표시. 텍스트 클릭으로 직접 수정. 모든 변경 자동 저장.
+<strong>편집 가이드</strong> · 🟢 더마 카드 (초록 left border) · 🟡 자연 카드 (노랑 left border) · LOCK 표시 = 함량 컨트롤 11종 · 드래그 이동 가능
 </div>
+
 <div class="overview">
-<div class="overview-title">한눈에 보기 — 멜라닌 케어 4단계 시스템</div>
-<div class="overview-flow">
-<div class="flow-box s1"><div class="num">STAGE 1</div><div class="ttl-ko">환경 방어</div><div class="ttl-en">DEFEND</div><div class="desc">UV · DNA · 자유라디칼 차단</div></div>
-<div class="flow-box s2"><div class="num">STAGE 2</div><div class="ttl-ko">생성 차단</div><div class="ttl-en">BLOCK</div><div class="desc">신호 차단 · 페오멜라닌 전환</div></div>
-<div class="flow-box s3"><div class="num">STAGE 3</div><div class="ttl-ko">합성 억제</div><div class="ttl-en">INHIBIT</div><div class="desc">티로시나아제 · 환원 · 전달 차단</div></div>
-<div class="flow-box s4"><div class="num">STAGE 4</div><div class="ttl-ko">재생 갱신</div><div class="ttl-en">RENEW</div><div class="desc">멜라닌 배출 · 콜라겐 · 자가포식</div></div>
+<div class="overview-title">한눈에 보기 — v13.8 4단계 시스템</div>
+<div class="shield-group">
+<div class="shield-group-title">1단계 SHIELD · 기미 방패 케어 (1-1 ~ 1-4)</div>
+<div class="shield-flow">
+<div class="flow-box s1-1"><div class="num">1-1</div><div class="ttl-ko">UV 방어·복구</div><div class="ttl-en">DEFEND</div><div class="desc">마이크로코쿠스 1% + 시로미</div></div>
+<div class="flow-box s1-2"><div class="num">1-2</div><div class="ttl-ko">멜라닌 생성 억제</div><div class="ttl-en">BLOCK</div><div class="desc">트라넥삼산 5% + 퀴노아</div></div>
+<div class="flow-box s1-3"><div class="num">1-3</div><div class="ttl-ko">합성 차단·전달</div><div class="ttl-en">INHIBIT</div><div class="desc">나이아신 4% + MAP 2% + 시벅손</div></div>
+<div class="flow-box s1-4"><div class="num">1-4</div><div class="ttl-ko">항산화·항당화</div><div class="ttl-en">PROTECT</div><div class="desc">카르노신 1% + 베리 컴플렉스</div></div>
 </div>
 </div>
+<div class="other-flow">
+<div class="flow-box s2 lg"><div class="num">2단계</div><div class="ttl-ko">멜라닌 청소 & 턴오버</div><div class="ttl-en">CLEAR</div><div class="desc">자가포식 + PHA</div></div>
+<div class="flow-box s3 lg"><div class="num">3단계</div><div class="ttl-ko">수분 공급</div><div class="ttl-en">HYDRATE</div><div class="desc">HA 8종 + 엑토인</div></div>
+<div class="flow-box s4 lg"><div class="num">4단계</div><div class="ttl-ko">장벽 형성</div><div class="ttl-en">FORTIFY</div><div class="desc">라멜라 Active 3:1:1:1</div></div>
+</div>
+</div>
+
 <div id="stages-container"></div>
-<div class="section-divider">
-<div class="label">SUPPORTING CARE</div>
-<div class="title">2 · 3 · 4 · 별도 케어 자산</div>
-<div class="desc">멜라닌 케어 4단계 외, 처방의 보습 · 장벽 · 턴오버를 책임지는 일반 케어 성분들. 카드를 끌어서 Stage와 자유롭게 이동 가능.</div>
-</div>
-<div id="care-container"></div>
 </section>
 
 <section id="tab2" class="tab-content">
-<div class="edit-hint">
-<strong>식약처 광고심의 안전 가이드</strong> · 카드 hover 시 ✎× 버튼. 항목 hover 시 × 삭제. 새 카드/항목 추가 가능.
-</div>
+<div class="edit-hint"><strong>식약처 광고심의 안전 가이드</strong></div>
 <div id="rules-container"></div>
 </section>
 
 <section id="tab3" class="tab-content">
-<div class="edit-hint">
-<strong>마케팅 보드</strong> · 여러 광고/캠페인을 별도 보드로 관리. 보드 chip 클릭으로 전환. chip을 더블클릭하면 이름 수정. 보드마다 섹션·카피·TO DO·메모 따로.
-</div>
+<div class="edit-hint"><strong>마케팅 보드</strong> · 여러 캠페인 보드로 관리</div>
 <div class="board-tabs" id="board-tabs"></div>
 <div class="board-meta" id="board-meta" style="display:none;"></div>
 <div id="marketing-container"></div>
@@ -417,174 +265,155 @@ html, body {
 
 <script>
 const STAGES_INIT = [
-  {key:"s1", badge:"STAGE 1", title:"환경 방어 — UV · DNA · 자유라디칼 차단", sub:"DEFEND", mech:"자외선(UV-A/B)이 멜라노사이트의 티로시나아제를 직접 활성화하고, DNA 손상(CPD)을 유발해 p53·MITF 신호를 켭니다. Stage 1은 <b>UV 도달 차단(마이카) + DNA 손상 복구(Photolyase) + 자유라디칼 소거(폴리페놀·안토시아닌)</b>로 멜라닌 생성 상위 트리거를 끕니다."},
-  {key:"s2", badge:"STAGE 2", title:"생성 차단 — 멜라닌 합성 상위 차단 + 페오멜라닌 전환", sub:"BLOCK", mech:"α-MSH → MC1R → cAMP → MITF → 티로시나아제 발현 사슬을 상위에서 차단 + 도파퀴논 분기점에서 시스테인 -SH 결합으로 어두운 유멜라닌 → 옅은 페오멜라닌으로 유도. <b>트란시노 II 60년 의학사 핵심 메커니즘</b>."},
-  {key:"s3", badge:"STAGE 3", title:"합성 억제 · 환원 · 전달 차단", sub:"INHIBIT", mech:"티로시나아제 직접 억제(비타민C·바쿠치올) + 이미 만들어진 멜라닌 환원(비타민C·글루타치온) + 멜라노솜의 케라티노사이트 전달 차단(나이아신아마이드 PAR-2). <b>식약처 미백 고시 4종 보유</b>."},
-  {key:"s4", badge:"STAGE 4", title:"재생 갱신 — 멜라닌 배출 · 콜라겐 · 자가포식", sub:"RENEW", mech:"정상 턴오버(28일) 회복 = 각질형성세포 분화 → NMF·세포간 지질 자체 생산 + 멜라닌 든 죽은 각질 자연 배출 + 콜라겐 합성 자극. <b>2016 Ohsumi 자가포식 메커니즘 매핑</b>."}
-];
-
-const CARES_INIT = [
-  {key:"care-water", badge:"CARE 2", title:"수분 보습 시스템", sub:"HYDRATION"},
-  {key:"care-barrier", badge:"CARE 3", title:"장벽 방어 · 라멜라 1:1:1 시스템", sub:"BARRIER"},
-  {key:"care-turn", badge:"CARE 4", title:"턴오버 · 각질 정상화", sub:"TURNOVER"}
+  {key:"s1-1", badge:"1-1 SHIELD", title:"UV 방어·DNA 복구", sub:"DEFEND", mech:"무기 차단 (TiO2·ZnO·식약처 자외선 차단) + <b>마이크로코쿠스용해물의 Photolyase 효소가 UV-DNA(CPD)를 직접 복구</b>. 시로미 한라산 안토시아닌으로 자유라디칼 1차 소거. <b>방어 + 복구 듀얼</b>."},
+  {key:"s1-2", badge:"1-2 SHIELD", title:"멜라닌 생성 억제", sub:"BLOCK", mech:"<b>트라넥삼산 5% LOCK</b>이 플라스민·α-MSH·MITF 차단. 알파-비사보롤 0.5%·알파-알부틴이 MITF 직접 억제. 시스테인HCL·B6·퀴노아의 페오멜라닌 전환 트리오 (트란시노 II 60년 매핑)."},
+  {key:"s1-3", badge:"1-3 SHIELD", title:"합성 차단 + 전달 차단", sub:"INHIBIT", mech:"<b>나이아신아마이드 4%</b> PAR-2 멜라노솜 전달 차단 + <b>비타민C 안정형 5종 시스템</b> (MAP 2% + 3-O-에틸 1% + 시스테인) + 코직애씨드 Cu 킬레이션 + 펩타이드 + 바쿠치올 식물 레티노이드. 시벅손 자연 비타민C+오메가-7로 자연 시너지."},
+  {key:"s1-4", badge:"1-4 SHIELD", title:"항산화·항당화 (재발 방지)", sub:"PROTECT", mech:"<b>카르노신 1% LOCK</b>으로 AGEs(당화 색소) 직접 차단 — 35-45세 호르몬형 기미 정확 매핑. CoQ10·설련화·6대륙 베리 컴플렉스(마퀴·월귤·골든·베이베리·블루베리·클라우드베리)로 누적 항산화."},
+  {key:"s2", badge:"2단계 CLEAR", title:"멜라닌 청소 & 턴오버", sub:"CLEAR", mech:"<b>2016 Ohsumi 자가포식 노벨 매핑</b> — 사카로마이세스·갈락토미세스 + 트레할로스 + 부활초의 4중 자가포식 + 락토바이오닉/말토바이오닉 PHA 듀얼 박피 + 아데노신 식약처 주름."},
+  {key:"s3", badge:"3단계 HYDRATE", title:"수분 공급 — HA 8종 + 엑토인", sub:"HYDRATE", mech:"<b>HA 8중 다층 보습</b> + 엑토인 (호염성 박테리아 보호 분자·민감 진정) + 베타-글루칸 + 판테놀 + 스쿠알란 + 실리카. *35-45세 시술 누적 민감 피부* 정확 매핑."},
+  {key:"s4", badge:"4단계 FORTIFY", title:"라멜라 Active 3:1:1:1", sub:"FORTIFY", mech:"<b>세라마이드 NP 0.30 : 콜레스테롤 0.10 : 스테아릭 0.10 : 팔미틱 0.10 = 3:1:1:1 (Mao-Qiang 1995 매핑)</b>. 손상 장벽 회복 TEWL -45% (Normal 1.8배). 피토스핑고신 라멜라 보조."}
 ];
 
 const INGREDIENTS_INIT = {
-  "s1-derma":[
-    {name:"마이크로코쿠스용해물",cas:"Micrococcus Lysate · 미생물 추출물",badge:"derma",rows:[["역할","Photolyase 효소 공급 → UV로 손상된 DNA(CPD) 직접 복구"],["함량","1.0% (유효 0.5-1%)"],["시너지","비타민C·E + 마이카"],["노벨","<span class=\"tag-nobel\">★ 2015 Sancar — DNA 복구</span>"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"마이카",cas:"CAS 12001-26-2 · Mica",badge:"derma",rows:[["역할","광물 광반사·UV 보조 차단·매트 펄"],["함량","0.5% (유효 0.5-2%)"],["시너지","실리카 에어로젤"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"베타글루칸",cas:"CAS 9012-72-0 · Beta-Glucan",badge:"derma",rows:[["역할","면역 활성·진정·HA의 20% 보습력"],["함량","0.3% (유효 0.1-0.5%)"],["시너지","HA + 세라마이드"],["논문","Pillai 2005 — 토피컬 항염·재생"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]}
+  "s1-1-derma":[
+    {name:"마이크로코쿠스용해물",cas:"Micrococcus Lysate · 미생물",badge:"derma",isLock:true,rows:[["역할","Photolyase 효소·UV-DNA(CPD) 직접 복구"],["함량","1.00% LOCK"],["노벨","<span class=\"tag-nobel\">★ 2015 Sancar 노벨</span>"],["주의","40°C 이하·차광"]]},
+    {name:"티타늄디옥사이드",cas:"TiO2 · CAS 13463-67-7",badge:"derma",rows:[["역할","무기 UV-A·B 차단"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["식약처","자외선 차단 등재"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
+    {name:"징크옥사이드",cas:"ZnO · CAS 1314-13-2",badge:"derma",rows:[["역할","UV-A long + 항균·진정"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["식약처","자외선 차단 등재"]]}
   ],
-  "s1-nature":[
-    {name:"남극이끼",cas:"Deschampsia Antarctica Extract",badge:"nature",origin:"남극 — 2종뿐인 자생 현화식물",rows:[["역할","극한 UV-B·저온 적응 → DNA 복구·항산화 효소 SOD/CAT 강화"],["함량","0.3% (유효 0.1-0.5%)"],["시너지","마이크로코쿠스용해물 (DNA 복구 듀얼)"],["노벨","<span class=\"tag-nobel\">★ 2015 Sancar 매핑 (식물성 Photolyase)</span>"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"설련화",cas:"Saussurea Involucrata · Syringin CAS 118-34-3",badge:"nature",origin:"티베트·중국 4,500-5,000m 영구동토",rows:[["역할","강력 항산화·항염·콜라겐 합성 (시린진·스코폴린)"],["함량","0.2% (유효 0.1-0.3%)"],["논문","Yi 2010 — DPPH 항산화·MMP-1 억제"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"시로미 추출물",cas:"Empetrum Nigrum · Delphinidin·Cyanidin",badge:"nature",origin:"한국 한라산 1,500m+ 고산",rows:[["역할","안토시아닌 강력 항산화·UV 보호·콜라겐 보존"],["함량","0.3% (유효 0.2-0.5%)"],["특징","한국 자생 anchor · K-beauty 시장 거의 비어있음"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"사막장미잎추출물",cas:"Adenium Obesum Leaf Cell Extract",badge:"nature",origin:"동아프리카·아라비아 호른",rows:[["역할","다육 식물 보호 분자·수분 보유·항산화"],["함량","0.3% (유효 0.3-1%)"],["시너지","드라세나스투키수 (동일 지역 듀얼)"],["특징","Plant Cell Culture 추출"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"마룰라잎추출물",cas:"Sclerocarya Birrea Leaf Extract",badge:"nature",origin:"남부 아프리카 사바나",rows:[["역할","폴리페놀 항산화·UV 보호"],["함량","1.0% (유효 0.3-1%)"],["특징","\"코끼리 나무\" — 건조·고온 적응"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]}
+  "s1-1-nature":[
+    {name:"시로미 추출물",cas:"Empetrum nigrum · Empetrum Nigrum Fruit Extract",badge:"nature",isHero:true,origin:"한국 한라산 1,500m+ 고산",rows:[["역할","★ 안토시아닌·강력 항산화·UV 보호"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["anchor","🇰🇷 한국 자생"]]},
+    {name:"남극이끼 추출물",cas:"Deschampsia antarctica · Deschampsia Antarctica Extract",badge:"nature",origin:"남극 — 2종 자생 현화식물",rows:[["역할","극한 UV-B·DNA 복구·SOD/CAT 강화"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["노벨","<span class=\"tag-nobel\">★ Sancar 식물 photolyase 매핑</span>"]]},
+    {name:"토코페롤 (비타민E)",cas:"Tocopherol · CAS 59-02-9",badge:"nature",rows:[["역할","지용성 비타민E·산화방지"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]}
+  ],
+  "s1-2-derma":[
+    {name:"트라넥삼산",cas:"Tranexamic Acid · CAS 1197-18-8",badge:"derma",isLock:true,rows:[["역할","★ 플라스민 차단·α-MSH·MITF 억제"],["함량","5.00% LOCK"],["식약처","미백 LOCK"],["임상","Wu 2012·Hsiao 2017 5% 12주 -30~50%"]]},
+    {name:"알파-비사보롤",cas:"Alpha-Bisabolol · CAS 515-69-5",badge:"derma",isLock:true,rows:[["역할","MITF 직접 억제·합성 마스터 차단"],["함량","0.50% LOCK (1→0.5% 축소)"],["식약처","미백 등재"],["임상","Lee 2010 0.5% 4주 -28%"]]},
+    {name:"알파-알부틴",cas:"Alpha-Arbutin · CAS 84380-01-8",badge:"derma",rows:[["역할","티로시나아제 안정형 차단·β형 10배"],["함량","<span class=\"tag-mfg\">제조사 결정 (한도 2%)</span>"],["식약처","미백 등재"]]},
+    {name:"시스테인HCL",cas:"Cysteine HCl · CAS 52-89-1 (KCID 1514)",badge:"derma",rows:[["역할","자유 -SH·페오멜라닌 전환"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["주의","<span class=\"tag-warn\">미백 광고 X·산화 빠름·EDTA</span>"]]},
+    {name:"피리독신HCL (B6)",cas:"Pyridoxine HCl · CAS 58-56-0",badge:"derma",rows:[["역할","PLP·CBS/CSE 효소 보조·시스테인 자가 합성"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["근거","트란시노 II 6mg/일 매핑"]]}
+  ],
+  "s1-2-nature":[
+    {name:"퀴노아 추출물",cas:"Chenopodium quinoa · Chenopodium Quinoa Seed Extract",badge:"nature",isHero:true,origin:"남미 안데스 3,000-4,000m",rows:[["역할","★ B6+메티오닌+시스테인+9EAA+사포닌 5-in-1"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["권위","<span class=\"tag-nobel\">UNESCO 2013</span>"]]}
+  ],
+  "s1-3-derma":[
+    {name:"나이아신아마이드 (B3)",cas:"Niacinamide · CAS 98-92-0",badge:"derma",isLock:true,rows:[["역할","★ PAR-2 차단·멜라노솜 전달·NAD+"],["함량","4.00% LOCK (5→4% 축소)"],["식약처","미백 등재"],["임상","Hakozaki 2002 -35~68%"]]},
+    {name:"MAP (마그네슘아스코빌포스페이트)",cas:"Magnesium Ascorbyl Phosphate · CAS 113170-55-1",badge:"derma",isLock:true,rows:[["역할","비타민C 안정형·티로시나아제 억제·콜라겐"],["함량","2.00% LOCK (3→2% 축소)"],["식약처","미백 등재"],["주의","<span class=\"tag-warn\">pH 6.5-7.5·PHA와 분리</span>"]]},
+    {name:"3-O-에틸 아스코빅애시드",cas:"3-O-Ethyl Ascorbic Acid · CAS 86404-04-8",badge:"derma",isLock:true,rows:[["역할","비타민C 에틸 안정·침투 우수"],["함량","1.00% LOCK"],["식약처","미백 등재"]]},
+    {name:"코직애씨드 (다이팔미테이트)",cas:"Kojic Acid Dipalmitate · CAS 79725-98-7",badge:"derma",isNew:true,rows:[["역할","Cu 킬레이션·티로시나아제 강력 차단"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["임상","Garcia 1996 2% 12주 -42%"],["주의","식약처 미백 X·간접 표현"]]},
+    {name:"글루타치온",cas:"Glutathione (GSH) · CAS 70-18-8",badge:"derma",rows:[["역할","γ-Glu-Cys-Gly·자유 -SH·환원·항산화"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["주의","<span class=\"tag-warn\">산화 빠름·헤드라인 X</span>"]]},
+    {name:"바쿠치올",cas:"Bakuchiol · CAS 10309-37-2 · (+)-(S)",badge:"derma",rows:[["역할","식물성 레티노이드·콜라겐·MMP 억제"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["임상","Dhaliwal 2018 BJD -59%"]]},
+    {name:"데카펩타이드-12 (Lumixyl)",cas:"Decapeptide-12 · CAS 736149-89-8",badge:"derma",rows:[["역할","티로시나아제 직접 억제·미백 펩타이드"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["임상","Hantash 2009 -38%"]]}
+  ],
+  "s1-3-nature":[
+    {name:"시벅손 추출물",cas:"Hippophae rhamnoides · Hippophae Rhamnoides Fruit Extract (Palmitoleic 373-49-9)",badge:"nature",isHero:true,origin:"시베리아·티베트 4,000m 고산",rows:[["역할","★ 비타민C 자연 + 오메가-7·장벽 회복"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["narrative","러시아 우주비행사 영양"]]}
+  ],
+  "s1-4-derma":[
+    {name:"카르노신",cas:"L-Carnosine · CAS 305-84-0",badge:"derma",isLock:true,rows:[["역할","★ β-알라닌+히스티딘·항당화 AGEs 차단"],["함량","1.00% LOCK"],["임상","Babizhayev 2010 1% 12주 AGE -27%"],["타깃","35-45세 호르몬형 기미·당화 색소"]]},
+    {name:"코엔자임Q10 (유비퀴논)",cas:"Ubiquinone · CAS 303-98-0",badge:"derma",rows:[["역할","미토콘드리아 항산화·세포 에너지"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["주의","40°C 이하·차광"]]}
+  ],
+  "s1-4-nature":[
+    {name:"베리 컴플렉스 4종 ★",cas:"마퀴베리·월귤(링곤)·골든베리·베이베리잎",badge:"nature",isHero:true,origin:"칠레·시베리아·페루 안데스·동아시아 (4대륙)",rows:[["역할","★ 안토시아닌 multi·델피니딘·아부틴·위타놀라이드"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["KCID","마퀴 7461 / 월귤 7492 ✓"]]},
+    {name:"마퀴베리 (아리스토텔리아 킬렌시스)",cas:"Aristotelia chilensis · Fruit Extract · KCID 7461",badge:"nature",origin:"칠레 파타고니아·Mapuche 4,000년",rows:[["역할","델피니딘 ORAC 최강 (29,000)"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
+    {name:"월귤추출물 (링곤베리)",cas:"Vaccinium vitis-idaea · Fruit Extract · KCID 7492",badge:"nature",origin:"시베리아·핀란드·한국 백두산",rows:[["역할","자연 아부틴 + 안토시아닌 + 폴리페놀"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["한방","동의보감 등재 (월귤)"]]},
+    {name:"골든베리 (잉카베리)",cas:"Physalis peruviana · Fruit Extract",badge:"nature",origin:"페루 안데스 1,500-3,000m·잉카 5,000년",rows:[["역할","위타놀라이드·카로테노이드"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
+    {name:"베이베리잎추출물",cas:"Myrica rubra · Leaf Extract",badge:"nature",origin:"동아시아 산악",rows:[["역할","항염·플라보노이드"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
+    {name:"빌베리잎 추출물",cas:"Vaccinium myrtillus · Leaf Extract",badge:"nature",origin:"북유럽·북미 야생",rows:[["역할","안토시아닌·미르틸린·항산화"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["주의","블루베리잎 X·빌베리잎이 정확"]]},
+    {name:"클라우드베리 추출물",cas:"Rubus chamaemorus · Fruit Extract",badge:"nature",origin:"핀란드 라플란드 늪지 -30°C",rows:[["역할","비타민C·엘라긴산·안토시아닌"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["주의","<span class=\"tag-warn\">⚠ KCID 미등재 — OEM 확인 필요</span>"]]},
+    {name:"설련화 추출물",cas:"Saussurea involucrata · Syringin CAS 118-34-3",badge:"nature",origin:"티베트 4,500-5,000m 영구동토",rows:[["역할","시린진·강력 항산화·콜라겐"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]}
   ],
   "s2-derma":[
-    {name:"트라넥삼산",cas:"CAS 1197-18-8 · Tranexamic Acid",badge:"derma",rows:[["역할","플라스민 차단 → α-MSH·MITF 억제 → 멜라닌 합성 감소"],["함량","5.0% LOCK (유효 2-5%)"],["시너지","시스테인 + 비타민C (트란시노 II 트리오)"],["의학사","1962 Okamoto 발명 · 1979 Nijo 기미 발견 · 2007 Transino II"],["논문","Wu 2012 · Hsiao 2017 — 5% 12주 색소 -30~50%"],["안전성","<span class=\"tag-safe\">자극 거의 없음</span> 드물게 따끔"]]},
-    {name:"알파-비사보롤",cas:"CAS 515-69-5 · Alpha-Bisabolol",badge:"derma",rows:[["역할","MITF 직접 억제 (전사 인자) → 합성 마스터 스위치 차단"],["함량","1.0% LOCK · 식약처 미백 고시"],["출처","캐모마일 (Matricaria recutita)"],["논문","Lee 2010 — 0.5% 4주 -28%"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"시스테인HCL",cas:"CAS 52-89-1 · KCID 1514",badge:"derma",rows:[["역할","자유 -SH → 도파퀴논 결합 → 페오멜라닌(옅은) 유도"],["함량","0.2% (산화방지제 명목 · 별표2 제약)"],["시너지","TXA + 비타민C + 피리독신 (트란시노 II)"],["리스크","<span class=\"tag-warn\">KCID 배합목적: 산화방지·헤어 (미백 광고 X)</span>"],["안전성","<span class=\"tag-safe\">자극 거의 없음</span> 산화 빠름"]]},
-    {name:"피리독신HCL (B6)",cas:"CAS 58-56-0 · Pyridoxine HCl",badge:"derma",rows:[["역할","PLP(B6 활성형) → CBS·CSE 효소 보조인자 → 시스테인 자가 합성"],["함량","0.3% LOCK"],["시너지","퀴노아·메티오닌·베타인 (시스테인 합성 시스템)"],["의학사","트란시노 II 6mg/일"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]}
+    {name:"아데노신",cas:"Adenosine · CAS 58-61-7",badge:"derma",rows:[["역할","★ 주름 개선·콜라겐 합성·섬유아세포"],["함량","<span class=\"tag-mfg\">제조사 결정 (식약처 0.04% 정확치)</span>"],["식약처","주름 등재"]]},
+    {name:"락토바이오닉애시드 (PHA)",cas:"Lactobionic Acid · CAS 96-82-2",badge:"derma",rows:[["역할","유산균 발효 PHA·각질 분해·턴오버"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["임상","Edison 2004 자극 0.2/10"],["주의","pH 3.5-4.5·MAP와 분리"]]},
+    {name:"말토바이오닉애시드",cas:"Maltobionic Acid · CAS 17103-22-1",badge:"derma",rows:[["역할","맥아 발효 PHA·보습+박피"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
+    {name:"알란토인",cas:"Allantoin · CAS 97-59-6",badge:"derma",rows:[["역할","각질 정상화·재생·진정"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]}
   ],
   "s2-nature":[
-    {name:"퀴노아 추출물",cas:"Chenopodium Quinoa Seed Extract",badge:"nature",origin:"남미 안데스 3,000-4,000m · 잉카 5,000년",rows:[["역할","★ B6 + 메티오닌 + 시스테인 + 9 EAA + 사포닌 5-in-1 — 시스테인 합성 경로 전 단계 자연 농축"],["함량","0.5% LOCK"],["시너지","피리독신HCL·시스테인HCL (자가 합성 트리오)"],["권위","<span class=\"tag-nobel\">UNESCO 2013 국제 퀴노아의 해</span>"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"사프란 추출물",cas:"Crocus Sativus Flower Extract · Crocin CAS 42553-65-1",badge:"nature",origin:"카슈미르·이란 고산 1,500-2,000m",rows:[["역할","크로신·크로세틴 강력 항산화·티로시나아제 억제·MITF 다운레귤레이션"],["함량","0.1% (유효 0.05-0.2%)"],["논문","Geng 2019 — 멜라닌 합성 -40% in vitro"],["특징","페르시아 5,000년 미백 전통"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"알펜로제 (알프스장미)",cas:"Rhododendron Ferrugineum · Delphinidin CAS 528-53-0",badge:"nature",origin:"유럽 알프스 1,500-2,500m 고산",rows:[["역할","델피니딘 안토시아닌 → UV 보호·MITF 억제·SOD 활성화"],["함량","0.3% (유효 0.2-0.5%)"],["특징","에델바이스 자매식물 · 고산 극한 적응"],["시너지","시로미 (안토시아닌 듀얼)"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]}
+    {name:"사카로마이세스 발효 추출물",cas:"Saccharomyces Ferment Extract",badge:"nature",isHero:true,origin:"효모 발효",rows:[["역할","★ 자가포식·세포 갱신·B6/아미노산"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["노벨","<span class=\"tag-nobel\">★ 2016 Ohsumi 자가포식</span>"]]},
+    {name:"갈락토미세스 발효여과물",cas:"Galactomyces Ferment Filtrate",badge:"nature",origin:"효모 발효",rows:[["역할","효모 자가포식·B군 비타민"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
+    {name:"트레할로스",cas:"Trehalose · CAS 99-20-7",badge:"nature",rows:[["역할","mTOR 비의존 자가포식·세포 보호"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
+    {name:"부활초 추출물",cas:"Myrothamnus flabellifolia · Leaf Extract",badge:"nature",origin:"나미브 사막 Resurrection plant",rows:[["역할","건조→부활·자가포식·트레할로스"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]}
   ],
   "s3-derma":[
-    {name:"나이아신아마이드",cas:"CAS 98-92-0 · Niacinamide (B3)",badge:"derma",rows:[["역할","PAR-2 차단 → 멜라노솜 전달 차단 + 장벽 강화 + NAD+ 전구체"],["함량","5.0% LOCK · 식약처 미백 고시"],["시너지","TXA + 비타민C (생성·전달 동시 차단)"],["논문","Hakozaki 2002 — 5% 8주 색소 -35~68% (P&G)"],["안전성","<span class=\"tag-safe\">4% 이하 자극 0</span> 5%+ 일부 민감"]]},
-    {name:"MAP (비타민C)",cas:"CAS 113170-55-1 · Magnesium Ascorbyl Phosphate",badge:"derma",rows:[["역할","비타민C 안정형 → 티로시나아제 억제·환원·콜라겐 합성"],["함량","3.0% LOCK · 식약처 미백 고시"],["시너지","3-O-에틸 + 글루코사이드 (비타민C 시스템)"],["노벨","<span class=\"tag-nobel\">1937 Szent-Györgyi (비타민C 발견)</span>"],["안전성","<span class=\"tag-safe\">자극 0</span> 알칼리성 — PHA와 충돌 주의"]]},
-    {name:"3-O-에틸 아스코빅애시드",cas:"CAS 86404-04-8",badge:"derma",rows:[["역할","비타민C 에틸 안정형 → 침투율 우수·티로시나아제 억제"],["함량","1.0% LOCK · 식약처 미백 고시"],["시너지","MAP + 글루코사이드"],["안전성","<span class=\"tag-safe\">1% 이하 자극 0</span> 3%+ 따끔"]]},
-    {name:"글루타치온",cas:"CAS 70-18-8 · Glutathione (GSH)",badge:"derma",rows:[["역할","γ-Glu-Cys-Gly · 자유 -SH 함유 · 멜라닌 환원·항산화"],["함량","0.2% (백엔드 · 헤드라인 X)"],["시너지","시스테인 + 비타민C (환원 트리오)"],["리스크","<span class=\"tag-warn\">토피컬 산화 빠름 · 헤드라인 정책 X</span>"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]}
+    {name:"히알루론산 8종 시스템",cas:"Sodium Hyaluronate 외 7종 · 9067-32-7 외",badge:"derma",rows:[["역할","분자량 다른 8종·표층·중층·심층 보습"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["narrative","HA 8중 시스템"]]},
+    {name:"엑토인",cas:"Ectoin · CAS 96702-03-3",badge:"derma",rows:[["역할","극한 수분 보호·민감 진정·UV 보호"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["출처","Halomonas elongata 호염성 박테리아"]]},
+    {name:"베타-글루칸",cas:"Beta-Glucan · CAS 9012-72-0",badge:"derma",rows:[["역할","면역·진정·HA 20% 보습력"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]},
+    {name:"판테놀 (B5)",cas:"D-Panthenol · CAS 16485-10-2",badge:"derma",rows:[["역할","판토텐산 전구체·보습·재생"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["근거","트란시노 II 판토텐 매핑"]]},
+    {name:"스쿠알란",cas:"Squalane · CAS 111-01-3",badge:"derma",rows:[["역할","자가 emollient·항산화"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["출처","올리브·사탕수수 비건"]]},
+    {name:"실리카 (에어로젤)",cas:"Silica · CAS 7631-86-9",badge:"derma",rows:[["역할","매트·확산광·텍스처"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"]]}
   ],
   "s3-nature":[
-    {name:"바쿠치올",cas:"CAS 10309-37-2 · (+)-(S) 자연 광학이성질체",badge:"nature",origin:"인도 5,000년 아유르베다 · Psoralea corylifolia 씨앗",rows:[["역할","식물성 레티노이드 → 콜라겐 합성·MMP 억제·티로시나아제 억제·NF-κB 항염"],["함량","0.5% LOCK"],["시너지","비타민C 시스템 + 나이아신 + PHA"],["임상","Dhaliwal 2018 BJD — vs 레티놀 0.5% 12주, 색소 -59% vs -44% (우월)"],["안전성","<span class=\"tag-safe\">자극 0</span> 임산부·수유부·AM+PM 가능"]]},
-    {name:"카카두 플럼",cas:"Terminalia Ferdinandiana Fruit Extract · Vitamin C CAS 50-81-7",badge:"nature",origin:"호주 노던 테리토리 · 어보리진 5만년",rows:[["역할","세계 최고 비타민C 함량(자몽의 100배) → 미백·콜라겐 합성·DNA 보호"],["함량","0.2% (유효 0.1-0.3%)"],["시너지","비타민C 5종 시스템 자연 보강"],["특징","엘라긴산 항산화 동반 · K-beauty 슬롯 비어있음"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]}
+    {name:"드라세나스투키수 (시그너처)",cas:"Sansevieria trifasciata Leaf Water (= 상아산세베리아수)",badge:"nature",isHero:true,origin:"동아프리카·아라비아 호른",rows:[["역할","★ 시그너처 워터·CAM 식물 자가 정수·사포닌·다당류"],["함량","<span class=\"tag-mfg\">정제수 대체·제조사 결정</span>"],["narrative","NASA 공기정화 식물"]]}
   ],
   "s4-derma":[
-    {name:"아데노신",cas:"CAS 58-61-7 · Adenosine",badge:"derma",rows:[["역할","주름 개선 (식약처 고시) · 콜라겐 합성·섬유아세포 증식"],["함량","0.04% LOCK · 식약처 고시 정확치"],["시너지","바쿠치올·마데카·임모르텔 (콜라겐 합성 시스템)"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"마데카소사이드",cas:"CAS 58479-68-8 · Madecassoside",badge:"derma",rows:[["역할","항염·콜라겐 합성·표피 재생 (센텔라 트리테르페노이드)"],["함량","0.2% LOCK (유효 0.1-0.5%)"],["시너지","아데노신·바쿠치올 (재생 트리오)"],["논문","Bonté 1994 — 콜라겐 I·III 합성 자극"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]}
+    {name:"세라마이드 NP ★ Active 3:1:1:1",cas:"Ceramide NP · CAS 100403-19-8",badge:"derma",isLock:true,rows:[["역할","★ 라멜라 Active [3]·과립층 모방"],["함량","0.30% LOCK"],["임상","Mao-Qiang 1995 매핑 TEWL -45%"],["주의","50°C 이하 후첨가"]]},
+    {name:"콜레스테롤",cas:"Cholesterol · CAS 57-88-5",badge:"derma",isLock:true,rows:[["역할","라멜라 [1] Chol"],["함량","0.10% LOCK"]]},
+    {name:"스테아릭애시드",cas:"Stearic Acid · CAS 57-11-4",badge:"derma",isLock:true,rows:[["역할","라멜라 [1] · 지방산"],["함량","0.10% LOCK"]]},
+    {name:"팔미틱애시드",cas:"Palmitic Acid · CAS 57-10-3",badge:"derma",isLock:true,rows:[["역할","라멜라 [1] · 지방산 (Active 3:1:1:1)"],["함량","0.10% LOCK"]]},
+    {name:"피토스핑고신",cas:"Phytosphingosine · CAS 554-62-1",badge:"derma",rows:[["역할","라멜라 보조·항균·각질 분화"],["함량","<span class=\"tag-mfg\">제조사 결정</span>"],["비고","스핑고신 대체 (안정성↑)"]]}
   ],
-  "s4-nature":[
-    {name:"사카로마이세스 발효 추출물",cas:"Saccharomyces Ferment Extract / Filtrate",badge:"nature",origin:"효모 발효 (지구상 전역)",rows:[["역할","자가포식 자극·세포 갱신·B6 함유 미네랄·아미노산·비타민"],["함량","1.0% (유효 0.5-3%)"],["시너지","트레할로스 + 부활초 (자가포식 트리오)"],["노벨","<span class=\"tag-nobel\">★ 2016 Ohsumi (자가포식) 간접 매핑</span>"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"임모르텔",cas:"Helichrysum Italicum Flower Extract",badge:"nature",origin:"프랑스 코르시카·프로방스 — \"영원의 꽃\"",rows:[["역할","콜라겐 합성·항산화·항염 (이탤리커디온·아세토페놀)"],["함량","0.3% (유효 0.2-0.5%)"],["특징","꺾어도 시들지 않는 부활 식물 · L'Occitane 시그너처"],["시너지","부활초 (Resurrection plant 듀얼)"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"드라세나스투키수",cas:"Dracaena Surculosa Water · 시그너처 베이스",badge:"nature",origin:"동아프리카·아라비아 호른",rows:[["역할","자가 정수 베이스 + 사포닌·플라보노이드·다당류·미네랄"],["함량","40% LOCK (베이스)"],["시너지","사막장미잎 (동일 지역 anchor)"],["특징","CAM 광합성 · 극한 건조 적응"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"부활초 (미로타므누스)",cas:"Myrothamnus Flabellifolia Leaf Extract",badge:"nature",origin:"나미브 사막 — Resurrection plant",rows:[["역할","완전 건조 → 물 → 부활 (Anhydrobiosis) · 자가포식·트레할로스 자연 함유"],["함량","0.5% (유효 0.3-1%)"],["시너지","사카로마이세스 (자가포식 듀얼)"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]}
-  ],
-  "care-water":[
-    {name:"히알루론산 8종 시스템",cas:"CAS 9067-32-7 · Sodium Hyaluronate 외 7종",badge:"derma",rows:[["역할","분자량 다른 8종 → 표층·중층·심층 보습"],["함량","총 0.7% (8종 합)"],["시너지","라멜라 + 베타글루칸 + 판테놀"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"판테놀 (B5)",cas:"CAS 16485-10-2 · D-Panthenol",badge:"derma",rows:[["역할","판토텐산 전구체 · 보습·표피 분화 정상화·재생"],["함량","3.0% LOCK"],["시너지","알란토인 + 세라마이드"],["의학사","트란시노 II 판토텐산 24mg/일 매핑"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"스쿠알란",cas:"CAS 111-01-3 · Squalane",badge:"derma",rows:[["역할","자가 emollient · 항산화 · 실리콘 대체"],["함량","2.0%"],["출처","올리브·사탕수수 식물성 (비건)"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"트레할로스",cas:"CAS 99-20-7 · Trehalose",badge:"derma",rows:[["역할","mTOR 비의존 자가포식 자극·세포 보호"],["함량","1.0%"],["시너지","부활초·사카로마이세스"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]}
-  ],
-  "care-barrier":[
-    {name:"세라마이드NP",cas:"CAS 100403-19-8 · Ceramide NP",badge:"derma",rows:[["역할","라멜라 1:1:1 ratio (Cer:Chol:FA)"],["함량","0.5% LOCK"],["시너지","콜레스테롤·스테아릭·팔미틱"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"콜레스테롤",cas:"CAS 57-88-5 · Cholesterol",badge:"derma",rows:[["역할","라멜라 ratio 1"],["함량","0.5% LOCK"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"스테아릭애시드",cas:"CAS 57-11-4 · Stearic Acid",badge:"derma",rows:[["역할","라멜라 지방산 · 유화 보조"],["함량","0.25% LOCK"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"팔미틱애시드",cas:"CAS 57-10-3 · Palmitic Acid",badge:"derma",rows:[["역할","라멜라 지방산 1:1:1 ratio"],["함량","0.25% LOCK"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"피토스핑고신",cas:"CAS 554-62-1 · Phytosphingosine",badge:"derma",rows:[["역할","라멜라 보조·항균·각질 분화 정상화"],["함량","0.05% (유효 0.02-0.1%)"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]}
-  ],
-  "care-turn":[
-    {name:"락토바이오닉애시드 (PHA)",cas:"CAS 96-82-2 · Lactobionic Acid",badge:"derma",rows:[["역할","유산균 발효 PHA · 각질 분해·턴오버·16 OH 강력 수분 결합"],["함량","2.0% LOCK"],["시너지","말토바이오닉 (발효 PHA 듀얼)"],["의학사","UW Solution — 장기 이식 보존액"],["임상","Edison 2004 — 8% 8주 자극 점수 0.2/10"],["안전성","<span class=\"tag-safe\">자극 0</span> AM+PM · 임산부 · 광민감 없음"]]},
-    {name:"말토바이오닉애시드",cas:"CAS 17103-22-1 · Maltobionic Acid",badge:"derma",rows:[["역할","맥아 발효 PHA · 16 OH · 보습 + 박피"],["함량","0.5% LOCK"],["시너지","락토바이오닉"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"알란토인",cas:"CAS 97-59-6 · Allantoin",badge:"derma",rows:[["역할","각질 정상화·재생·진정"],["함량","0.2% (유효 0.1-0.5%)"],["시너지","판테놀 + 마데카소사이드"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]},
-    {name:"NAG (엔-아세틸글루코사민)",cas:"CAS 7512-17-6 · N-Acetyl Glucosamine",badge:"derma",rows:[["역할","GAG 합성·각질 정상화·HA 전구체"],["함량","2.0% LOCK"],["시너지","나이아신아마이드 (Bissett P&G 임상 듀얼)"],["논문","Bissett 2007 — NAG 2% + 나이아신 4% 색소 -16% 8주"],["안전성","<span class=\"tag-safe\">자극 0</span>"]]}
-  ]
+  "s4-nature":[]
 };
 
 const RULES_INIT = [
-  {id:"banned", iconType:"danger", title:"절대 금지 표현 · 사용 시 광고업무정지 4-6개월", items:[
-    {marker:"no", text:"\"기미 치료/완치/제거\" — 의약품 효능 직접 표현 (화장품법 제13조 위반)"},
-    {marker:"no", text:"\"트란시노\" · \"TXA로 기미 치료\" 등 의약품 상표 직접 언급"},
-    {marker:"no", text:"\"L-시스테인으로 기미 옅게\" — 시스테인HCL KCID 배합목적 위반 (산화방지·헤어 등재)"},
-    {marker:"no", text:"\"글루타치온 미백\" 헤드라인 — 토피컬 산화 불안정성 + 정책"},
-    {marker:"no", text:"\"○○% 색소 감소\" 과장 비포·애프터 (입증 자료 없는 수치)"},
-    {marker:"no", text:"\"DNA 재생/복구\" 등 의약품 영역 표현"},
-    {marker:"no", text:"\"피부과에서 처방받는\" 등 의약품·의료기기 오인 표현"},
-    {marker:"no", text:"임상시험 인용 시 출처·조건 미명시 (소비자 오인 위험)"}
+  {id:"banned", iconType:"danger", title:"절대 금지 표현 (광고업무정지 4-6개월)", items:[
+    {marker:"no", text:"\"기미 치료/완치/제거\" — 의약품 효능 직접 표현"},
+    {marker:"no", text:"\"트란시노\" · \"TXA로 기미 치료\" — 의약품 상표 직접 언급"},
+    {marker:"no", text:"\"L-시스테인으로 기미 옅게\" — KCID 배합목적 위반"},
+    {marker:"no", text:"\"코직산 미백 효과\" — 코직산은 식약처 미백 미등재"},
+    {marker:"no", text:"\"○○% 색소 감소\" 비포·애프터 과장 (입증 자료 X)"},
+    {marker:"no", text:"\"DNA 재생/복구\" 등 의약품 영역 표현"}
   ]},
-  {id:"caution", iconType:"warn", title:"주의 표현 · 사용 가능하나 광고심의 케이스별 판단", items:[
-    {marker:"caution", text:"\"기미 개선에 도움\" — 식약처 미백 기능성 화장품 등재 시만 사용"},
-    {marker:"caution", text:"\"트란시노 처방의 메커니즘\" — 의약품 비교 인상 주의"},
-    {marker:"caution", text:"\"잠 자듯 옅어지는 기미\" 등 효능 강조 비유 — 의약품 오인 우려"},
-    {marker:"caution", text:"임상 인용 시 \"성분 단독 임상\" 명시"},
-    {marker:"caution", text:"\"피부과학\" · \"더마\" — 의료 오인 표현"}
+  {id:"safe", iconType:"safe", title:"안전한 회피 표현 (식약처 미백 등재 기반)", items:[
+    {marker:"yes", text:"\"기미 개선 (식약처 미백 기능성)\" — 트라넥삼산/나이아신/MAP/3-O-에틸/비사보롤/알파-알부틴 6종"},
+    {marker:"yes", text:"\"주름 개선 (식약처 주름개선 기능성)\" — 아데노신"},
+    {marker:"yes", text:"\"멜라닌 합성 신호 차단\"·\"MITF 억제\"·\"PAR-2 차단\" — 분자 메커니즘"},
+    {marker:"yes", text:"\"비타민C 안정형 5종 시스템\" — 성분 표현"},
+    {marker:"yes", text:"\"항당화 (Glycation Care)\" — 카르노신 메커니즘"},
+    {marker:"yes", text:"\"라멜라 Active 3:1:1:1\" · \"Mao-Qiang 1995 매핑\" — 구조·과학"},
+    {marker:"yes", text:"\"자가포식 활성\" (2016 Ohsumi 노벨) · \"DNA 복구 효소\" (2015 Sancar) — 메커니즘"}
   ]},
-  {id:"safe", iconType:"safe", title:"안전한 회피 표현 · 광고심의 통과 가능", items:[
-    {marker:"yes", text:"\"멜라닌 합성 신호 차단\" · \"MITF 억제\" · \"α-MSH 경로 작용\" — 성분 작용 기전"},
-    {marker:"yes", text:"\"PAR-2 차단\" · \"티로시나아제 억제\" — 분자 메커니즘 설명"},
-    {marker:"yes", text:"\"기미 개선 (식약처 미백 기능성)\" — 정식 기능성 신고 시"},
-    {marker:"yes", text:"\"주름 개선 (식약처 주름개선 기능성)\" — 아데노신 0.04% 정확치"},
-    {marker:"yes", text:"\"비타민C 안정형 5종 시스템\" · \"발효 PHA\" — 성분 표현"},
-    {marker:"yes", text:"\"장벽 회복\" · \"라멜라 1:1:1 ratio\" — 구조 표현"},
-    {marker:"yes", text:"\"턴오버 정상화\" · \"각질 분화\" — 생리적 작용 표현"},
-    {marker:"yes", text:"\"○○% 효과 (○○명 8주, 자기평가)\" — 출처·조건 명시 자기평가"}
-  ]},
-  {id:"checklist", iconType:"info", title:"광고 전 체크리스트", items:[
-    {marker:"num", text:"미백 기능성 화장품 신고 완료 여부"},
-    {marker:"num", text:"주름 개선 기능성 신고 (아데노신 0.04%)"},
-    {marker:"num", text:"모든 임상·통계 수치에 출처·조건 명시"},
-    {marker:"num", text:"비포·애프터 사진 사용 시 동일 조건·동일 광원 명시"},
-    {marker:"num", text:"의료진·연예인 후기 사용 시 광고 표기"},
-    {marker:"num", text:"\"전성분\" 정확 표기 (KCID 등재명 그대로)"},
-    {marker:"num", text:"SNS·블로그 체험단 광고 시 대가성 표기"},
-    {marker:"num", text:"경쟁 의약품·화장품 직접 비교 표현 회피"}
-  ]},
-  {id:"riskInst", iconType:"danger", title:"리스크 성분별 표기 주의", items:[
-    {marker:"caution", text:"<b>시스테인HCL (KCID 1514)</b> — KCID 배합목적 산화방지·헤어 등 · 미백 클레임 광고 불가 · 라벨 전성분 표기만 가능"},
-    {marker:"caution", text:"<b>아세틸시스테인 (KCID 1703)</b> — 별표2 사용한도 (퍼머용 외) · 크림 사용 회색지대 · 사용 시 OEM/식약처 자문 필수"},
-    {marker:"caution", text:"<b>글루타치온 (CAS 70-18-8)</b> — 토피컬 산화 빠름 · 헤드라인 사용 X · 라벨 후반부 표기만"},
-    {marker:"caution", text:"<b>나이아신아마이드 5%</b> — 산성 가수분해 시 니코틴산 발생 · pH 5.5 이상 + EDTA 필수"},
-    {marker:"caution", text:"<b>비타민C MAP</b> — pH 6.5-7.5 알칼리성 · PHA(pH 3.5-4.5)와 동시 사용 시 효능 약화"}
+  {id:"riskInst", iconType:"warn", title:"리스크 성분별 표기 주의", items:[
+    {marker:"caution", text:"<b>시스테인HCL (KCID 1514)</b> — 미백 클레임 광고 X · 라벨 전성분 표기만"},
+    {marker:"caution", text:"<b>글루타치온</b> — 산화 빠름 · 헤드라인 X · 라벨 후반부"},
+    {marker:"caution", text:"<b>코직애씨드</b> — 식약처 미백 미등재 · 직접 미백 클레임 X · 메커니즘 표현만"},
+    {marker:"caution", text:"<b>나이아신 4%</b> — pH 5+ 필수 + EDTA"},
+    {marker:"caution", text:"<b>MAP 2%</b> — pH 6.5-7.5 · PHA와 분리 첨가"},
+    {marker:"caution", text:"<b>카르노신 1%</b> — 40°C 이하·EDTA·알루미늄 튜브"},
+    {marker:"caution", text:"<b>Cer NP Active 3:1:1:1</b> — 50°C 이하 후첨가"}
   ]}
 ];
 
 function defaultBoardSections() {
   return [
-    {id:"ad-type"+Date.now(), type:"options", title:"광고 형태 (복수 선택)", options:[
-      {value:"display", label:"디스플레이 광고"}, {value:"banner", label:"배너 광고"},
-      {value:"article", label:"기사형 글"}, {value:"instagram", label:"인스타 카로셀"},
-      {value:"youtube", label:"유튜브 영상"}, {value:"blog", label:"블로그 콘텐츠"},
-      {value:"naver", label:"네이버 검색 광고"}, {value:"kakao", label:"카카오 광고"}
+    {id:"ad-type"+Date.now(), type:"options", title:"광고 형태", options:[
+      {value:"display", label:"디스플레이"}, {value:"banner", label:"배너"},
+      {value:"article", label:"기사형"}, {value:"instagram", label:"인스타 카로셀"},
+      {value:"youtube", label:"유튜브"}, {value:"blog", label:"블로그"},
+      {value:"naver", label:"네이버 검색"}, {value:"kakao", label:"카카오"}
     ], selected:[], memo:""},
-    {id:"funnel"+Date.now()+1, type:"memo", title:"고객 구매 흐름 (Funnel)", placeholder:"1. 인지 → 2. 관심 → 3. 고려 → 4. 구매 → 5. 재구매", memo:""},
-    {id:"priority"+Date.now()+2, type:"memo", title:"강조 성분 우선순위", placeholder:"1순위: \n2순위: \n3순위: ", memo:""},
-    {id:"copy"+Date.now()+3, type:"memo", title:"주요 카피 메시지", placeholder:"헤드라인: \n서브: \n클로징: ", memo:""},
-    {id:"todo"+Date.now()+4, type:"todo", title:"TO DO", items:[
-      {text:"카피 시안 1차 작성", done:false},
-      {text:"비주얼 레퍼런스 수집", done:false}
-    ]},
-    {id:"memo"+Date.now()+5, type:"memo", title:"자유 메모", placeholder:"아이디어·스크린샷 URL·레퍼런스...", memo:""}
+    {id:"priority"+Date.now()+1, type:"memo", title:"강조 성분 우선순위 (트라나마카C)", placeholder:"1순위: 트라넥삼산 5% (식약처 미백)\n2순위: 나이아신아마이드 4% (식약처 미백)\n3순위: 카르노신 1% (항당화)\n4순위: 마이크로코쿠스용해물 1% (DNA 복구)\n5순위: 비타민C 5종 시스템", memo:""},
+    {id:"copy"+Date.now()+2, type:"memo", title:"주요 카피", placeholder:"헤드라인: \n서브: \n클로징: ", memo:""},
+    {id:"todo"+Date.now()+3, type:"todo", title:"TO DO", items:[
+      {text:"트라나마카C 시그너처 카피 작성", done:false},
+      {text:"4×4 시스템 카로셀 디자인", done:false},
+      {text:"라멜라 Active 3:1:1:1 카피 검토", done:false}
+    ]}
   ];
 }
 
 const MARKETING_INIT = {
   activeBoardId: "board-default",
   boards: [
-    { id: "board-default", name: "트라넥삼산 + 시스테인 DA", sections: defaultBoardSections() }
+    { id: "board-default", name: "v13.8 트라나마카C 광고", sections: defaultBoardSections() }
   ]
 };
 
-const STORAGE_KEY = 'tx-mela-v13-5-v3';
+const STORAGE_KEY = 'tx-mela-v13-8-v5';
 function loadState() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; } }
 function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); flashSave(); }
-function flashSave() {
-  const el = document.getElementById('save-indicator');
-  el.classList.add('show');
-  clearTimeout(window._saveT);
-  window._saveT = setTimeout(() => el.classList.remove('show'), 1000);
-}
-function getState(key, fallback) {
-  const s = loadState();
-  return (s[key] !== undefined) ? s[key] : JSON.parse(JSON.stringify(fallback));
-}
-function setState(key, val) {
-  const s = loadState();
-  s[key] = val;
-  saveState(s);
-}
+function flashSave() { const el = document.getElementById('save-indicator'); el.classList.add('show'); clearTimeout(window._saveT); window._saveT = setTimeout(() => el.classList.remove('show'), 1000); }
+function getState(key, fallback) { const s = loadState(); return (s[key] !== undefined) ? s[key] : JSON.parse(JSON.stringify(fallback)); }
+function setState(key, val) { const s = loadState(); s[key] = val; saveState(s); }
 function escapeHtml(t) { return String(t == null ? '' : t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function renderStages() {
@@ -592,6 +421,8 @@ function renderStages() {
   const ingredients = getState('ingredients', INGREDIENTS_INIT);
   let html = '';
   stages.forEach((stg) => {
+    const dermaKey = stg.key + '-derma';
+    const natureKey = stg.key + '-nature';
     html += `<div class="stage-section">
       <div class="stage-head ${stg.key}">
         <span class="stage-badge ${stg.key}">${stg.badge}</span>
@@ -600,52 +431,37 @@ function renderStages() {
       </div>
       <div class="stage-body">
         <div class="mech-box ${stg.key}"><span class="mech-label">작용 원리</span>${stg.mech}</div>
-        <div class="subsection-title">더마 원료</div>
-        <div class="card-grid" data-section-key="${stg.key}-derma">${renderCards(stg.key + '-derma', ingredients[stg.key + '-derma'] || [])}</div>
-        <button class="add-card-btn" onclick="addCard('${stg.key}-derma')">+ 성분 카드 추가</button>
-        <div class="subsection-title">자연 원료</div>
-        <div class="card-grid" data-section-key="${stg.key}-nature">${renderCards(stg.key + '-nature', ingredients[stg.key + '-nature'] || [])}</div>
-        <button class="add-card-btn" onclick="addCard('${stg.key}-nature')">+ 성분 카드 추가</button>
+        <div class="subsection-title derma">🟢 더마 액티브</div>
+        <div class="card-grid" data-section-key="${dermaKey}">${renderCards(dermaKey, ingredients[dermaKey] || [])}</div>
+        <button class="add-card-btn" onclick="addCard('${dermaKey}')">+ 더마 성분 추가</button>
+        <div class="subsection-title nature">🟡 자연 서포트</div>
+        <div class="card-grid" data-section-key="${natureKey}">${renderCards(natureKey, ingredients[natureKey] || [])}</div>
+        <button class="add-card-btn" onclick="addCard('${natureKey}')">+ 자연 성분 추가</button>
       </div>
     </div>`;
   });
   document.getElementById('stages-container').innerHTML = html;
 }
 
-function renderCares() {
-  const cares = getState('cares', CARES_INIT);
-  const ingredients = getState('ingredients', INGREDIENTS_INIT);
-  let html = '';
-  cares.forEach((c) => {
-    html += `<div class="stage-section">
-      <div class="stage-head ${c.key}">
-        <span class="stage-badge ${c.key}">${c.badge}</span>
-        <div class="stage-title">${escapeHtml(c.title)}</div>
-        <span class="stage-sub">${c.sub}</span>
-      </div>
-      <div class="stage-body">
-        <div class="card-grid" data-section-key="${c.key}">${renderCards(c.key, ingredients[c.key] || [])}</div>
-        <button class="add-card-btn" onclick="addCard('${c.key}')">+ 성분 카드 추가</button>
-      </div>
-    </div>`;
-  });
-  document.getElementById('care-container').innerHTML = html;
-}
-
 function renderCards(sectionKey, items) {
   return items.map((ing, i) => {
-    const rowsHtml = ing.rows.map((r) =>
-      `<dl class="card-row"><dt>${escapeHtml(r[0])}</dt><dd>${r[1]}</dd></dl>`
-    ).join('');
+    const rowsHtml = ing.rows.map((r) => `<dl class="card-row"><dt>${escapeHtml(r[0])}</dt><dd>${r[1]}</dd></dl>`).join('');
     const originHtml = ing.origin ? `<div class="card-origin">📍 ${escapeHtml(ing.origin)}</div>` : '';
-    return `<div class="ingredient-card" data-section="${sectionKey}" data-idx="${i}">
+    const lockTag = ing.isLock ? '<span class="hero-tag">LOCK</span>' : '';
+    const heroTag = ing.isHero ? '<span class="hero-tag" style="background:var(--nature);">HERO</span>' : '';
+    const newTag = ing.isNew ? '<span class="new-tag">NEW</span>' : '';
+    let extraClass = '';
+    if (ing.isLock) extraClass += ' is-lock';
+    if (ing.isNew) extraClass += ' is-new';
+    if (ing.badge === 'derma') extraClass += ' is-derma';
+    if (ing.badge === 'nature') extraClass += ' is-nature';
+    return `<div class="ingredient-card${extraClass}" data-section="${sectionKey}" data-idx="${i}">
       <span class="drag-handle">⋮⋮</span>
       <div class="card-controls">
-        <button class="ctrl-btn" onclick="toggleEditCard(this)" title="편집">✎</button>
         <button class="ctrl-btn delete" onclick="deleteCard('${sectionKey}', ${i})" title="삭제">×</button>
       </div>
       <div class="card-head">
-        <span class="card-name">${escapeHtml(ing.name)}</span>
+        <span class="card-name">${escapeHtml(ing.name)}${lockTag}${heroTag}${newTag}</span>
         <span class="card-cas">${escapeHtml(ing.cas)}</span>
         <span class="card-badge ${ing.badge}">${ing.badge === 'derma' ? '더마' : '자연'}</span>
       </div>
@@ -655,102 +471,52 @@ function renderCards(sectionKey, items) {
   }).join('');
 }
 
-function getIngredients() { return getState('ingredients', INGREDIENTS_INIT); }
-function setIngredients(ing) { setState('ingredients', ing); }
-
 function deleteCard(sectionKey, idx) {
-  if (!confirm('이 성분 카드를 삭제할까요?')) return;
-  const ing = getIngredients();
+  if (!confirm('이 카드를 삭제할까요?')) return;
+  const ing = getState('ingredients', INGREDIENTS_INIT);
   ing[sectionKey].splice(idx, 1);
-  setIngredients(ing);
-  renderStages();
-  renderCares();
-  initSortable();
+  setState('ingredients', ing);
+  renderStages(); initSortable();
 }
 
 function addCard(sectionKey) {
   const name = prompt('성분명 (한글):');
   if (!name) return;
-  const cas = prompt('CAS No. / INCI (영문) — 모르면 빈칸:') || '';
-  const isDerma = confirm('더마 원료입니까? (확인=더마, 취소=자연)');
-  const newCard = {
-    name: name, cas: cas, badge: isDerma ? 'derma' : 'nature',
-    rows: [['역할', '편집 가능'],['함량', '편집 가능'],['안전성', '<span class="tag-safe">자극 0</span>']]
-  };
-  if (!isDerma) {
-    const origin = prompt('원산지·추출 지대:') || '';
-    if (origin) newCard.origin = origin;
-  }
-  const ing = getIngredients();
+  const cas = prompt('학명 / INCI / CAS:') || '';
+  const isDerma = sectionKey.endsWith('-derma');
+  const newCard = { name, cas, badge: isDerma ? 'derma' : 'nature', rows: [['역할','편집'],['함량','제조사 결정']] };
+  if (!isDerma) { const origin = prompt('원산지·추출 지대:') || ''; if (origin) newCard.origin = origin; }
+  const ing = getState('ingredients', INGREDIENTS_INIT);
   if (!ing[sectionKey]) ing[sectionKey] = [];
   ing[sectionKey].push(newCard);
-  setIngredients(ing);
-  renderStages();
-  renderCares();
-  initSortable();
-}
-
-function toggleEditCard(btn) {
-  const card = btn.closest('.ingredient-card');
-  const editing = card.dataset.editing === 'true';
-  if (editing) {
-    card.dataset.editing = 'false';
-    card.querySelector('.card-name').contentEditable = 'false';
-    card.querySelectorAll('.card-row dd').forEach(d => d.contentEditable = 'false');
-    btn.textContent = '✎';
-    saveCardEdit(card);
-  } else {
-    card.dataset.editing = 'true';
-    card.querySelector('.card-name').contentEditable = 'true';
-    card.querySelectorAll('.card-row dd').forEach(d => d.contentEditable = 'true');
-    btn.textContent = '✓';
-  }
-}
-
-function saveCardEdit(card) {
-  const sectionKey = card.dataset.section;
-  const idx = parseInt(card.dataset.idx);
-  const ing = getIngredients();
-  if (!ing[sectionKey] || !ing[sectionKey][idx]) return;
-  ing[sectionKey][idx].name = card.querySelector('.card-name').textContent.trim();
-  ing[sectionKey][idx].rows = Array.from(card.querySelectorAll('.card-row')).map(row => [
-    row.querySelector('dt').textContent.trim(),
-    row.querySelector('dd').innerHTML.trim()
-  ]);
-  setIngredients(ing);
+  setState('ingredients', ing);
+  renderStages(); initSortable();
 }
 
 function handleSortEnd(evt) {
   const fromKey = evt.from.dataset.sectionKey;
   const toKey = evt.to.dataset.sectionKey;
-  const oldIdx = evt.oldIndex;
-  const newIdx = evt.newIndex;
   if (!fromKey || !toKey) return;
-  const ing = getIngredients();
+  const ing = getState('ingredients', INGREDIENTS_INIT);
   if (!ing[fromKey]) ing[fromKey] = [];
   if (!ing[toKey]) ing[toKey] = [];
   if (fromKey === toKey) {
-    const [moved] = ing[fromKey].splice(oldIdx, 1);
-    ing[fromKey].splice(newIdx, 0, moved);
+    const [m] = ing[fromKey].splice(evt.oldIndex, 1);
+    ing[fromKey].splice(evt.newIndex, 0, m);
   } else {
-    const [moved] = ing[fromKey].splice(oldIdx, 1);
-    ing[toKey].splice(newIdx, 0, moved);
+    const [m] = ing[fromKey].splice(evt.oldIndex, 1);
+    ing[toKey].splice(evt.newIndex, 0, m);
   }
-  setIngredients(ing);
-  renderStages();
-  renderCares();
-  initSortable();
+  setState('ingredients', ing);
+  renderStages(); initSortable();
 }
 
 function initSortable() {
   document.querySelectorAll('.card-grid').forEach(grid => {
     if (grid._sortable) grid._sortable.destroy();
     grid._sortable = Sortable.create(grid, {
-      group: 'ingredients',
-      animation: 180,
-      ghostClass: 'sortable-ghost',
-      chosenClass: 'sortable-chosen',
-      dragClass: 'sortable-drag',
+      group: 'ingredients', animation: 180,
+      ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen', dragClass: 'sortable-drag',
       onEnd: handleSortEnd
     });
   });
@@ -765,84 +531,17 @@ function renderRules() {
       const markerChar = { no:'✕', yes:'✓', caution:'⚠', num:`${iIdx+1}.` }[item.marker] || '·';
       return `<li><span class="marker ${item.marker}">${markerChar}</span><span class="rule-text">${item.text}</span><button class="item-del" onclick="deleteRuleItem(${rIdx}, ${iIdx})">×</button></li>`;
     }).join('');
-    html += `<div class="rule-card" data-rule-idx="${rIdx}">
-      <div class="card-controls">
-        <button class="ctrl-btn" onclick="moveRule(${rIdx}, -1)" title="위로">↑</button>
-        <button class="ctrl-btn" onclick="moveRule(${rIdx}, 1)" title="아래로">↓</button>
-        <button class="ctrl-btn" onclick="toggleEditRule(this, ${rIdx})" title="편집">✎</button>
-        <button class="ctrl-btn delete" onclick="deleteRule(${rIdx})" title="삭제">×</button>
-      </div>
+    html += `<div class="rule-card">
       <div class="rule-title">
         <span class="rule-icon ${rule.iconType}">${iconChar}</span>
         <span class="rule-title-text">${escapeHtml(rule.title)}</span>
       </div>
       <ul class="rule-list">${itemsHtml}</ul>
-      <button class="add-item-btn" onclick="addRuleItem(${rIdx})">+ 항목 추가</button>
     </div>`;
   });
-  html += `<button class="add-card-btn" onclick="addRule()">+ 새 룰 카드 추가</button>`;
   document.getElementById('rules-container').innerHTML = html;
 }
-function moveRule(idx, dir) {
-  const rules = getState('rules', RULES_INIT);
-  const newIdx = idx + dir;
-  if (newIdx < 0 || newIdx >= rules.length) return;
-  [rules[idx], rules[newIdx]] = [rules[newIdx], rules[idx]];
-  setState('rules', rules);
-  renderRules();
-}
-function deleteRule(idx) {
-  if (!confirm('이 룰 카드 전체를 삭제할까요?')) return;
-  const rules = getState('rules', RULES_INIT);
-  rules.splice(idx, 1);
-  setState('rules', rules);
-  renderRules();
-}
-function addRule() {
-  const title = prompt('룰 카드 제목:');
-  if (!title) return;
-  const iconType = prompt('아이콘 타입 (danger / warn / safe / info):', 'info') || 'info';
-  const rules = getState('rules', RULES_INIT);
-  rules.push({ id: 'custom-' + Date.now(), iconType, title, items: [{ marker:'caution', text:'편집 가능' }] });
-  setState('rules', rules);
-  renderRules();
-}
-function addRuleItem(rIdx) {
-  const rules = getState('rules', RULES_INIT);
-  const marker = prompt('마커 타입 (no / yes / caution / num):', 'caution') || 'caution';
-  const text = prompt('항목 내용:') || '편집 가능';
-  rules[rIdx].items.push({ marker, text });
-  setState('rules', rules);
-  renderRules();
-}
-function deleteRuleItem(rIdx, iIdx) {
-  if (!confirm('이 항목을 삭제할까요?')) return;
-  const rules = getState('rules', RULES_INIT);
-  rules[rIdx].items.splice(iIdx, 1);
-  setState('rules', rules);
-  renderRules();
-}
-function toggleEditRule(btn, rIdx) {
-  const card = btn.closest('.rule-card');
-  const editing = card.dataset.editing === 'true';
-  if (editing) {
-    card.dataset.editing = 'false';
-    card.querySelector('.rule-title-text').contentEditable = 'false';
-    card.querySelectorAll('.rule-text').forEach(t => t.contentEditable = 'false');
-    btn.textContent = '✎';
-    const rules = getState('rules', RULES_INIT);
-    rules[rIdx].title = card.querySelector('.rule-title-text').textContent.trim();
-    card.querySelectorAll('.rule-text').forEach((t, iIdx) => {
-      if (rules[rIdx].items[iIdx]) rules[rIdx].items[iIdx].text = t.innerHTML.trim();
-    });
-    setState('rules', rules);
-  } else {
-    card.dataset.editing = 'true';
-    card.querySelector('.rule-title-text').contentEditable = 'true';
-    card.querySelectorAll('.rule-text').forEach(t => t.contentEditable = 'true');
-    btn.textContent = '✓';
-  }
-}
+function deleteRuleItem(rIdx, iIdx) { if (!confirm('삭제?')) return; const rs = getState('rules', RULES_INIT); rs[rIdx].items.splice(iIdx, 1); setState('rules', rs); renderRules(); }
 
 function getMarketing() { return getState('marketing', MARKETING_INIT); }
 function setMarketing(m) { setState('marketing', m); }
@@ -852,211 +551,47 @@ function renderBoardTabs() {
   let html = '';
   m.boards.forEach((board) => {
     const isActive = board.id === m.activeBoardId;
-    html += `<div class="board-chip ${isActive ? 'active' : ''}" data-board-id="${board.id}" onclick="selectBoard('${board.id}')" ondblclick="event.stopPropagation(); renameBoard('${board.id}', this)">
+    html += `<div class="board-chip ${isActive ? 'active' : ''}" onclick="selectBoard('${board.id}')">
       <span class="chip-name">${escapeHtml(board.name)}</span>
-      <button class="chip-del" onclick="event.stopPropagation(); deleteBoard('${board.id}')" title="보드 삭제">×</button>
+      <button class="chip-del" onclick="event.stopPropagation(); deleteBoard('${board.id}')">×</button>
     </div>`;
   });
   html += `<button class="add-board-btn" onclick="addBoard()">+ 새 보드</button>`;
   document.getElementById('board-tabs').innerHTML = html;
 }
-
-function selectBoard(id) {
-  const m = getMarketing();
-  m.activeBoardId = id;
-  setMarketing(m);
-  renderBoardTabs();
-  renderMarketing();
-}
-
-function renameBoard(id, chipEl) {
-  const nameEl = chipEl.querySelector('.chip-name');
-  nameEl.contentEditable = 'true';
-  nameEl.focus();
-  document.execCommand('selectAll', false, null);
-  nameEl.addEventListener('blur', function done() {
-    nameEl.contentEditable = 'false';
-    const newName = nameEl.textContent.trim();
-    if (newName) {
-      const m = getMarketing();
-      const b = m.boards.find(b => b.id === id);
-      if (b) { b.name = newName; setMarketing(m); }
-    } else {
-      renderBoardTabs();
-    }
-    nameEl.removeEventListener('blur', done);
-  }, { once: true });
-  nameEl.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); nameEl.blur(); }
-  });
-}
-
-function addBoard() {
-  const name = prompt('새 보드 이름 (예: 기미 4유형 진단 인스타):');
-  if (!name) return;
-  const m = getMarketing();
-  const id = 'board-' + Date.now();
-  m.boards.push({ id, name, sections: defaultBoardSections() });
-  m.activeBoardId = id;
-  setMarketing(m);
-  renderBoardTabs();
-  renderMarketing();
-}
-
-function deleteBoard(id) {
-  const m = getMarketing();
-  if (m.boards.length <= 1) { alert('마지막 보드는 삭제할 수 없습니다.'); return; }
-  if (!confirm('이 보드를 삭제할까요? 보드 안의 모든 섹션·메모가 사라집니다.')) return;
-  m.boards = m.boards.filter(b => b.id !== id);
-  if (m.activeBoardId === id) m.activeBoardId = m.boards[0].id;
-  setMarketing(m);
-  renderBoardTabs();
-  renderMarketing();
-}
-
-function getActiveBoard() {
-  const m = getMarketing();
-  return m.boards.find(b => b.id === m.activeBoardId);
-}
+function selectBoard(id) { const m = getMarketing(); m.activeBoardId = id; setMarketing(m); renderBoardTabs(); renderMarketing(); }
+function addBoard() { const n = prompt('새 보드 이름:'); if (!n) return; const m = getMarketing(); const id = 'b' + Date.now(); m.boards.push({ id, name: n, sections: defaultBoardSections() }); m.activeBoardId = id; setMarketing(m); renderBoardTabs(); renderMarketing(); }
+function deleteBoard(id) { const m = getMarketing(); if (m.boards.length <= 1) { alert('마지막 보드는 삭제 불가'); return; } if (!confirm('삭제?')) return; m.boards = m.boards.filter(b => b.id !== id); if (m.activeBoardId === id) m.activeBoardId = m.boards[0].id; setMarketing(m); renderBoardTabs(); renderMarketing(); }
+function getActiveBoard() { const m = getMarketing(); return m.boards.find(b => b.id === m.activeBoardId); }
 
 function renderMarketing() {
   const board = getActiveBoard();
-  if (!board) {
-    document.getElementById('marketing-container').innerHTML = '';
-    document.getElementById('board-meta').style.display = 'none';
-    return;
-  }
+  if (!board) return;
   const m = getMarketing();
   document.getElementById('board-meta').style.display = 'flex';
-  document.getElementById('board-meta').innerHTML = `<span class="meta-icon">📋</span><span class="meta-text">현재 보드: <b>${escapeHtml(board.name)}</b> (총 ${m.boards.length}개 보드 · ${board.sections.length}개 섹션)</span>`;
+  document.getElementById('board-meta').innerHTML = `<span>📋</span><span>현재 보드: <b>${escapeHtml(board.name)}</b> (총 ${m.boards.length}개)</span>`;
   let html = '';
   board.sections.forEach((sec, idx) => {
     let body = '';
     if (sec.type === 'options') {
-      body = `<div class="option-grid">${(sec.options||[]).map(opt => {
-        const selected = (sec.selected || []).includes(opt.value);
-        return `<div class="option-pill${selected?' selected':''}" onclick="toggleOption(${idx}, '${opt.value}')">${escapeHtml(opt.label)}</div>`;
-      }).join('')}</div>
-      <textarea class="memo-area" oninput="updateMemo(${idx}, this.value)" placeholder="선택한 광고 형태 별 전략·예산·일정 메모...">${escapeHtml(sec.memo || '')}</textarea>`;
+      body = `<div class="option-grid">${(sec.options||[]).map(opt => { const sel = (sec.selected || []).includes(opt.value); return `<div class="option-pill${sel?' selected':''}" onclick="toggleOption(${idx}, '${opt.value}')">${escapeHtml(opt.label)}</div>`; }).join('')}</div>
+      <textarea class="memo-area" oninput="updateMemo(${idx}, this.value)">${escapeHtml(sec.memo || '')}</textarea>`;
     } else if (sec.type === 'memo') {
       body = `<textarea class="memo-area" oninput="updateMemo(${idx}, this.value)" placeholder="${escapeHtml(sec.placeholder || '')}" style="min-height: 180px;">${escapeHtml(sec.memo || '')}</textarea>`;
     } else if (sec.type === 'todo') {
       const items = sec.items || [];
-      body = items.map((t, i) => `
-        <div class="todo-item">
-          <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo(${idx}, ${i})">
-          <div class="todo-text" contenteditable="true" oninput="updateTodoText(${idx}, ${i}, this.textContent)">${escapeHtml(t.text)}</div>
-          <button class="todo-del" onclick="deleteTodo(${idx}, ${i})">×</button>
-        </div>`).join('') + `<button class="add-item-btn" onclick="addTodo(${idx})">+ 작업 추가</button>`;
+      body = items.map((t, i) => `<div class="todo-item"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo(${idx}, ${i})"><div class="todo-text" contenteditable="true" oninput="updateTodoText(${idx}, ${i}, this.textContent)">${escapeHtml(t.text)}</div></div>`).join('') + `<button class="add-item-btn" onclick="addTodo(${idx})">+ 작업 추가</button>`;
     }
-    html += `<div class="section-card" data-mkt-idx="${idx}">
-      <div class="card-controls">
-        <button class="ctrl-btn" onclick="moveMarketing(${idx}, -1)" title="위로">↑</button>
-        <button class="ctrl-btn" onclick="moveMarketing(${idx}, 1)" title="아래로">↓</button>
-        <button class="ctrl-btn" onclick="toggleEditMkt(this, ${idx})" title="편집">✎</button>
-        <button class="ctrl-btn delete" onclick="deleteMarketing(${idx})" title="삭제">×</button>
-      </div>
-      <div class="section-card-title">${escapeHtml(sec.title)}</div>
-      ${body}
-    </div>`;
+    html += `<div class="section-card"><div class="section-card-title">${escapeHtml(sec.title)}</div>${body}</div>`;
   });
-  html += `<button class="add-card-btn" onclick="addMarketingSection()">+ 새 섹션 추가</button>`;
   document.getElementById('marketing-container').innerHTML = html;
 }
 
-function toggleOption(idx, value) {
-  const m = getMarketing();
-  const board = m.boards.find(b => b.id === m.activeBoardId);
-  const sel = board.sections[idx].selected || [];
-  const i = sel.indexOf(value);
-  if (i >= 0) sel.splice(i, 1); else sel.push(value);
-  board.sections[idx].selected = sel;
-  setMarketing(m);
-  renderMarketing();
-}
-function updateMemo(idx, val) {
-  const m = getMarketing();
-  const board = m.boards.find(b => b.id === m.activeBoardId);
-  board.sections[idx].memo = val;
-  setMarketing(m);
-}
-function toggleTodo(idx, i) {
-  const m = getMarketing();
-  const board = m.boards.find(b => b.id === m.activeBoardId);
-  board.sections[idx].items[i].done = !board.sections[idx].items[i].done;
-  setMarketing(m);
-  renderMarketing();
-}
-function updateTodoText(idx, i, text) {
-  const m = getMarketing();
-  const board = m.boards.find(b => b.id === m.activeBoardId);
-  board.sections[idx].items[i].text = text;
-  setMarketing(m);
-}
-function deleteTodo(idx, i) {
-  if (!confirm('이 작업을 삭제할까요?')) return;
-  const m = getMarketing();
-  const board = m.boards.find(b => b.id === m.activeBoardId);
-  board.sections[idx].items.splice(i, 1);
-  setMarketing(m);
-  renderMarketing();
-}
-function addTodo(idx) {
-  const m = getMarketing();
-  const board = m.boards.find(b => b.id === m.activeBoardId);
-  if (!board.sections[idx].items) board.sections[idx].items = [];
-  board.sections[idx].items.push({ text: '새 작업', done: false });
-  setMarketing(m);
-  renderMarketing();
-}
-function moveMarketing(idx, dir) {
-  const m = getMarketing();
-  const board = m.boards.find(b => b.id === m.activeBoardId);
-  const newIdx = idx + dir;
-  if (newIdx < 0 || newIdx >= board.sections.length) return;
-  [board.sections[idx], board.sections[newIdx]] = [board.sections[newIdx], board.sections[idx]];
-  setMarketing(m);
-  renderMarketing();
-}
-function deleteMarketing(idx) {
-  if (!confirm('이 섹션을 삭제할까요?')) return;
-  const m = getMarketing();
-  const board = m.boards.find(b => b.id === m.activeBoardId);
-  board.sections.splice(idx, 1);
-  setMarketing(m);
-  renderMarketing();
-}
-function addMarketingSection() {
-  const title = prompt('섹션 제목:');
-  if (!title) return;
-  const type = prompt('유형 (memo / todo / options):', 'memo') || 'memo';
-  const m = getMarketing();
-  const board = m.boards.find(b => b.id === m.activeBoardId);
-  const newSec = { id: 'custom-' + Date.now(), type, title };
-  if (type === 'memo') { newSec.memo = ''; newSec.placeholder = '메모...'; }
-  else if (type === 'todo') { newSec.items = [{ text:'편집 가능', done:false }]; }
-  else if (type === 'options') { newSec.options = []; newSec.selected = []; newSec.memo = ''; }
-  board.sections.push(newSec);
-  setMarketing(m);
-  renderMarketing();
-}
-function toggleEditMkt(btn, idx) {
-  const card = btn.closest('.section-card');
-  const editing = card.dataset.editing === 'true';
-  if (editing) {
-    card.dataset.editing = 'false';
-    card.querySelector('.section-card-title').contentEditable = 'false';
-    btn.textContent = '✎';
-    const m = getMarketing();
-    const board = m.boards.find(b => b.id === m.activeBoardId);
-    board.sections[idx].title = card.querySelector('.section-card-title').textContent.trim();
-    setMarketing(m);
-  } else {
-    card.dataset.editing = 'true';
-    card.querySelector('.section-card-title').contentEditable = 'true';
-    btn.textContent = '✓';
-  }
-}
+function toggleOption(idx, v) { const m = getMarketing(); const b = m.boards.find(b => b.id === m.activeBoardId); const s = b.sections[idx].selected || []; const i = s.indexOf(v); if (i >= 0) s.splice(i, 1); else s.push(v); b.sections[idx].selected = s; setMarketing(m); renderMarketing(); }
+function updateMemo(idx, v) { const m = getMarketing(); const b = m.boards.find(b => b.id === m.activeBoardId); b.sections[idx].memo = v; setMarketing(m); }
+function toggleTodo(idx, i) { const m = getMarketing(); const b = m.boards.find(b => b.id === m.activeBoardId); b.sections[idx].items[i].done = !b.sections[idx].items[i].done; setMarketing(m); renderMarketing(); }
+function updateTodoText(idx, i, t) { const m = getMarketing(); const b = m.boards.find(b => b.id === m.activeBoardId); b.sections[idx].items[i].text = t; setMarketing(m); }
+function addTodo(idx) { const m = getMarketing(); const b = m.boards.find(b => b.id === m.activeBoardId); if (!b.sections[idx].items) b.sections[idx].items = []; b.sections[idx].items.push({ text:'새 작업', done:false }); setMarketing(m); renderMarketing(); }
 
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1070,22 +605,10 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-function restoreActiveTab() {
-  const s = loadState();
-  if (s.activeTab) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    const btn = document.querySelector(`[data-tab="${s.activeTab}"]`);
-    if (btn) { btn.classList.add('active'); document.getElementById(s.activeTab).classList.add('active'); }
-  }
-}
-
 renderStages();
-renderCares();
 renderRules();
 renderBoardTabs();
 renderMarketing();
-restoreActiveTab();
 initSortable();
 </script>
 </body>
