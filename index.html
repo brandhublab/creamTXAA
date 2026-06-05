@@ -859,15 +859,12 @@ body.edit-mode-on .tab-btn .tab-name-edit{
   </div>
 </div>
 
-<!-- EXPORT BAR -->
+<!-- EXPORT BAR (간소화: Excel/CSV/Sheets/이미지는 경쟁사 탭으로 이동) -->
 <div class="export-bar">
-  <button class="exp-btn" onclick="exportExcel()">📊 Excel</button>
-  <button class="exp-btn" onclick="exportCSVAll()">📄 CSV</button>
-  <button class="exp-btn" onclick="exportGoogleSheets()">🔗 Google Sheets</button>
-  <button class="exp-btn" onclick="captureImage()">📷 이미지</button>
-  <button class="exp-btn" onclick="exportJSON()" title="JSON 다운로드 (단축키: Ctrl+Shift+S)">💾 JSON 백업</button>
-  <button class="exp-btn" onclick="document.getElementById('json-import').click()" title="JSON 파일에서 복원">📂 불러오기</button>
-  <button class="exp-btn" onclick="quickGistPush()" title="Gist로 푸시 (단축키: Ctrl+Shift+G)" style="background:#1A6B4A;color:#fff;border-color:#1A6B4A">☁️ Gist 푸시</button>
+  <button class="exp-btn" onclick="exportJSON()" title="JSON 다운로드 — 전체 데이터를 파일로 저장&#10;단축키: Ctrl+Shift+S">💾 JSON 백업</button>
+  <button class="exp-btn" onclick="document.getElementById('json-import').click()" title="JSON 파일에서 데이터 복원">📂 불러오기</button>
+  <button class="exp-btn" onclick="quickGistPush()" title="Gist로 푸시 — 클라우드에 데이터 업로드&#10;단축키: Ctrl+Shift+G" style="background:#1A6B4A;color:#fff;border-color:#1A6B4A">☁️ Gist 푸시</button>
+  <button class="exp-btn" onclick="quickGistPull()" title="Gist에서 풀 — 클라우드 데이터를 이 브라우저로 다운로드&#10;단축키: Ctrl+Shift+L" style="background:#2563EB;color:#fff;border-color:#2563EB">⬇️ Gist 풀</button>
   <input type="file" id="json-import" accept=".json" style="display:none" onchange="loadJSON(this)">
   <span class="save-indicator" id="save-indicator">저장 준비됨</span>
 </div>
@@ -8504,7 +8501,7 @@ function saveWIG(){sv();showToast('가중목/점수판 저장 완료');}
 function exportCSVBrands(){
  const H=['브랜드','영문/도메인','회사명','제품명','판매가','티어','타겟연령','채널','평점','리뷰','REF','우선순위','분석메모'];
  const rows=allData.map(d=>[d.brand,d.brandEn,d.company,d.product,d.price,d.tier,d.age,(d.channels||[]).join('|'),d.rating,d.reviews,d.ref,d.priority,d.notes].map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`));
- dl([H,...rows].map(r=>r.join(',')).join('\n'),'epitect_brands.csv','text/csv');
+ dl([H,...rows].map(r=>r.join(',')).join('\n'), getBosFilename('csv', '경쟁사DB'),'text/csv');
 }
 function exportCSVAll(){exportCSVBrands();}
 function dl(content,filename,type){
@@ -8529,7 +8526,7 @@ function exportExcel(){
   ['브랜드','긍정','부정','강점','약점','시사점'],
   ...revData.map(d=>[d.brand,(d.pos||[]).join('/'),(d.neg||[]).join('/'),d.str||'',d.wk||'',d.insight||''])
  ]),'리뷰 분석');
- XLSX.writeFile(wb,'epitect_research.xlsx');showToast('Excel 다운로드 완료');
+ XLSX.writeFile(wb, getBosFilename('xlsx', '전체')); showToast('Excel 다운로드 완료');
 }
 function exportGoogleSheets(){exportCSVBrands();setTimeout(()=>{window.open('https://sheets.new','_blank');showToast('구글 시트에서 파일→가져오기→CSV 선택');},400);}
 function exportJSON(){
@@ -8541,7 +8538,7 @@ function exportJSON(){
             String(now.getDate()).padStart(2,'0') + '_' +
             String(now.getHours()).padStart(2,'0') + 
             String(now.getMinutes()).padStart(2,'0');
- const filename = 'BrandOSKIT_' + ts + '.json';
+ const filename = getBosFilename('json', '전체백업');
  dl(JSON.stringify(snap,null,2), filename, 'application/json');
  showToast('JSON 백업 완료 - ' + filename);
 }
@@ -8567,7 +8564,7 @@ function captureImage(){
  const activeTab=document.querySelector('.tab-pane.act');
  showToast('이미지 저장 중...');
  setTimeout(()=>{html2canvas(activeTab,{scale:2,useCORS:true,backgroundColor:'#FAFAF8'}).then(canvas=>{
-  const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download='epitect_screenshot.png';a.click();showToast('이미지 저장 완료');
+  const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=getBosFilename('png', '화면캡처');a.click();showToast('이미지 저장 완료');
  }).catch(()=>showToast('이미지 저장 실패','red'));},150);
 }
 
@@ -12163,7 +12160,7 @@ function forceIsolationReset(){
 
 
 <!-- 📅 캘린더 항목 편집 모달 -->
-<div id="bos-cal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;align-items:center;justify-content:center" onclick="if(event.target===this)closeCalModal_BOS()">
+<div id="bos-cal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;align-items:center;justify-content:center">
   <div style="background:#fff;border-radius:12px;padding:24px;max-width:480px;width:90%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
       <div id="bos-cal-modal-title" style="font-size:15px;font-weight:700;color:var(--tx)">📌 항목 추가</div>
@@ -12356,18 +12353,19 @@ function forceIsolationReset(){
   
   // 카테고리 정의 (전역) - 워크플로우 순서대로
   var CAL_CATEGORIES_BOS = [
-    {key:'기획',           emoji:'🎯', color:'#2563EB'},  // 블루
-    {key:'샘플의뢰',        emoji:'🧪', color:'#7A4AA8'},  // 보라
-    {key:'사양픽스',        emoji:'📋', color:'#3a8a8a'},  // 청록
-    {key:'생산',           emoji:'🏭', color:'#D2691E'},  // 진오렌지
-    {key:'패키지 디자인',    emoji:'📦', color:'#A87C4A'},  // 카키
-    {key:'상세페이지 디자인', emoji:'🎨', color:'#C0392B'},  // 레드
-    {key:'광고 영상 제작',   emoji:'🎬', color:'#8A5A3A'},  // 다크브라운
-    {key:'웹사이트 세팅',    emoji:'💻', color:'#1A6B4A'},  // 다크그린
-    {key:'런칭',           emoji:'🚀', color:'#C8A45A'},  // 골드
-    {key:'협찬 마케팅',     emoji:'🤝', color:'#5A8A4A'},  // 그린
-    {key:'공동 구매',       emoji:'🛒', color:'#E67E22'},  // 오렌지
-    {key:'기타',           emoji:'📌', color:'#7F8C8D'}   // 그레이
+    // ━━ 빨강 → 보라 spectrum (시간 흐름 순) ━━
+    {key:'기획',           emoji:'🎯', color:'#E74C3C'},  // 1️⃣ 빨강 (시작)
+    {key:'샘플의뢰',        emoji:'🧪', color:'#E67E22'},  // 2️⃣ 주황
+    {key:'사양픽스',        emoji:'📋', color:'#F39C12'},  // 3️⃣ 황금
+    {key:'생산',           emoji:'🏭', color:'#F1C40F'},  // 4️⃣ 노랑
+    {key:'패키지 디자인',    emoji:'📦', color:'#9ACD32'},  // 5️⃣ 황록
+    {key:'상세페이지 디자인', emoji:'🎨', color:'#27AE60'},  // 6️⃣ 초록
+    {key:'광고 영상 제작',   emoji:'🎬', color:'#16A085'},  // 7️⃣ 청록
+    {key:'웹사이트 세팅',    emoji:'💻', color:'#3498DB'},  // 8️⃣ 하늘
+    {key:'런칭',           emoji:'🚀', color:'#2563EB'},  // 9️⃣ 파랑 (런칭!)
+    {key:'협찬 마케팅',     emoji:'🤝', color:'#7A4AA8'},  // 🔟 보라 (마케팅!)
+    {key:'공동 구매',       emoji:'🛒', color:'#9B59B6'},  // 1️⃣1️⃣ 자주
+    {key:'기타',           emoji:'📌', color:'#7F8C8D'}   // 1️⃣2️⃣ 회색
   ];
   
   // 현재 정렬·필터 상태
@@ -13732,7 +13730,7 @@ function forceIsolationReset(){
       var now = new Date();
       var ts = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_' + String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0');
       a.href = url;
-      a.download = 'BrandOSKIT_' + ts + '.json';
+      a.download = getBosFilename('json', '전체백업');
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -15102,6 +15100,39 @@ body.edit-mode-on #edit-mode-indicator{
     }
   };
   
+  // ━━ Gist 풀 단축 함수 (단축키: Ctrl+Shift+L) ━━
+  window.quickGistPull = function(){
+    // 토큰 설정 확인
+    var raw = null;
+    try { raw = localStorage.getItem('bos_sync_settings_v1'); } catch(e){}
+    var settings = null;
+    try { if(raw) settings = JSON.parse(raw); } catch(e){}
+    
+    if(!settings || !settings.gistToken || !settings.gistId){
+      // 설정 안 되어 있으면 동기화 모달 열기
+      if(typeof openSyncModal === 'function'){
+        openSyncModal();
+        if(typeof switchSyncTab === 'function') switchSyncTab('phase2');
+        setTimeout(function(){
+          if(typeof syncToast === 'function') syncToast('💡 먼저 Token + Gist ID 를 설정하세요', 'warn');
+        }, 200);
+      } else {
+        alert('동기화 시스템을 먼저 설정해주세요.');
+      }
+      return;
+    }
+    
+    // 사용자 확인 - 풀은 로컬 데이터를 덮어쓰니까 명시적 동의 필요
+    if(!confirm('⚠ Gist 풀 실행\n\n클라우드의 데이터로 이 브라우저의 로컬 데이터를 덮어쓰게 됩니다.\n계속하시겠습니까?')) return;
+    
+    // 토큰+Gist ID 있음 → 바로 풀 실행
+    if(typeof gistPull === 'function'){
+      gistPull();
+    } else {
+      alert('gistPull 함수를 찾을 수 없습니다');
+    }
+  };
+  
   // 단축키 시스템
   document.addEventListener('keydown', function(e){
     // input/textarea/contenteditable 안에서는 단축키 무시 (텍스트 입력 우선)
@@ -15119,6 +15150,13 @@ body.edit-mode-on #edit-mode-indicator{
       if(typeof exportJSON === 'function'){
         exportJSON();
       }
+      return;
+    }
+    
+    // Ctrl+Shift+L = Gist 풀
+    if(ctrl && shift && (e.key === 'L' || e.key === 'l')){
+      e.preventDefault();
+      if(typeof quickGistPull === 'function') quickGistPull();
       return;
     }
     
@@ -15721,14 +15759,61 @@ window.addEventListener('resize', function(){
     tip.style.top = y + 'px';
   }
   
-  // ━━ 날짜 포맷 (YYYY-MM-DD → 2026년 6월 4일 (월)) ━━
+  // ━━ 날짜 포맷 (YYYY-MM-DD → 2026년 6월 4일 (월) + D-day) ━━
   var dayNames = ['일','월','화','수','목','금','토'];
   function fmtCellDate(iso){
     var parts = iso.split('-');
     if(parts.length !== 3) return iso;
     var d = new Date(parts[0]+'-'+parts[1]+'-'+parts[2]+'T00:00:00');
     if(isNaN(d.getTime())) return iso;
-    return parts[0] + '년 ' + parseInt(parts[1]) + '월 ' + parseInt(parts[2]) + '일 (' + dayNames[d.getDay()] + ')';
+    
+    var dateStr = parts[0] + '년 ' + parseInt(parts[1]) + '월 ' + parseInt(parts[2]) + '일 (' + dayNames[d.getDay()] + ')';
+    
+    // ━━ D-day 계산 ━━
+    var today = new Date();
+    today.setHours(0,0,0,0);
+    d.setHours(0,0,0,0);
+    var diffMs = d.getTime() - today.getTime();
+    var diffDays = Math.round(diffMs / 86400000);
+    
+    var ddayLabel = '';
+    if(diffDays === 0){
+      ddayLabel = '<span style="color:#FFD54F;font-weight:700">📍 오늘</span>';
+    } else if(diffDays > 0){
+      // 미래
+      var future = formatRelativeFuture(diffDays);
+      ddayLabel = '<span style="color:#81C784">D-' + diffDays + ' · ' + future + ' 후</span>';
+    } else {
+      // 과거
+      var past = formatRelativeFuture(-diffDays);
+      ddayLabel = '<span style="color:#E57373">D+' + (-diffDays) + ' · ' + past + ' 전</span>';
+    }
+    
+    return dateStr + '<div style="margin-top:3px;font-size:10.5px">' + ddayLabel + '</div>';
+  }
+  
+  // ━━ N일을 사람 친화적 표기로 (일/주+일/개월+일/년) ━━
+  function formatRelativeFuture(days){
+    if(days < 7) return days + '일';
+    if(days < 30){
+      var w = Math.floor(days/7);
+      var rd = days - w*7;
+      return w + '주' + (rd > 0 ? ' ' + rd + '일' : '');
+    }
+    if(days < 365){
+      var m = Math.floor(days/30);
+      var rd2 = days - m*30;
+      var wks = Math.floor(rd2/7);
+      var rdf = rd2 - wks*7;
+      var s = m + '개월';
+      if(wks > 0) s += ' ' + wks + '주';
+      if(rdf > 0) s += ' ' + rdf + '일';
+      return s;
+    }
+    var y = Math.floor(days/365);
+    var rd3 = days - y*365;
+    var mn = Math.floor(rd3/30);
+    return y + '년' + (mn > 0 ? ' ' + mn + '개월' : '');
   }
   
   // ━━ 셀 마우스오버 - 풍부한 툴팁 ━━
@@ -15837,7 +15922,7 @@ window.addEventListener('resize', function(){
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.55);
-  z-index:9500;
+  z-index:99999;
   align-items:center;
   justify-content:center;
 }
@@ -16052,7 +16137,7 @@ window.addEventListener('resize', function(){
 </style>
 
 <!-- 색상 팔레트 모달 -->
-<div id="cal-color-palette-modal" onclick="if(event.target===this)closeCalColorPaletteModal_BOS()">
+<div id="cal-color-palette-modal">
   <div class="cp-card">
     <div class="cp-head">
       <div>
@@ -16132,33 +16217,34 @@ window.addEventListener('resize', function(){
   var _selectedPaletteColor = '#C8A45A';
   var _userChangedColor = false;  // 사용자가 색을 수동 변경했는지 추적
   
-  // ━━ 카테고리 변경 → 기본 색 자동 설정 ━━
+  // ━━ 카테고리 변경 → 기본 색 자동 설정 (사용자 변경 플래그 무시 - 항상 적용) ━━
   window.onCalCategoryChange_BOS = function(catKey){
+    var badge = document.getElementById('bos-cal-color-from-cat');
     if(!catKey){
-      // 카테고리 해제 - 배지 숨김, 색은 그대로
-      var badge = document.getElementById('bos-cal-color-from-cat');
       if(badge) badge.style.display = 'none';
       return;
     }
     
-    // 사용자가 이미 수동으로 색을 변경했다면 자동 변경 안 함
-    if(_userChangedColor){
-      // 그래도 배지는 표시 (현재 색이 카테고리 기본인지 사용자 정의인지)
+    var catInfo = (CAL_CATEGORIES_BOS || []).find(function(c){ return c.key === catKey; });
+    if(!catInfo || !catInfo.color){
+      console.warn('[Cat Color] 카테고리 정보 없음:', catKey);
       return;
     }
     
-    var catInfo = (CAL_CATEGORIES_BOS || []).find(function(c){ return c.key === catKey; });
-    if(!catInfo || !catInfo.color) return;
-    
-    // 색상 자동 설정
+    // 색상 자동 설정 - 무조건 적용 (사용자가 수동 변경했어도 카테고리 변경 시 다시 적용)
     var colorInput = document.getElementById('bos-cal-item-color');
-    if(colorInput) colorInput.value = catInfo.color;
+    if(colorInput){
+      colorInput.value = catInfo.color;
+      console.log('[Cat Color] 카테고리 ' + catKey + ' → ' + catInfo.color);
+    }
     
     // 팔레트 픽커 갱신
     if(typeof renderColorPicker_BOS === 'function') renderColorPicker_BOS(catInfo.color);
     
+    // _userChangedColor 리셋 (카테고리 변경했으니 자동 색이 다시 적용된 상태)
+    _userChangedColor = false;
+    
     // "카테고리 자동" 배지 표시
-    var badge = document.getElementById('bos-cal-color-from-cat');
     if(badge) badge.style.display = 'inline-block';
   };
   
@@ -16553,6 +16639,54 @@ window.addEventListener('resize', function(){
   
   console.log('[Cal] 포토샵 스타일 정밀 색상 픽커 준비됨');
 })();
+</script>
+
+<!-- ━━━ 📁 파일명 생성 헬퍼 (brandos_브랜드명_날짜_화면명) ━━━ -->
+<script id="bos-filename-helper">
+window.getBosFilename = function(ext, screenName){
+  // 브랜드명
+  var brand = 'BrandOS';
+  try {
+    var brandInput = document.getElementById('hub-name-input');
+    if(brandInput && brandInput.value) brand = brandInput.value.trim();
+  } catch(e){}
+  
+  // 화면명 - 인자로 받았으면 그것, 아니면 현재 활성 탭에서 추출
+  var screen = screenName || '';
+  if(!screen){
+    try {
+      var activeTab = document.querySelector('.tab-btn.act');
+      if(activeTab){
+        var span = activeTab.querySelector('.tab-name-edit') || activeTab.querySelector('span');
+        if(span) screen = span.textContent.trim();
+      }
+    } catch(e){}
+  }
+  if(!screen) screen = '전체';
+  
+  // 날짜 YYYYMMDD
+  var now = new Date();
+  var date = now.getFullYear() 
+    + String(now.getMonth()+1).padStart(2,'0')
+    + String(now.getDate()).padStart(2,'0');
+  
+  // 파일명 안전화 (특수문자/공백 제거)
+  var sanitize = function(s){
+    return String(s)
+      .replace(/[\\\/:*?"<>|]/g, '')   // 파일 시스템 금지 문자
+      .replace(/\s+/g, '_')            // 공백을 _
+      .replace(/[^\w가-힣\-]/g, '')    // 영숫자/한글/-/_ 만
+      .substr(0, 30);                  // 길이 제한
+  };
+  
+  var safeBrand = sanitize(brand) || 'BrandOS';
+  var safeScreen = sanitize(screen) || '전체';
+  var safeExt = (ext || 'txt').replace(/^\./, '');
+  
+  return 'brandos_' + safeBrand + '_' + date + '_' + safeScreen + '.' + safeExt;
+};
+
+console.log('[Filename] getBosFilename 헬퍼 준비됨');
 </script>
 </body>
 </html>
