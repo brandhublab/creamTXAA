@@ -12448,18 +12448,25 @@ function forceIsolationReset(){
   // 카테고리 정의 (전역) - 워크플로우 순서대로
   var CAL_CATEGORIES_BOS = [
     // ━━ 빨강 → 보라 spectrum (시간 흐름 순) ━━
-    {key:'기획',           emoji:'🎯', color:'#E74C3C'},  // 1️⃣ 빨강 (시작)
-    {key:'샘플의뢰',        emoji:'🧪', color:'#E67E22'},  // 2️⃣ 주황
-    {key:'사양픽스',        emoji:'📋', color:'#F39C12'},  // 3️⃣ 황금
-    {key:'생산',           emoji:'🏭', color:'#F1C40F'},  // 4️⃣ 노랑
-    {key:'패키지 디자인',    emoji:'📦', color:'#9ACD32'},  // 5️⃣ 황록
-    {key:'상세페이지 디자인', emoji:'🎨', color:'#27AE60'},  // 6️⃣ 초록
-    {key:'광고 영상 제작',   emoji:'🎬', color:'#16A085'},  // 7️⃣ 청록
-    {key:'웹사이트 세팅',    emoji:'💻', color:'#3498DB'},  // 8️⃣ 하늘
-    {key:'런칭',           emoji:'🚀', color:'#2563EB'},  // 9️⃣ 파랑 (런칭!)
-    {key:'협찬 마케팅',     emoji:'🤝', color:'#7A4AA8'},  // 🔟 보라 (마케팅!)
-    {key:'공동 구매',       emoji:'🛒', color:'#9B59B6'},  // 1️⃣1️⃣ 자주
-    {key:'기타',           emoji:'📌', color:'#7F8C8D'}   // 1️⃣2️⃣ 회색
+    {key:'기획',           emoji:'🎯', color:'#E74C3C'},  // 1️⃣  빨강 (시작)
+    {key:'샘플의뢰',        emoji:'🧪', color:'#E67E22'},  // 2️⃣  주황
+    {key:'사양픽스',        emoji:'📋', color:'#F39C12'},  // 3️⃣  황금주황
+    {key:'CT TEST',        emoji:'✅', color:'#FF8C42'},  // 4️⃣  진한주황 (개발 검증)
+    {key:'문안 검수',       emoji:'✍️', color:'#FFB74D'},  // 5️⃣  연한주황 (문서 검토)
+    {key:'임상 시험 의뢰',  emoji:'🔬', color:'#FBC02D'},  // 6️⃣  황금노랑
+    {key:'생산',           emoji:'🏭', color:'#F1C40F'},  // 7️⃣  노랑
+    {key:'패키지 디자인',    emoji:'📦', color:'#9ACD32'},  // 8️⃣  황록
+    {key:'상세페이지 디자인', emoji:'🎨', color:'#27AE60'},  // 9️⃣  초록
+    {key:'광고 영상 제작',   emoji:'🎬', color:'#16A085'},  // 🔟  청록
+    {key:'웹사이트 세팅',    emoji:'💻', color:'#3498DB'},  // 1️⃣1️⃣ 하늘
+    {key:'런칭',           emoji:'🚀', color:'#2563EB'},  // 1️⃣2️⃣ 파랑 (런칭!)
+    {key:'판매 진행',       emoji:'🛍️', color:'#3F51B5'},  // 1️⃣3️⃣ 남색 (판매 시작)
+    {key:'퍼포먼스 마케팅',  emoji:'📈', color:'#5C6BC0'},  // 1️⃣4️⃣ 연남 (광고 운영)
+    {key:'협찬 마케팅',     emoji:'🤝', color:'#7A4AA8'},  // 1️⃣5️⃣ 보라
+    {key:'바이럴 마케팅',   emoji:'🌐', color:'#9B59B6'},  // 1️⃣6️⃣ 자주
+    {key:'공동 구매',       emoji:'🛒', color:'#AB47BC'},  // 1️⃣7️⃣ 진자주
+    {key:'인력 채용',       emoji:'👥', color:'#7F8C8D'},  // 1️⃣8️⃣ 회색 (운영성)
+    {key:'기타',           emoji:'📌', color:'#95A5A6'}   // 1️⃣9️⃣ 연회색
   ];
   // ━━ window 에 노출 (다른 IIFE에서 접근 가능하도록) ━━
   window.CAL_CATEGORIES_BOS = CAL_CATEGORIES_BOS;
