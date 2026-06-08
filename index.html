@@ -11806,17 +11806,57 @@ function forceIsolationReset(){
   </div>
 </div>
 <div id="t15" class="tab-pane">
-  <div class="hbar">
-    <div style="font-size:12px;font-weight:500">📹 Meta 광고 기획</div>
-    <div style="display:flex;gap:6px">
-      <button class="btn" onclick="addAdPlan()">+ 기획안 추가</button>
-      <button class="btn pri" onclick="saveAdPlans()">저장</button>
+  <!-- 서브탭 헤더 -->
+  <div class="hbar" style="padding:8px 18px 0">
+    <div style="display:flex;gap:4px;flex-wrap:wrap">
+      <button class="stab active" id="t15-sub-meta-btn" onclick="showAdSubTab(\'meta\')">📹 메타 광고</button>
+      <button class="stab" id="t15-sub-power-btn" onclick="showAdSubTab(\'power\')">📝 파워 컨텐츠</button>
+      <button class="stab" id="t15-sub-display-btn" onclick="showAdSubTab(\'display\')">🖼 디스플레이 배너</button>
     </div>
   </div>
-  <div style="padding:0 18px 6px">
-    <div id="ad-plan-tabs" style="display:flex;gap:6px;padding:10px 0;overflow-x:auto;flex-wrap:wrap"></div>
+  
+  <!-- 서브탭 1: 📹 메타 광고 기획 (기존) -->
+  <div id="t15-sub-meta">
+    <div class="hbar">
+      <div style="font-size:12px;font-weight:500">📹 Meta 광고 기획 (페이스북·인스타그램 퍼포먼스)</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn" onclick="addAdPlan()">+ 기획안 추가</button>
+        <button class="btn pri" onclick="saveAdPlans()">저장</button>
+      </div>
+    </div>
+    <div style="padding:0 18px 6px">
+      <div id="ad-plan-tabs" style="display:flex;gap:6px;padding:10px 0;overflow-x:auto;flex-wrap:wrap"></div>
+    </div>
+    <div id="ad-plan-content" style="padding:0 18px 18px"></div>
   </div>
-  <div id="ad-plan-content" style="padding:0 18px 18px"></div>
+  
+  <!-- 서브탭 2: 📝 파워 컨텐츠 (블로그 글 형식) -->
+  <div id="t15-sub-power" style="display:none">
+    <div class="hbar">
+      <div>
+        <div style="font-size:12px;font-weight:500">📝 파워 컨텐츠 기획 (네이버 블로그·티스토리·브런치)</div>
+        <div style="font-size:10.5px;color:var(--mu);margin-top:2px">SEO 키워드 · 본문 구조 · 발행 일정 관리</div>
+      </div>
+      <button class="btn btn-grn-bos" onclick="addPowerContent_BOS()">＋ 컨텐츠 추가</button>
+    </div>
+    <div style="padding:0 18px 18px">
+      <div id="power-content-list" style="display:flex;flex-direction:column;gap:12px;margin-top:10px"></div>
+    </div>
+  </div>
+  
+  <!-- 서브탭 3: 🖼 디스플레이 이미지 배너 -->
+  <div id="t15-sub-display" style="display:none">
+    <div class="hbar">
+      <div>
+        <div style="font-size:12px;font-weight:500">🖼 디스플레이 이미지 배너</div>
+        <div style="font-size:10.5px;color:var(--mu);margin-top:2px">네이버 · 구글 디스플레이 · 카카오 모먼트 · DSP 등</div>
+      </div>
+      <button class="btn btn-grn-bos" onclick="addDisplayBanner_BOS()">＋ 배너 추가</button>
+    </div>
+    <div style="padding:0 18px 18px">
+      <div id="display-banner-list" style="display:flex;flex-direction:column;gap:12px;margin-top:10px"></div>
+    </div>
+  </div>
 </div>
 
 <!-- TAB t16: 조직구성표 -->
@@ -12050,6 +12090,17 @@ function forceIsolationReset(){
 </div>
 
 <div id="t20" class="tab-pane">
+  <!-- 서브탭 헤더 -->
+  <div class="hbar" style="padding:10px 18px 0">
+    <div style="display:flex;gap:4px;flex-wrap:wrap">
+      <button class="stab active" id="t20-sub-calendar-btn" onclick="showCalendarSubTab(\'calendar\')">📅 캘린더</button>
+      <button class="stab" id="t20-sub-sample-btn" onclick="showCalendarSubTab(\'sample\')">🧪 샘플</button>
+      <button class="stab" id="t20-sub-outsource-btn" onclick="showCalendarSubTab(\'outsource\')">🤝 아웃소싱</button>
+    </div>
+  </div>
+  
+  <!-- 서브탭 1: 📅 캘린더 (기존) -->
+  <div id="t20-sub-calendar">
   <div class="card" style="padding:20px;margin-bottom:14px">
     <div class="cal-items-section-bos">
       <div class="cal-items-header-bos">
@@ -12079,21 +12130,113 @@ function forceIsolationReset(){
     </div>
 
     <div class="cal-controls-bos" style="margin-top:18px">
-      <div class="cal-view-tabs-bos">
-        <button class="cal-view-tab-bos" data-view="prev2" onclick="switchCalView_BOS('prev2')">재작년</button>
-        <button class="cal-view-tab-bos" data-view="prev1" onclick="switchCalView_BOS('prev1')">작년</button>
-        <button class="cal-view-tab-bos active" data-view="single" onclick="switchCalView_BOS('single')">올해</button>
-        <button class="cal-view-tab-bos" data-view="next1" onclick="switchCalView_BOS('next1')">내년</button>
-        <button class="cal-view-tab-bos" data-view="next2" onclick="switchCalView_BOS('next2')">내후년</button>
-        <button class="cal-view-tab-bos" data-view="past" onclick="switchCalView_BOS('past')">과거 전체 (3년)</button>
-        <button class="cal-view-tab-bos" data-view="future" onclick="switchCalView_BOS('future')">미래 전체 (3년)</button>
-        <button class="cal-view-tab-bos" data-view="all" onclick="switchCalView_BOS('all')">전체 (5년)</button>
+      <div class="cal-view-tabs-bos" id="cal-year-nav-bos">
+        <button class="cal-view-tab-bos" data-view="prev2" onclick="switchCalView_BOS('prev2')">2024</button>
+        <button class="cal-view-tab-bos" data-view="prev1" onclick="switchCalView_BOS('prev1')">2025</button>
+        <button class="cal-view-tab-bos active" data-view="single" onclick="switchCalView_BOS('single')">2026</button>
+        <button class="cal-view-tab-bos" data-view="next1" onclick="switchCalView_BOS('next1')">2027</button>
+        <button class="cal-view-tab-bos" data-view="next2" onclick="switchCalView_BOS('next2')">2028</button>
+        <button class="cal-view-tab-bos" data-view="past" onclick="switchCalView_BOS('past')" title="과거 3년 (2024~2026)">📜 과거 3년</button>
+        <button class="cal-view-tab-bos" data-view="future" onclick="switchCalView_BOS('future')" title="미래 3년 (2026~2028)">🔮 미래 3년</button>
+        <button class="cal-view-tab-bos" data-view="all" onclick="switchCalView_BOS('all')" title="전체 5년 (2024~2028)">🌐 전체 5년</button>
       </div>
       <div style="font-size:11px;color:var(--mu)">🔵 오늘 / 🔘 항목별 색상</div>
     </div>
 
     <div class="cal-grid-bos" id="bos-cal-grid" style="margin-top:14px"></div>
   </div>
+  </div>  <!-- /#t20-sub-calendar -->
+  
+  <!-- ━━━ 서브탭 2: 🧪 샘플 추적 ━━━ -->
+  <div id="t20-sub-sample" style="display:none">
+    <div class="card" style="padding:20px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:14px;font-weight:700">🧪 샘플 의뢰 추적</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:3px">업체별 샘플 의뢰일 · 도착일 · 실제 소요 기간을 한눈에 비교</div>
+        </div>
+        <button class="btn btn-grn-bos" onclick="addSampleEntry_BOS()">＋ 샘플 의뢰 추가</button>
+      </div>
+      
+      <!-- 통계 요약 -->
+      <div id="sample-summary-bos" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px"></div>
+      
+      <!-- 테이블 -->
+      <div style="overflow-x:auto;border:1px solid var(--bd);border-radius:8px">
+        <table id="sample-table-bos" style="width:100%;border-collapse:collapse;font-size:12px;min-width:1100px">
+          <thead style="background:#FAFAF8;border-bottom:2px solid var(--bd)">
+            <tr>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:140px">업체명</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:100px">담당자</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px">의뢰 샘플</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">의뢰일</th>
+              <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:95px">예상소요</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">도착일</th>
+              <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:95px">실제소요</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px">메모</th>
+              <th style="padding:9px 8px;width:36px"></th>
+            </tr>
+          </thead>
+          <tbody id="sample-tbody-bos">
+            <tr><td colspan="9" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">샘플 의뢰 내역이 없습니다. <b>＋ 샘플 의뢰 추가</b> 를 눌러 시작하세요.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div style="margin-top:10px;font-size:10.5px;color:var(--mu);line-height:1.6">
+        💡 <b>예상소요</b>는 의뢰 시 업체가 제시한 기간을 일 단위로 입력 · <b>실제소요</b>는 의뢰일↔도착일에서 자동 계산
+      </div>
+    </div>
+  </div>
+  
+  <!-- ━━━ 서브탭 3: 🤝 아웃소싱 ━━━ -->
+  <div id="t20-sub-outsource" style="display:none">
+    <div class="card" style="padding:20px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:14px;font-weight:700">🤝 아웃소싱 관리</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:3px">부자재 · 생산 · 발주 · 디자인 · 영상 · 마케팅 등 외부 의뢰 건 추적</div>
+        </div>
+        <button class="btn btn-grn-bos" onclick="addOutsourceEntry_BOS()">＋ 아웃소싱 추가</button>
+      </div>
+      
+      <!-- 카테고리 필터 -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;padding:10px 12px;background:#FAFAF8;border:1px solid var(--bd);border-radius:8px;margin-bottom:14px;align-items:center">
+        <span style="font-size:11px;color:var(--mu);font-weight:600">📂 카테고리</span>
+        <div id="outsource-cat-filter-bos" style="display:flex;gap:5px;flex-wrap:wrap"></div>
+      </div>
+      
+      <!-- 통계 요약 -->
+      <div id="outsource-summary-bos" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px"></div>
+      
+      <!-- 테이블 -->
+      <div style="overflow-x:auto;border:1px solid var(--bd);border-radius:8px">
+        <table id="outsource-table-bos" style="width:100%;border-collapse:collapse;font-size:12px;min-width:1250px">
+          <thead style="background:#FAFAF8;border-bottom:2px solid var(--bd)">
+            <tr>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:120px">카테고리</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:130px">업체명</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:90px">담당자</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">의뢰일</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px">업체 제안 결과물</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">도착일</th>
+              <th style="padding:9px 8px;text-align:right;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">비용 (원)</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px">실제 결과물</th>
+              <th style="padding:9px 8px;width:36px"></th>
+            </tr>
+          </thead>
+          <tbody id="outsource-tbody-bos">
+            <tr><td colspan="9" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">아웃소싱 내역이 없습니다. <b>＋ 아웃소싱 추가</b> 를 눌러 시작하세요.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div style="margin-top:10px;font-size:10.5px;color:var(--mu);line-height:1.6">
+        💡 <b>업체 제안 결과물</b>은 의뢰 시 약속받은 산출물(예: 영상 2분 × 3편) · <b>실제 결과물</b>은 받은 결과(파일명 / 링크 / 코멘트)
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- 📦 정보저장소 탭 -->
@@ -12628,6 +12771,8 @@ function forceIsolationReset(){
         + 'ondragleave="onCalCardDragLeave_BOS(event)" '
         + 'ondrop="onCalCardDrop_BOS(event,\'' + item.id + '\')" '
         + 'ondragend="onCalCardDragEnd_BOS(event)" '
+        + 'onmouseenter="highlightCalItem_BOS(\'' + item.id + '\')" '
+        + 'onmouseleave="clearCalHighlight_BOS()" '
         + 'onclick="if(!event.target.closest(\'.cal-card-drag-handle\'))editCalendarItem_BOS(\'' + item.id + '\')">'
         + '<span class="cal-card-drag-handle" title="드래그하여 순서 변경" style="cursor:grab;color:var(--mu);font-size:13px;padding:4px 6px;user-select:none;align-self:center" onclick="event.stopPropagation()">⋮⋮</span>'
         + '<div class="cal-item-color-bos" style="background:' + item.color + '"></div>'
@@ -12720,12 +12865,23 @@ function forceIsolationReset(){
       
       var dayClass = dayOfWeek === 0 ? 'sun' : (dayOfWeek === 6 ? 'sat' : '');
       
+      // ━━ 셀 안 배지가 너무 많이 쌓이지 않도록: 최대 6개 표시 + 나머지는 "+N" ━━
+      var MAX_VISIBLE = 6;  // 한 셀당 최대 표시 배지 수
+      var visibleBadges = weekBadges.slice(0, MAX_VISIBLE);
+      var hiddenCount = weekBadges.length - visibleBadges.length;
+      var overflowTitle = '';
+      if(hiddenCount > 0){
+        overflowTitle = weekBadges.slice(MAX_VISIBLE).map(function(b){ return b.title + ' (' + b.weekNum + '주차)'; }).join(' / ');
+      }
       var badgesHtml = weekBadges.length > 0
-        ? '<div class="cal-cell-badges-bos">' + weekBadges.map(function(b){
+        ? '<div class="cal-cell-badges-bos">' + visibleBadges.map(function(b){
             return '<span class="cal-cell-week-bos" style="background:' + b.color + ';cursor:pointer" '
+              + 'data-cal-badge-id="' + b.id + '" '
               + 'onclick="event.stopPropagation();editCalendarItem_BOS(\'' + b.id + '\')" '
               + 'title="' + escapeAttr_BOS(b.title) + ' - ' + b.weekNum + '주차 (클릭하여 편집)">' + b.weekNum + '</span>';
-          }).join('') + '</div>'
+          }).join('') 
+          + (hiddenCount > 0 ? '<span class="cal-cell-overflow-bos" title="' + escapeAttr_BOS(overflowTitle) + '">+' + hiddenCount + '</span>' : '')
+          + '</div>'
         : '';
       
       var tipParts = [];
@@ -13543,6 +13699,7 @@ function forceIsolationReset(){
           <button onclick="gistPull()" style="padding:9px 14px;background:#2563EB;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">⬇️ Gist에서 풀</button>
           <button onclick="inspectSyncData()" style="padding:9px 14px;background:#fff;color:#8B5E00;border:1px solid #e8d4a8;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🔍 데이터 점검</button>
           <button onclick="inspectGistData()" style="padding:9px 14px;background:#fff;color:#8B5E00;border:1px solid #e8d4a8;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">📡 Gist 내용 확인</button>
+    <button class="sync-btn" onclick="autoFindBrandoskitGist_BOS()" style="background:#FFF3E0;border-color:#FB8C00;color:#E65100" title="Token만 있어도 BrandOSKIT Gist 자동 검색">🔍 Gist 자동찾기</button>
         </div>
       </div>
       
@@ -13676,7 +13833,12 @@ function forceIsolationReset(){
     'bos_ingred_files_v1',     // 🧪 성분 컨셉 HTML 파일 목록
     'bos_ingred_current_v1',   // 🧪 성분 컨셉 현재 선택 인덱스
     'bos_detailhtml_files_v1', // 🌐 상세페이지 HTML 파일 목록
-    'bos_detailhtml_current_v1'// 🌐 상세페이지 HTML 현재 선택 인덱스
+    'bos_detailhtml_current_v1',// 🌐 상세페이지 HTML 현재 선택 인덱스
+    'bos_sample_data_v1',      // 🧪 샘플 의뢰 추적
+    'bos_outsource_data_v1',   // 🤝 아웃소싱 데이터
+    'bos_outsource_filter_v1', // 🤝 아웃소싱 카테고리 필터
+    'bos_power_content_v1',    // 📝 파워 컨텐츠 (블로그)
+    'bos_display_banner_v1'    // 🖼 디스플레이 배너
   ];
   
   // ━━ 동적 키 prefix (제품별 데이터: epitect-v7__제품ID) ━━
@@ -14163,9 +14325,35 @@ function forceIsolationReset(){
     // 입력칸의 값을 자동으로 settings에 반영 (사용자가 설정 저장 안 눌렀어도)
     syncAutoApplyInputs();
     if(!syncSettings.gistToken){ syncToast('먼저 토큰을 입력하세요', 'warn'); return; }
-    if(!syncSettings.gistId){ 
-      syncToast('💡 Gist ID 입력칸에 값을 넣고 [설정 저장]을 먼저 누르세요', 'warn'); 
-      return; 
+    
+    // ━━ Gist ID 없으면 자동 검색 (Token만 있어도 풀 가능) ━━
+    if(!syncSettings.gistId){
+      syncToast('🔍 BrandOSKIT Gist 자동 검색 중...', 'info');
+      console.log('[Sync] Gist ID 없음 - 자동 검색 시작');
+      
+      findBrandoskitGist_BOS().then(function(gistId){
+        if(gistId){
+          console.log('[Sync] 자동 검색 성공:', gistId);
+          syncSettings.gistId = gistId;
+          // localStorage 저장
+          try {
+            localStorage.setItem('bos_sync_settings_v1', JSON.stringify(syncSettings));
+          } catch(e){}
+          // UI 갱신
+          var inp = document.getElementById('sync-gist-id-input');
+          if(inp) inp.value = gistId;
+          if(typeof updateSyncStatus === 'function') updateSyncStatus();
+          syncToast('✅ Gist 자동 찾음 (' + gistId.slice(0,10) + '...) — 풀 진행', 'success');
+          // 풀 재시도
+          setTimeout(function(){ window.gistPull(); }, 400);
+        } else {
+          syncToast('❌ BrandOSKIT Gist 못 찾음. 먼저 푸시하거나 Gist ID를 직접 입력하세요.', 'error');
+        }
+      }).catch(function(err){
+        console.error('[Sync] 자동 검색 실패:', err);
+        syncToast('❌ 자동 검색 실패: ' + (err.message || err), 'error');
+      });
+      return;
     }
     
     syncToast('⏳ Gist에서 풀 중...', 'info');
@@ -17033,6 +17221,946 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
   }
   
   console.log('[Detail HTML] iframe 로더 준비됨');
+})();
+</script>
+
+<!-- ━━━ 📅 캘린더 서브탭 시스템 (샘플 + 아웃소싱 + 연도 동적) ━━━ -->
+<script id="cal-subtab-script">
+(function(){
+  var LS_SAMPLE = 'bos_sample_data_v1';
+  var LS_OUTSRC = 'bos_outsource_data_v1';
+  var LS_OUTSRC_FILTER = 'bos_outsource_filter_v1';
+  
+  // ━━ 아웃소싱 카테고리 (사용자 요청) ━━
+  var OUTSOURCE_CATS = [
+    {key:'전체',   emoji:'📋', color:'#7F8C8D'},
+    {key:'부자재', emoji:'📦', color:'#9ACD32'},
+    {key:'생산',   emoji:'🏭', color:'#F1C40F'},
+    {key:'발주',   emoji:'📝', color:'#E67E22'},
+    {key:'디자인', emoji:'🎨', color:'#27AE60'},
+    {key:'영상',   emoji:'🎬', color:'#16A085'},
+    {key:'마케팅', emoji:'📈', color:'#7A4AA8'},
+    {key:'기타',   emoji:'📌', color:'#95A5A6'}
+  ];
+  window.OUTSOURCE_CATS = OUTSOURCE_CATS;
+  
+  // ━━ 데이터 로드/저장 ━━
+  function loadSample(){
+    try { var raw = localStorage.getItem(LS_SAMPLE); return raw ? JSON.parse(raw) : []; }
+    catch(e){ return []; }
+  }
+  function saveSample(arr){
+    try { localStorage.setItem(LS_SAMPLE, JSON.stringify(arr)); if(typeof updateSaveTime==='function') updateSaveTime(); } catch(e){}
+  }
+  function loadOutsource(){
+    try { var raw = localStorage.getItem(LS_OUTSRC); return raw ? JSON.parse(raw) : []; }
+    catch(e){ return []; }
+  }
+  function saveOutsource(arr){
+    try { localStorage.setItem(LS_OUTSRC, JSON.stringify(arr)); if(typeof updateSaveTime==='function') updateSaveTime(); } catch(e){}
+  }
+  function loadOutsourceFilter(){
+    try { return localStorage.getItem(LS_OUTSRC_FILTER) || '전체'; } catch(e){ return '전체'; }
+  }
+  function saveOutsourceFilter(v){
+    try { localStorage.setItem(LS_OUTSRC_FILTER, v); } catch(e){}
+  }
+  
+  // ━━ 날짜 차이 계산 (일 단위) ━━
+  function daysBetween(d1, d2){
+    if(!d1 || !d2) return null;
+    var a = new Date(d1 + 'T00:00:00');
+    var b = new Date(d2 + 'T00:00:00');
+    if(isNaN(a.getTime()) || isNaN(b.getTime())) return null;
+    return Math.round((b - a) / 86400000);
+  }
+  function escAttr(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+  function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function fmtNumber(n){ return (parseInt(n)||0).toLocaleString('ko-KR'); }
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 서브탭 전환
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  window.showCalendarSubTab = function(name){
+    var subs = ['calendar', 'sample', 'outsource'];
+    subs.forEach(function(s){
+      var btn = document.getElementById('t20-sub-' + s + '-btn');
+      var pane = document.getElementById('t20-sub-' + s);
+      if(btn) btn.classList.toggle('active', s === name);
+      if(pane) pane.style.display = (s === name) ? '' : 'none';
+    });
+    if(name === 'sample') renderSampleTable_BOS();
+    if(name === 'outsource') renderOutsourceTable_BOS();
+  };
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🧪 샘플 추적
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  window.renderSampleTable_BOS = function(){
+    var tbody = document.getElementById('sample-tbody-bos');
+    if(!tbody) return;
+    var data = loadSample();
+    
+    if(data.length === 0){
+      tbody.innerHTML = '<tr><td colspan="9" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">샘플 의뢰 내역이 없습니다. <b>＋ 샘플 의뢰 추가</b> 를 눌러 시작하세요.</td></tr>';
+      renderSampleSummary_BOS(data);
+      return;
+    }
+    
+    tbody.innerHTML = data.map(function(s){
+      var actual = daysBetween(s.requestDate, s.arrivalDate);
+      var actualText = '';
+      if(actual !== null){
+        var expected = parseInt(s.expectedDays) || 0;
+        var diff = expected > 0 ? actual - expected : null;
+        var diffColor = '#7F8C8D';
+        var diffLabel = '';
+        if(diff !== null){
+          if(diff < 0){ diffColor = '#27AE60'; diffLabel = ' (' + diff + '일)'; }
+          else if(diff > 0){ diffColor = '#E74C3C'; diffLabel = ' (+' + diff + '일)'; }
+          else { diffColor = '#7F8C8D'; diffLabel = ' (정시)'; }
+        }
+        actualText = '<span style="font-weight:600;color:' + diffColor + '">' + actual + '일' + diffLabel + '</span>';
+      } else {
+        actualText = '<span style="color:var(--mu);font-size:10.5px">진행중</span>';
+      }
+      
+      var statusBg = s.arrivalDate ? '#F0F9F4' : '#FFFBF0';
+      
+      return '<tr style="border-bottom:1px solid var(--bd);background:' + statusBg + '" data-sample-id="' + s.id + '">'
+        + '<td style="padding:5px 6px"><input value="' + escAttr(s.vendor) + '" placeholder="업체명" oninput="updateSampleField_BOS(\'' + s.id + '\',\'vendor\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;font-weight:500;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        + '<td style="padding:5px 6px"><input value="' + escAttr(s.contact) + '" placeholder="담당자" oninput="updateSampleField_BOS(\'' + s.id + '\',\'contact\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        + '<td style="padding:5px 6px"><input value="' + escAttr(s.sampleName) + '" placeholder="제품명 / 사양" oninput="updateSampleField_BOS(\'' + s.id + '\',\'sampleName\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        + '<td style="padding:5px 6px"><input type="date" value="' + escAttr(s.requestDate) + '" oninput="updateSampleField_BOS(\'' + s.id + '\',\'requestDate\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff"></td>'
+        + '<td style="padding:5px 6px;text-align:center"><input type="number" value="' + escAttr(s.expectedDays) + '" placeholder="일" min="0" oninput="updateSampleField_BOS(\'' + s.id + '\',\'expectedDays\',this.value)" style="width:55px;padding:4px 4px;border:1px solid var(--bd);border-radius:4px;font-size:11px;text-align:center"><span style="font-size:10px;color:var(--mu);margin-left:3px">일</span></td>'
+        + '<td style="padding:5px 6px"><input type="date" value="' + escAttr(s.arrivalDate) + '" oninput="updateSampleField_BOS(\'' + s.id + '\',\'arrivalDate\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff"></td>'
+        + '<td style="padding:5px 6px;text-align:center;font-size:11px">' + actualText + '</td>'
+        + '<td style="padding:5px 6px"><input value="' + escAttr(s.memo) + '" placeholder="메모" oninput="updateSampleField_BOS(\'' + s.id + '\',\'memo\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11px;color:var(--mu);background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\';this.style.color=\'var(--tx)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\';this.style.color=\'var(--mu)\'"></td>'
+        + '<td style="padding:5px 4px;text-align:center"><button onclick="deleteSampleEntry_BOS(\'' + s.id + '\')" title="삭제" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:13px;padding:4px 6px">✕</button></td>'
+        + '</tr>';
+    }).join('');
+    
+    renderSampleSummary_BOS(data);
+  };
+  
+  function renderSampleSummary_BOS(data){
+    var box = document.getElementById('sample-summary-bos');
+    if(!box) return;
+    var total = data.length;
+    var completed = data.filter(function(s){ return s.arrivalDate; }).length;
+    var ongoing = total - completed;
+    var avgActual = 0;
+    var completedData = data.filter(function(s){ return s.arrivalDate && s.requestDate; });
+    if(completedData.length > 0){
+      var sum = 0;
+      completedData.forEach(function(s){
+        var d = daysBetween(s.requestDate, s.arrivalDate);
+        if(d !== null) sum += d;
+      });
+      avgActual = Math.round(sum / completedData.length);
+    }
+    var summaries = [
+      {label:'전체 의뢰', value: total + '건', color:'#3498DB', bg:'#EBF5FB'},
+      {label:'진행 중',   value: ongoing + '건', color:'#E67E22', bg:'#FEF5E7'},
+      {label:'완료',      value: completed + '건', color:'#27AE60', bg:'#E8F8EF'},
+      {label:'평균 소요', value: avgActual + '일', color:'#7A4AA8', bg:'#F4ECF7'}
+    ];
+    box.innerHTML = summaries.map(function(s){
+      return '<div style="background:' + s.bg + ';border-radius:8px;padding:11px 14px;border-left:3px solid ' + s.color + '">'
+        + '<div style="font-size:10px;color:var(--mu);margin-bottom:4px;font-weight:600">' + s.label + '</div>'
+        + '<div style="font-size:18px;font-weight:700;color:' + s.color + ';font-family:\'Roboto Mono\',monospace">' + s.value + '</div>'
+        + '</div>';
+    }).join('');
+  }
+  
+  window.addSampleEntry_BOS = function(){
+    var data = loadSample();
+    data.unshift({
+      id: 'smp_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
+      vendor: '',
+      contact: '',
+      sampleName: '',
+      requestDate: new Date().toISOString().slice(0,10),
+      expectedDays: '',
+      arrivalDate: '',
+      memo: ''
+    });
+    saveSample(data);
+    renderSampleTable_BOS();
+  };
+  
+  window.updateSampleField_BOS = function(id, key, val){
+    var data = loadSample();
+    var item = data.find(function(s){ return s.id === id; });
+    if(!item) return;
+    item[key] = val;
+    saveSample(data);
+    // 의뢰일/도착일 변경 시 실제소요 셀만 갱신 - 전체 재렌더는 input focus 잃게 하니까 부분 갱신
+    if(key === 'requestDate' || key === 'arrivalDate'){
+      var actual = daysBetween(item.requestDate, item.arrivalDate);
+      var row = document.querySelector('[data-sample-id="' + id + '"]');
+      if(row){
+        var cells = row.querySelectorAll('td');
+        if(cells[6]){
+          if(actual !== null){
+            var expected = parseInt(item.expectedDays) || 0;
+            var diff = expected > 0 ? actual - expected : null;
+            var diffColor = '#7F8C8D', diffLabel = '';
+            if(diff !== null){
+              if(diff < 0){ diffColor = '#27AE60'; diffLabel = ' (' + diff + '일)'; }
+              else if(diff > 0){ diffColor = '#E74C3C'; diffLabel = ' (+' + diff + '일)'; }
+              else { diffColor = '#7F8C8D'; diffLabel = ' (정시)'; }
+            }
+            cells[6].innerHTML = '<span style="font-weight:600;color:' + diffColor + '">' + actual + '일' + diffLabel + '</span>';
+          } else {
+            cells[6].innerHTML = '<span style="color:var(--mu);font-size:10.5px">진행중</span>';
+          }
+        }
+        row.style.background = item.arrivalDate ? '#F0F9F4' : '#FFFBF0';
+      }
+      renderSampleSummary_BOS(data);
+    }
+  };
+  
+  window.deleteSampleEntry_BOS = function(id){
+    if(!confirm('이 샘플 의뢰 내역을 삭제하시겠습니까?')) return;
+    var data = loadSample().filter(function(s){ return s.id !== id; });
+    saveSample(data);
+    renderSampleTable_BOS();
+  };
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🤝 아웃소싱
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  window.renderOutsourceTable_BOS = function(){
+    var tbody = document.getElementById('outsource-tbody-bos');
+    if(!tbody) return;
+    var data = loadOutsource();
+    var filter = loadOutsourceFilter();
+    
+    // 필터 칩 렌더
+    var filterEl = document.getElementById('outsource-cat-filter-bos');
+    if(filterEl){
+      filterEl.innerHTML = OUTSOURCE_CATS.map(function(c){
+        var count = c.key === '전체' ? data.length : data.filter(function(d){ return d.category === c.key; }).length;
+        var active = filter === c.key;
+        return '<button onclick="setOutsourceFilter_BOS(\'' + c.key + '\')" style="background:' + (active?c.color:'#fff') + ';color:' + (active?'#fff':'var(--tx)') + ';border:1px solid ' + c.color + ';border-radius:14px;padding:3px 10px;font-size:10.5px;cursor:pointer;font-weight:' + (active?'700':'500') + '">'
+          + c.emoji + ' ' + c.key + ' <span style="opacity:.8">(' + count + ')</span></button>';
+      }).join('');
+    }
+    
+    var filtered = filter === '전체' ? data : data.filter(function(d){ return d.category === filter; });
+    
+    if(filtered.length === 0){
+      var msg = data.length === 0 
+        ? '아웃소싱 내역이 없습니다. <b>＋ 아웃소싱 추가</b> 를 눌러 시작하세요.'
+        : '<b>' + filter + '</b> 카테고리에 해당하는 내역이 없습니다.';
+      tbody.innerHTML = '<tr><td colspan="9" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">' + msg + '</td></tr>';
+      renderOutsourceSummary_BOS(data);
+      return;
+    }
+    
+    tbody.innerHTML = filtered.map(function(o){
+      // 카테고리 select options
+      var catOptions = OUTSOURCE_CATS.filter(function(c){ return c.key !== '전체'; }).map(function(c){
+        return '<option value="' + c.key + '"' + (o.category === c.key ? ' selected' : '') + '>' + c.emoji + ' ' + c.key + '</option>';
+      }).join('');
+      
+      var catInfo = OUTSOURCE_CATS.find(function(c){ return c.key === o.category; }) || OUTSOURCE_CATS[0];
+      var rowBg = o.deliveryDate ? '#F0F9F4' : '#FFFBF0';
+      
+      return '<tr style="border-bottom:1px solid var(--bd);background:' + rowBg + ';border-left:3px solid ' + catInfo.color + '" data-outsource-id="' + o.id + '">'
+        + '<td style="padding:5px 6px"><select onchange="updateOutsourceField_BOS(\'' + o.id + '\',\'category\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff;cursor:pointer">' + catOptions + '</select></td>'
+        + '<td style="padding:5px 6px"><input value="' + escAttr(o.vendor) + '" placeholder="업체명" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'vendor\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;font-weight:500;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        + '<td style="padding:5px 6px"><input value="' + escAttr(o.contact) + '" placeholder="담당자" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'contact\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        + '<td style="padding:5px 6px"><input type="date" value="' + escAttr(o.requestDate) + '" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'requestDate\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff"></td>'
+        + '<td style="padding:5px 6px"><textarea placeholder="예: 영상 2분 × 3편, 의뢰서 첨부" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'proposal\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11px;background:transparent;resize:vertical;min-height:28px;font-family:inherit" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">' + escHtml(o.proposal) + '</textarea></td>'
+        + '<td style="padding:5px 6px"><input type="date" value="' + escAttr(o.deliveryDate) + '" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'deliveryDate\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff"></td>'
+        + '<td style="padding:5px 6px;text-align:right"><input type="number" value="' + escAttr(o.cost) + '" placeholder="0" min="0" step="1000" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'cost\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11px;background:transparent;text-align:right;font-family:\'Roboto Mono\',monospace" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        + '<td style="padding:5px 6px"><textarea placeholder="실제 받은 결과물 / 링크 / 코멘트" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'result\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11px;background:transparent;resize:vertical;min-height:28px;font-family:inherit" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">' + escHtml(o.result) + '</textarea></td>'
+        + '<td style="padding:5px 4px;text-align:center"><button onclick="deleteOutsourceEntry_BOS(\'' + o.id + '\')" title="삭제" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:13px;padding:4px 6px">✕</button></td>'
+        + '</tr>';
+    }).join('');
+    
+    renderOutsourceSummary_BOS(data);
+  };
+  
+  function renderOutsourceSummary_BOS(data){
+    var box = document.getElementById('outsource-summary-bos');
+    if(!box) return;
+    var total = data.length;
+    var completed = data.filter(function(o){ return o.deliveryDate; }).length;
+    var ongoing = total - completed;
+    var totalCost = data.reduce(function(s, o){ return s + (parseInt(o.cost)||0); }, 0);
+    var summaries = [
+      {label:'전체 의뢰', value: total + '건', color:'#3498DB', bg:'#EBF5FB'},
+      {label:'진행 중',   value: ongoing + '건', color:'#E67E22', bg:'#FEF5E7'},
+      {label:'완료',      value: completed + '건', color:'#27AE60', bg:'#E8F8EF'},
+      {label:'총 비용',   value: fmtNumber(totalCost) + '원', color:'#7A4AA8', bg:'#F4ECF7'}
+    ];
+    box.innerHTML = summaries.map(function(s){
+      return '<div style="background:' + s.bg + ';border-radius:8px;padding:11px 14px;border-left:3px solid ' + s.color + '">'
+        + '<div style="font-size:10px;color:var(--mu);margin-bottom:4px;font-weight:600">' + s.label + '</div>'
+        + '<div style="font-size:18px;font-weight:700;color:' + s.color + ';font-family:\'Roboto Mono\',monospace">' + s.value + '</div>'
+        + '</div>';
+    }).join('');
+  }
+  
+  window.addOutsourceEntry_BOS = function(){
+    var data = loadOutsource();
+    data.unshift({
+      id: 'out_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
+      category: '부자재',
+      vendor: '',
+      contact: '',
+      requestDate: new Date().toISOString().slice(0,10),
+      proposal: '',
+      deliveryDate: '',
+      cost: '',
+      result: ''
+    });
+    saveOutsource(data);
+    renderOutsourceTable_BOS();
+  };
+  
+  window.updateOutsourceField_BOS = function(id, key, val){
+    var data = loadOutsource();
+    var item = data.find(function(o){ return o.id === id; });
+    if(!item) return;
+    item[key] = val;
+    saveOutsource(data);
+    // 카테고리 변경 시 색 변경 & 도착일 변경 시 행 색 변경 - 전체 재렌더 없이
+    if(key === 'category'){
+      var row = document.querySelector('[data-outsource-id="' + id + '"]');
+      if(row){
+        var catInfo = OUTSOURCE_CATS.find(function(c){ return c.key === val; }) || OUTSOURCE_CATS[0];
+        row.style.borderLeft = '3px solid ' + catInfo.color;
+      }
+      renderOutsourceSummary_BOS(data);
+      // 필터 칩의 카운트 갱신
+      var filterEl = document.getElementById('outsource-cat-filter-bos');
+      var curFilter = loadOutsourceFilter();
+      if(filterEl){
+        filterEl.innerHTML = OUTSOURCE_CATS.map(function(c){
+          var count = c.key === '전체' ? data.length : data.filter(function(d){ return d.category === c.key; }).length;
+          var active = curFilter === c.key;
+          return '<button onclick="setOutsourceFilter_BOS(\'' + c.key + '\')" style="background:' + (active?c.color:'#fff') + ';color:' + (active?'#fff':'var(--tx)') + ';border:1px solid ' + c.color + ';border-radius:14px;padding:3px 10px;font-size:10.5px;cursor:pointer;font-weight:' + (active?'700':'500') + '">'
+            + c.emoji + ' ' + c.key + ' <span style="opacity:.8">(' + count + ')</span></button>';
+        }).join('');
+      }
+    } else if(key === 'deliveryDate'){
+      var row2 = document.querySelector('[data-outsource-id="' + id + '"]');
+      if(row2) row2.style.background = val ? '#F0F9F4' : '#FFFBF0';
+      renderOutsourceSummary_BOS(data);
+    } else if(key === 'cost'){
+      renderOutsourceSummary_BOS(data);
+    }
+  };
+  
+  window.setOutsourceFilter_BOS = function(catKey){
+    saveOutsourceFilter(catKey);
+    renderOutsourceTable_BOS();
+  };
+  
+  window.deleteOutsourceEntry_BOS = function(id){
+    if(!confirm('이 아웃소싱 내역을 삭제하시겠습니까?')) return;
+    var data = loadOutsource().filter(function(o){ return o.id !== id; });
+    saveOutsource(data);
+    renderOutsourceTable_BOS();
+  };
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 📅 연도 라벨 자동 갱신 (오늘 기준 동적)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  window.updateCalYearLabels_BOS = function(){
+    var y = new Date().getFullYear();
+    var map = {
+      'prev2': y - 2,
+      'prev1': y - 1,
+      'single': y,
+      'next1': y + 1,
+      'next2': y + 2
+    };
+    Object.keys(map).forEach(function(v){
+      var btn = document.querySelector('#cal-year-nav-bos button[data-view="' + v + '"]');
+      if(btn) btn.textContent = String(map[v]);
+    });
+    // 과거/미래/전체 버튼은 툴팁만 업데이트
+    var pastBtn = document.querySelector('#cal-year-nav-bos button[data-view="past"]');
+    if(pastBtn) pastBtn.title = '과거 3년 (' + (y-2) + '~' + y + ')';
+    var futureBtn = document.querySelector('#cal-year-nav-bos button[data-view="future"]');
+    if(futureBtn) futureBtn.title = '미래 3년 (' + y + '~' + (y+2) + ')';
+    var allBtn = document.querySelector('#cal-year-nav-bos button[data-view="all"]');
+    if(allBtn) allBtn.title = '전체 5년 (' + (y-2) + '~' + (y+2) + ')';
+  };
+  
+  // 페이지 로드 + showTab('t20') 호출 시 자동
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', updateCalYearLabels_BOS);
+  } else {
+    setTimeout(updateCalYearLabels_BOS, 100);
+  }
+  
+  // showTab 래핑 - t20 진입 시 연도 라벨 갱신 + 서브탭 상태 복원
+  var _prevShowTab2 = window.showTab;
+  if(typeof _prevShowTab2 === 'function' && !window.showTab._t20Wrapped){
+    var origShowTab = window.showTab;
+    window.showTab = function(){
+      origShowTab.apply(this, arguments);
+      if(arguments[0] === 't20'){
+        setTimeout(function(){
+          updateCalYearLabels_BOS();
+          // 현재 활성 서브탭에 따라 렌더
+          var samplePane = document.getElementById('t20-sub-sample');
+          var outsourcePane = document.getElementById('t20-sub-outsource');
+          if(samplePane && samplePane.style.display !== 'none') renderSampleTable_BOS();
+          if(outsourcePane && outsourcePane.style.display !== 'none') renderOutsourceTable_BOS();
+        }, 50);
+      }
+    };
+    window.showTab._t20Wrapped = true;
+  }
+  
+  console.log('[Cal Subtabs] 샘플 + 아웃소싱 + 연도 동적 준비됨');
+})();
+</script>
+
+<!-- ━━━ 📅 캘린더 셀 오버플로 + 카드↔캘린더 하이라이트 ━━━ -->
+<style id="cal-highlight-style">
+/* 셀 배지 영역 - 오버플로 제한 (max 2줄 보장) */
+.cal-cell-badges-bos{
+  max-height:26px;
+  overflow:hidden;
+  position:relative;
+}
+
+/* +N 오버플로 배지 */
+.cal-cell-overflow-bos{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:14px;
+  height:12px;
+  padding:0 3px;
+  border-radius:2px;
+  font-size:8px;
+  font-weight:700;
+  color:#fff;
+  background:rgba(0,0,0,.65);
+  line-height:1;
+  flex-shrink:0;
+  cursor:default;
+}
+
+/* ━━ 하이라이트 모드: body 에 cal-highlighting 클래스 시 ━━ */
+/* 모든 배지를 흐리게 만들고, .cal-item-highlight 만 강조 */
+body.cal-highlighting .cal-cell-week-bos{
+  opacity:0.18;
+  transition:opacity .15s, transform .2s, box-shadow .2s;
+}
+body.cal-highlighting .cal-cell-week-bos.cal-item-highlight{
+  opacity:1;
+  transform:scale(1.5);
+  outline:2px solid #FFD54F;
+  z-index:20;
+  box-shadow:0 0 10px rgba(255,167,38,.7), 0 0 0 1px #FF8F00 inset;
+  position:relative;
+  animation:cal-pulse-bos 1.2s ease-in-out infinite;
+}
+@keyframes cal-pulse-bos{
+  0%, 100% { box-shadow: 0 0 10px rgba(255,167,38,.7), 0 0 0 1px #FF8F00 inset; }
+  50% { box-shadow: 0 0 18px rgba(255,167,38,1), 0 0 0 1px #FF6F00 inset; }
+}
+
+/* 항목 있는 셀(.has-items) 자체에 살짝 강조 */
+body.cal-highlighting .cal-cell-bos.cal-cell-has-highlighted{
+  background:#FFF8E1 !important;
+  border-color:#FFB300 !important;
+  box-shadow:0 2px 6px rgba(255,167,38,.2);
+  z-index:5;
+}
+
+/* 오버플로 배지도 흐리게 */
+body.cal-highlighting .cal-cell-overflow-bos{
+  opacity:0.18;
+  transition:opacity .15s;
+}
+
+/* 카드도 흐리게 - 호버한 카드만 강조 */
+body.cal-highlighting .cal-item-card-bos{
+  opacity:0.4;
+  transition:opacity .15s, box-shadow .2s, transform .2s;
+}
+body.cal-highlighting .cal-item-card-bos:hover{
+  opacity:1;
+  box-shadow:0 4px 14px rgba(255,167,38,.3);
+  border-color:#FFB300;
+}
+</style>
+
+<script id="cal-highlight-script">
+(function(){
+  // ━━ 카드 호버 시 캘린더에서 해당 항목 강조 ━━
+  window.highlightCalItem_BOS = function(itemId){
+    if(!itemId) return;
+    document.body.classList.add('cal-highlighting');
+    // 모든 배지에서 highlight 클래스 제거 후 해당 id만 추가
+    document.querySelectorAll('.cal-cell-week-bos').forEach(function(b){
+      var match = b.getAttribute('data-cal-badge-id') === itemId;
+      b.classList.toggle('cal-item-highlight', match);
+      // 부모 셀도 강조
+      if(match){
+        var cell = b.closest('.cal-cell-bos');
+        if(cell) cell.classList.add('cal-cell-has-highlighted');
+      }
+    });
+  };
+  
+  window.clearCalHighlight_BOS = function(){
+    document.body.classList.remove('cal-highlighting');
+    document.querySelectorAll('.cal-item-highlight').forEach(function(b){
+      b.classList.remove('cal-item-highlight');
+    });
+    document.querySelectorAll('.cal-cell-has-highlighted').forEach(function(c){
+      c.classList.remove('cal-cell-has-highlighted');
+    });
+  };
+  
+  console.log('[Cal] 카드↔캘린더 하이라이트 준비됨');
+})();
+</script>
+
+<!-- ━━━ 🔍 BrandOSKIT Gist 자동 검색 헬퍼 ━━━ -->
+<script id="gist-auto-find-script">
+(function(){
+  // 사용자의 모든 Gist 중 brandoskit-data.json 파일 가진 것 찾기
+  window.findBrandoskitGist_BOS = function(){
+    var token = (typeof syncSettings !== 'undefined' && syncSettings.gistToken) || '';
+    if(!token){
+      return Promise.reject(new Error('Token이 설정되지 않았습니다'));
+    }
+    console.log('[Sync] GitHub API에서 Gist 목록 가져오는 중...');
+    
+    return fetch('https://api.github.com/gists?per_page=100', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'token ' + token,
+        'Accept': 'application/vnd.github+json'
+      },
+      cache: 'no-store'
+    }).then(function(r){
+      if(!r.ok){
+        return r.text().then(function(text){
+          throw new Error('HTTP ' + r.status + ': ' + (text||'').slice(0,150));
+        });
+      }
+      return r.json();
+    }).then(function(gists){
+      if(!Array.isArray(gists)){
+        throw new Error('잘못된 응답 형식');
+      }
+      console.log('[Sync] Gist 목록 수신:', gists.length + '개');
+      
+      // 1순위: brandoskit-data.json 파일이 있는 Gist
+      for(var i = 0; i < gists.length; i++){
+        var g = gists[i];
+        if(g.files && g.files['brandoskit-data.json']){
+          console.log('[Sync] BrandOSKIT Gist 발견:', g.id, '- description:', g.description);
+          return g.id;
+        }
+      }
+      
+      // 2순위: description 에 "BrandOS" 또는 "epitect" 포함된 Gist
+      for(var j = 0; j < gists.length; j++){
+        var g2 = gists[j];
+        var desc = (g2.description || '').toLowerCase();
+        if(desc.indexOf('brandos') >= 0 || desc.indexOf('epitect') >= 0){
+          console.log('[Sync] description 매칭 Gist:', g2.id, '-', g2.description);
+          return g2.id;
+        }
+      }
+      
+      // 3순위: 파일명에 brand 또는 epitect 들어간 Gist
+      for(var k = 0; k < gists.length; k++){
+        var g3 = gists[k];
+        if(g3.files){
+          var fnames = Object.keys(g3.files);
+          for(var f = 0; f < fnames.length; f++){
+            var fn = fnames[f].toLowerCase();
+            if(fn.indexOf('brand') >= 0 || fn.indexOf('epitect') >= 0){
+              console.log('[Sync] 파일명 매칭 Gist:', g3.id, '- file:', fnames[f]);
+              return g3.id;
+            }
+          }
+        }
+      }
+      
+      return null;  // 못 찾음
+    });
+  };
+  
+  // 동기화 모달에서 명시적으로 자동 찾기 실행
+  window.autoFindBrandoskitGist_BOS = function(){
+    if(typeof syncAutoApplyInputs === 'function') syncAutoApplyInputs();
+    
+    if(!syncSettings.gistToken){
+      syncToast('먼저 GitHub Token을 입력하고 [설정 저장]을 누르세요', 'warn');
+      return;
+    }
+    
+    syncToast('🔍 GitHub Gist 목록에서 BrandOSKIT 검색 중...', 'info');
+    
+    findBrandoskitGist_BOS().then(function(gistId){
+      if(gistId){
+        syncSettings.gistId = gistId;
+        try {
+          localStorage.setItem('bos_sync_settings_v1', JSON.stringify(syncSettings));
+        } catch(e){}
+        
+        var inp = document.getElementById('sync-gist-id-input');
+        if(inp) inp.value = gistId;
+        if(typeof updateSyncStatus === 'function') updateSyncStatus();
+        
+        syncToast('✅ Gist 찾음! ID: ' + gistId + ' (자동 저장됨)', 'success');
+        console.log('[Sync] 자동 검색 완료. Gist ID 저장됨:', gistId);
+      } else {
+        syncToast('❌ BrandOSKIT 관련 Gist를 찾지 못했습니다. 먼저 [Gist로 푸시]를 누르거나 Gist ID를 직접 입력하세요.', 'error');
+      }
+    }).catch(function(err){
+      console.error('[Sync] 자동 검색 에러:', err);
+      var msg = err.message || String(err);
+      if(msg.indexOf('401') >= 0){
+        syncToast('❌ Token이 유효하지 않습니다. 다시 발급해주세요.', 'error');
+      } else if(msg.indexOf('403') >= 0){
+        syncToast('❌ Token 권한 부족 (gist 권한 필요)', 'error');
+      } else {
+        syncToast('❌ 검색 실패: ' + msg, 'error');
+      }
+    });
+  };
+  
+  console.log('[Sync] BrandOSKIT Gist 자동 검색 헬퍼 준비됨');
+})();
+</script>
+
+<!-- ━━━ 📹 광고기획 서브탭 (파워 컨텐츠 + 디스플레이 배너) ━━━ -->
+<script id="ad-subtab-script">
+(function(){
+  var LS_POWER = 'bos_power_content_v1';
+  var LS_BANNER = 'bos_display_banner_v1';
+  
+  // ━━ 데이터 ━━
+  function loadPower(){
+    try { var raw = localStorage.getItem(LS_POWER); return raw ? JSON.parse(raw) : []; }
+    catch(e){ return []; }
+  }
+  function savePower(arr){
+    try { localStorage.setItem(LS_POWER, JSON.stringify(arr)); if(typeof updateSaveTime==='function') updateSaveTime(); } catch(e){}
+  }
+  function loadBanner(){
+    try { var raw = localStorage.getItem(LS_BANNER); return raw ? JSON.parse(raw) : []; }
+    catch(e){ return []; }
+  }
+  function saveBanner(arr){
+    try { localStorage.setItem(LS_BANNER, JSON.stringify(arr)); if(typeof updateSaveTime==='function') updateSaveTime(); } catch(e){}
+  }
+  
+  function escAttr(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+  function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function fmtNum(n){ return (parseInt(n)||0).toLocaleString('ko-KR'); }
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 서브탭 전환
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  window.showAdSubTab = function(name){
+    var subs = ['meta', 'power', 'display'];
+    subs.forEach(function(s){
+      var btn = document.getElementById('t15-sub-' + s + '-btn');
+      var pane = document.getElementById('t15-sub-' + s);
+      if(btn) btn.classList.toggle('active', s === name);
+      if(pane) pane.style.display = (s === name) ? '' : 'none';
+    });
+    if(name === 'power') renderPowerContents_BOS();
+    if(name === 'display') renderDisplayBanners_BOS();
+  };
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 📝 파워 컨텐츠 (블로그 글)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  var PLATFORM_OPTS = ['네이버 블로그', '티스토리', '브런치', '인플루언서 협찬', '카페 게시글', '기타'];
+  var STATUS_OPTS = [
+    {key:'기획', color:'#9E9E9E'},
+    {key:'작성중', color:'#FF9800'},
+    {key:'검수', color:'#3498DB'},
+    {key:'발행 예정', color:'#7A4AA8'},
+    {key:'발행 완료', color:'#27AE60'}
+  ];
+  
+  window.renderPowerContents_BOS = function(){
+    var listEl = document.getElementById('power-content-list');
+    if(!listEl) return;
+    var data = loadPower();
+    
+    if(data.length === 0){
+      listEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--mu);font-size:12px;background:#FAFAF8;border-radius:8px;border:1px dashed var(--bd)">'
+        + '파워 컨텐츠 기획안이 없습니다.<br><br>'
+        + '<button class="btn btn-grn-bos" onclick="addPowerContent_BOS()">＋ 첫 컨텐츠 추가</button>'
+        + '</div>';
+      return;
+    }
+    
+    listEl.innerHTML = data.map(function(p, idx){
+      var statusInfo = STATUS_OPTS.find(function(s){ return s.key === p.status; }) || STATUS_OPTS[0];
+      var platformOpts = PLATFORM_OPTS.map(function(opt){
+        return '<option value="' + opt + '"' + (p.platform === opt ? ' selected' : '') + '>' + opt + '</option>';
+      }).join('');
+      var statusOptsHtml = STATUS_OPTS.map(function(s){
+        return '<option value="' + s.key + '"' + (p.status === s.key ? ' selected' : '') + '>● ' + s.key + '</option>';
+      }).join('');
+      
+      return '<div class="card" style="padding:16px;border-left:4px solid ' + statusInfo.color + '">'
+        // 헤더: 제목 + 상태 + 삭제
+        + '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">'
+          + '<input value="' + escAttr(p.title) + '" placeholder="컨텐츠 제목 (예: 출산 후 기미 관리법 7가지)" oninput="updatePowerField_BOS(\'' + p.id + '\',\'title\',this.value)" style="flex:1;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-weight:600">'
+          + '<select onchange="updatePowerField_BOS(\'' + p.id + '\',\'status\',this.value);renderPowerContents_BOS()" style="padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;background:#fff;color:' + statusInfo.color + ';font-weight:700;cursor:pointer">' + statusOptsHtml + '</select>'
+          + '<button onclick="deletePowerContent_BOS(\'' + p.id + '\')" title="삭제" style="background:none;border:1px solid var(--bd);border-radius:6px;padding:6px 10px;font-size:12px;cursor:pointer;color:#C0392B">✕</button>'
+        + '</div>'
+        // 메타 정보 그리드
+        + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:10px">'
+          + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">📌 플랫폼</label>'
+            + '<select onchange="updatePowerField_BOS(\'' + p.id + '\',\'platform\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;background:#fff">' + platformOpts + '</select></div>'
+          + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">✍️ 작성자/계정</label>'
+            + '<input value="' + escAttr(p.author) + '" placeholder="블로거 또는 자체 계정" oninput="updatePowerField_BOS(\'' + p.id + '\',\'author\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px"></div>'
+          + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">📅 발행 예정일</label>'
+            + '<input type="date" value="' + escAttr(p.publishDate) + '" oninput="updatePowerField_BOS(\'' + p.id + '\',\'publishDate\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11px"></div>'
+          + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">💰 비용 (원)</label>'
+            + '<input type="number" value="' + escAttr(p.cost) + '" placeholder="0" min="0" step="10000" oninput="updatePowerField_BOS(\'' + p.id + '\',\'cost\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;font-family:\'Roboto Mono\',monospace;text-align:right"></div>'
+        + '</div>'
+        // 키워드
+        + '<div style="margin-bottom:10px">'
+          + '<label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">🔑 타겟 키워드 (쉼표 구분 · 네이버 SEO)</label>'
+          + '<input value="' + escAttr(p.keywords) + '" placeholder="예: 출산 후 기미, 기미크림 추천, 임산부 기미" oninput="updatePowerField_BOS(\'' + p.id + '\',\'keywords\',this.value)" style="width:100%;padding:6px 9px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;font-family:\'Roboto Mono\',monospace">'
+        + '</div>'
+        // 본문 구조 - 4단 입력
+        + '<div style="margin-bottom:10px">'
+          + '<label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:5px">📋 본문 구조 (도입 → 문제 → 해결 → CTA)</label>'
+          + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">'
+            + '<textarea placeholder="① 도입 — 독자 공감 후크 (1-2줄)" oninput="updatePowerField_BOS(\'' + p.id + '\',\'intro\',this.value)" style="padding:6px 9px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;font-family:inherit;resize:vertical;min-height:50px">' + escHtml(p.intro) + '</textarea>'
+            + '<textarea placeholder="② 문제 제기 — 독자의 페인 포인트" oninput="updatePowerField_BOS(\'' + p.id + '\',\'problem\',this.value)" style="padding:6px 9px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;font-family:inherit;resize:vertical;min-height:50px">' + escHtml(p.problem) + '</textarea>'
+            + '<textarea placeholder="③ 해결책 — 우리 제품/방법 자연스럽게 노출" oninput="updatePowerField_BOS(\'' + p.id + '\',\'solution\',this.value)" style="padding:6px 9px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;font-family:inherit;resize:vertical;min-height:50px">' + escHtml(p.solution) + '</textarea>'
+            + '<textarea placeholder="④ CTA — 행동 유도 (구매 링크, 후기 등)" oninput="updatePowerField_BOS(\'' + p.id + '\',\'cta\',this.value)" style="padding:6px 9px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;font-family:inherit;resize:vertical;min-height:50px">' + escHtml(p.cta) + '</textarea>'
+          + '</div>'
+        + '</div>'
+        // URL + 메모
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+          + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">🔗 발행 URL (완료 시)</label>'
+            + '<input value="' + escAttr(p.url) + '" placeholder="https://blog.naver.com/..." oninput="updatePowerField_BOS(\'' + p.id + '\',\'url\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11px;font-family:\'Roboto Mono\',monospace"></div>'
+          + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">📝 메모</label>'
+            + '<input value="' + escAttr(p.memo) + '" placeholder="참고사항" oninput="updatePowerField_BOS(\'' + p.id + '\',\'memo\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11px"></div>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+  };
+  
+  window.addPowerContent_BOS = function(){
+    var data = loadPower();
+    data.unshift({
+      id: 'pwr_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
+      title: '',
+      status: '기획',
+      platform: '네이버 블로그',
+      author: '',
+      publishDate: '',
+      cost: '',
+      keywords: '',
+      intro: '',
+      problem: '',
+      solution: '',
+      cta: '',
+      url: '',
+      memo: ''
+    });
+    savePower(data);
+    renderPowerContents_BOS();
+  };
+  
+  window.updatePowerField_BOS = function(id, key, val){
+    var data = loadPower();
+    var item = data.find(function(p){ return p.id === id; });
+    if(!item) return;
+    item[key] = val;
+    savePower(data);
+  };
+  
+  window.deletePowerContent_BOS = function(id){
+    if(!confirm('이 파워 컨텐츠 기획을 삭제하시겠습니까?')) return;
+    var data = loadPower().filter(function(p){ return p.id !== id; });
+    savePower(data);
+    renderPowerContents_BOS();
+  };
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🖼 디스플레이 이미지 배너
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  var CHANNEL_OPTS = ['네이버 GFA', '카카오 모먼트', '구글 디스플레이(GDN)', 'Meta(인스타·페북)', '유튜브 디스플레이', 'DSP / RTB', '기타'];
+  var SIZE_PRESETS = ['600 × 600 (정방형)', '1200 × 628 (와이드)', '1080 × 1080 (인스타)', '1080 × 1350 (인스타 세로)', '300 × 250 (사각)', '728 × 90 (가로 띠)', '320 × 50 (모바일 띠)', '160 × 600 (세로)', '커스텀'];
+  var BANNER_STATUS = [
+    {key:'기획', color:'#9E9E9E'},
+    {key:'디자인 의뢰', color:'#FF9800'},
+    {key:'검수', color:'#3498DB'},
+    {key:'송출 예정', color:'#7A4AA8'},
+    {key:'송출 중', color:'#27AE60'},
+    {key:'종료', color:'#7F8C8D'}
+  ];
+  
+  window.renderDisplayBanners_BOS = function(){
+    var listEl = document.getElementById('display-banner-list');
+    if(!listEl) return;
+    var data = loadBanner();
+    
+    if(data.length === 0){
+      listEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--mu);font-size:12px;background:#FAFAF8;border-radius:8px;border:1px dashed var(--bd)">'
+        + '디스플레이 배너 기획이 없습니다.<br><br>'
+        + '<button class="btn btn-grn-bos" onclick="addDisplayBanner_BOS()">＋ 첫 배너 추가</button>'
+        + '</div>';
+      return;
+    }
+    
+    listEl.innerHTML = data.map(function(b){
+      var statusInfo = BANNER_STATUS.find(function(s){ return s.key === b.status; }) || BANNER_STATUS[0];
+      var channelOpts = CHANNEL_OPTS.map(function(c){
+        return '<option value="' + c + '"' + (b.channel === c ? ' selected' : '') + '>' + c + '</option>';
+      }).join('');
+      var sizeOpts = SIZE_PRESETS.map(function(s){
+        return '<option value="' + s + '"' + (b.size === s ? ' selected' : '') + '>' + s + '</option>';
+      }).join('');
+      var statusOpts = BANNER_STATUS.map(function(s){
+        return '<option value="' + s.key + '"' + (b.status === s.key ? ' selected' : '') + '>● ' + s.key + '</option>';
+      }).join('');
+      
+      // 이미지 미리보기
+      var imgPreview = '';
+      if(b.imageUrl){
+        imgPreview = '<img src="' + escAttr(b.imageUrl) + '" style="max-width:100%;max-height:240px;border:1px solid var(--bd);border-radius:6px;display:block;object-fit:contain;background:#FAFAF8" onerror="this.style.display=\'none\'">';
+      } else {
+        imgPreview = '<div style="padding:30px;text-align:center;background:#FAFAF8;border:1px dashed var(--bd);border-radius:6px;color:var(--mu);font-size:11px">이미지 URL 입력 시 미리보기 표시</div>';
+      }
+      
+      return '<div class="card" style="padding:16px;border-left:4px solid ' + statusInfo.color + '">'
+        // 헤더
+        + '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">'
+          + '<input value="' + escAttr(b.name) + '" placeholder="배너명 (예: 6월 출산 후 기미 캠페인 메인 비주얼)" oninput="updateBannerField_BOS(\'' + b.id + '\',\'name\',this.value)" style="flex:1;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-weight:600">'
+          + '<select onchange="updateBannerField_BOS(\'' + b.id + '\',\'status\',this.value);renderDisplayBanners_BOS()" style="padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;background:#fff;color:' + statusInfo.color + ';font-weight:700;cursor:pointer">' + statusOpts + '</select>'
+          + '<button onclick="deleteDisplayBanner_BOS(\'' + b.id + '\')" title="삭제" style="background:none;border:1px solid var(--bd);border-radius:6px;padding:6px 10px;font-size:12px;cursor:pointer;color:#C0392B">✕</button>'
+        + '</div>'
+        // 메타 정보 그리드
+        + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:10px">'
+          + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">📺 송출 채널</label>'
+            + '<select onchange="updateBannerField_BOS(\'' + b.id + '\',\'channel\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;background:#fff">' + channelOpts + '</select></div>'
+          + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">📐 사이즈</label>'
+            + '<select onchange="updateBannerField_BOS(\'' + b.id + '\',\'size\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;background:#fff">' + sizeOpts + '</select></div>'
+          + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">🎨 디자이너</label>'
+            + '<input value="' + escAttr(b.designer) + '" placeholder="외주/자체" oninput="updateBannerField_BOS(\'' + b.id + '\',\'designer\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px"></div>'
+          + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">💰 제작비 (원)</label>'
+            + '<input type="number" value="' + escAttr(b.cost) + '" placeholder="0" min="0" step="10000" oninput="updateBannerField_BOS(\'' + b.id + '\',\'cost\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;font-family:\'Roboto Mono\',monospace;text-align:right"></div>'
+        + '</div>'
+        // 일정 그리드
+        + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">'
+          + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">📅 디자인 의뢰일</label>'
+            + '<input type="date" value="' + escAttr(b.designStart) + '" oninput="updateBannerField_BOS(\'' + b.id + '\',\'designStart\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11px"></div>'
+          + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">📅 송출 시작</label>'
+            + '<input type="date" value="' + escAttr(b.startDate) + '" oninput="updateBannerField_BOS(\'' + b.id + '\',\'startDate\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11px"></div>'
+          + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">📅 송출 종료</label>'
+            + '<input type="date" value="' + escAttr(b.endDate) + '" oninput="updateBannerField_BOS(\'' + b.id + '\',\'endDate\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11px"></div>'
+        + '</div>'
+        // 카피 영역 (메인/서브/CTA)
+        + '<div style="margin-bottom:10px">'
+          + '<label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:5px">📝 카피</label>'
+          + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">'
+            + '<textarea placeholder="① 메인 카피 (헤드라인)" oninput="updateBannerField_BOS(\'' + b.id + '\',\'mainCopy\',this.value)" style="padding:6px 9px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;font-family:inherit;resize:vertical;min-height:50px;font-weight:600">' + escHtml(b.mainCopy) + '</textarea>'
+            + '<textarea placeholder="② 서브 카피 (보조 문구)" oninput="updateBannerField_BOS(\'' + b.id + '\',\'subCopy\',this.value)" style="padding:6px 9px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;font-family:inherit;resize:vertical;min-height:50px">' + escHtml(b.subCopy) + '</textarea>'
+            + '<textarea placeholder="③ CTA 문구 (예: 자세히 보기, 30% 받기)" oninput="updateBannerField_BOS(\'' + b.id + '\',\'ctaText\',this.value)" style="padding:6px 9px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;font-family:inherit;resize:vertical;min-height:50px">' + escHtml(b.ctaText) + '</textarea>'
+          + '</div>'
+        + '</div>'
+        // 이미지 URL + 미리보기
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start">'
+          + '<div>'
+            + '<label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">🖼 이미지 URL (디자인 시안 / 최종 시안)</label>'
+            + '<input value="' + escAttr(b.imageUrl) + '" placeholder="https://gi.esmplus.com/... 또는 imgur 등" oninput="updateBannerField_BOS(\'' + b.id + '\',\'imageUrl\',this.value);renderDisplayBanners_BOS()" style="width:100%;padding:6px 9px;border:1px solid var(--bd);border-radius:4px;font-size:11px;font-family:\'Roboto Mono\',monospace;margin-bottom:6px">'
+            + '<label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">🔗 클릭 시 이동 URL</label>'
+            + '<input value="' + escAttr(b.linkUrl) + '" placeholder="랜딩 페이지 URL" oninput="updateBannerField_BOS(\'' + b.id + '\',\'linkUrl\',this.value)" style="width:100%;padding:6px 9px;border:1px solid var(--bd);border-radius:4px;font-size:11px;font-family:\'Roboto Mono\',monospace;margin-bottom:6px">'
+            + '<label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">📝 메모</label>'
+            + '<textarea placeholder="A/B 테스트 가설, 타겟 페르소나 등" oninput="updateBannerField_BOS(\'' + b.id + '\',\'memo\',this.value)" style="width:100%;padding:6px 9px;border:1px solid var(--bd);border-radius:4px;font-size:11.5px;font-family:inherit;resize:vertical;min-height:60px">' + escHtml(b.memo) + '</textarea>'
+          + '</div>'
+          + '<div>'
+            + '<label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">미리보기</label>'
+            + imgPreview
+          + '</div>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+  };
+  
+  window.addDisplayBanner_BOS = function(){
+    var data = loadBanner();
+    data.unshift({
+      id: 'bnr_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
+      name: '',
+      status: '기획',
+      channel: '네이버 GFA',
+      size: '1200 × 628 (와이드)',
+      designer: '',
+      cost: '',
+      designStart: '',
+      startDate: '',
+      endDate: '',
+      mainCopy: '',
+      subCopy: '',
+      ctaText: '',
+      imageUrl: '',
+      linkUrl: '',
+      memo: ''
+    });
+    saveBanner(data);
+    renderDisplayBanners_BOS();
+  };
+  
+  window.updateBannerField_BOS = function(id, key, val){
+    var data = loadBanner();
+    var item = data.find(function(b){ return b.id === id; });
+    if(!item) return;
+    item[key] = val;
+    saveBanner(data);
+  };
+  
+  window.deleteDisplayBanner_BOS = function(id){
+    if(!confirm('이 디스플레이 배너 기획을 삭제하시겠습니까?')) return;
+    var data = loadBanner().filter(function(b){ return b.id !== id; });
+    saveBanner(data);
+    renderDisplayBanners_BOS();
+  };
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // showTab 래핑 - t15 진입 시 현재 활성 서브탭 렌더
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  var _origShowTab15 = window.showTab;
+  if(typeof _origShowTab15 === 'function' && !window.showTab._t15Wrapped){
+    var prevST = window.showTab;
+    window.showTab = function(){
+      prevST.apply(this, arguments);
+      if(arguments[0] === 't15'){
+        setTimeout(function(){
+          var powerPane = document.getElementById('t15-sub-power');
+          var displayPane = document.getElementById('t15-sub-display');
+          if(powerPane && powerPane.style.display !== 'none') renderPowerContents_BOS();
+          if(displayPane && displayPane.style.display !== 'none') renderDisplayBanners_BOS();
+        }, 50);
+      }
+    };
+    window.showTab._t15Wrapped = true;
+  }
+  
+  console.log('[Ad Subtabs] 파워 컨텐츠 + 디스플레이 배너 준비됨');
 })();
 </script>
 </body>
