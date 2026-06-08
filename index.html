@@ -18163,5 +18163,82 @@ body.cal-highlighting .cal-item-card-bos:hover{
   console.log('[Ad Subtabs] 파워 컨텐츠 + 디스플레이 배너 준비됨');
 })();
 </script>
+
+<!-- ━━━ ⌨️ ESC 키로 모달 닫기 ━━━ -->
+<script id="esc-close-modal-script">
+(function(){
+  // 모달 우선순위 - 위에 떠 있는 것부터 (z-index 큰 순)
+  // pwd-gate는 제외 (비밀번호 보호)
+  var MODAL_CONFIGS = [
+    // [id, close 함수명 (없으면 display:none)]
+    ['cal-color-palette-modal',  'closeCalColorPaletteModal_BOS'],  // z 99999
+    ['info-image-zoom',           null],                              // z 9100
+    ['gist-token-guide-modal',    null],                              // z 9100
+    ['bos-cal-modal',             'closeCalModal_BOS'],               // z 9000
+    ['info-storage-modal',        'closeInfoStorageModal'],           // z 9000
+    ['sync-modal',                'closeSyncModal'],                  // z 9000
+    ['brandModal',                'closeBrandModal'],                 // 경쟁사
+    ['rev-ai-modal',              null],                              // 리뷰 AI
+    ['persona-ai-modal',          null],                              // 페르소나 AI
+    ['idea-ai-modal',             null]                               // 아이디어 AI
+  ];
+  
+  function isModalVisible(modal){
+    if(!modal) return false;
+    // inline style 의 display 가 'none' 이 아니거나 'flex'/'block' 같은 값
+    var inlineDisplay = modal.style.display;
+    if(inlineDisplay === 'none' || inlineDisplay === '') return false;
+    // computed style 도 확인
+    var computed = getComputedStyle(modal);
+    if(computed.display === 'none') return false;
+    if(computed.visibility === 'hidden') return false;
+    return true;
+  }
+  
+  function closeModal(config){
+    var id = config[0];
+    var fnName = config[1];
+    var modal = document.getElementById(id);
+    if(!modal) return false;
+    
+    // close 함수 우선 호출
+    if(fnName && typeof window[fnName] === 'function'){
+      try {
+        window[fnName]();
+        return true;
+      } catch(e){
+        console.warn('[ESC] close 함수 에러:', fnName, e);
+      }
+    }
+    
+    // 폴백: display:none 직접 설정
+    modal.style.display = 'none';
+    return true;
+  }
+  
+  document.addEventListener('keydown', function(e){
+    if(e.key !== 'Escape') return;
+    
+    // 텍스트 입력 중에 IME 조합 중이면 ESC 무시 (한글 입력기)
+    if(e.isComposing) return;
+    
+    // 가장 위에 떠 있는 모달 1개만 닫기
+    for(var i = 0; i < MODAL_CONFIGS.length; i++){
+      var config = MODAL_CONFIGS[i];
+      var modal = document.getElementById(config[0]);
+      if(isModalVisible(modal)){
+        if(closeModal(config)){
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('[ESC] 모달 닫음:', config[0]);
+          return;
+        }
+      }
+    }
+  }, true);  // capture phase - 더 우선
+  
+  console.log('[ESC] 모달 닫기 핸들러 준비됨');
+})();
+</script>
 </body>
 </html>
