@@ -537,6 +537,22 @@ body.edit-mode-on .tab-btn .tab-name-edit{
  body.mobile-nav-collapsed .hub-top-actions{display:none !important}
  /* 접힘 상태에서 nav-brand 의 border-bottom 제거 (선이 떠 있는 느낌 방지) */
  body.mobile-nav-collapsed .nav-brand{border-bottom:none}
+
+/* ━━ PC 메뉴바 토글 (>768px 에서만 동작) ━━ */
+@media (min-width:769px){
+  /* PC에서 토글 버튼 보임 */
+  #pc-nav-toggle{display:inline-flex !important;align-items:center;justify-content:center}
+  #pc-nav-toggle:hover{background:rgba(255,255,255,.15) !important;color:#fff !important}
+  /* 접힌 상태: 탭 영역만 숨김 (브랜드명/액션 영역은 유지) */
+  body.pc-nav-collapsed .nav-tabs-wrap{display:none !important}
+  /* 토글 아이콘 회전 표시 */
+  body.pc-nav-collapsed #pc-nav-toggle-icon{display:inline-block;transform:rotate(90deg);transition:transform .2s}
+  #pc-nav-toggle-icon{display:inline-block;transition:transform .2s}
+}
+/* 모바일에서는 PC 토글 버튼 숨김 (햄버거만 사용) */
+@media (max-width:768px){
+  #pc-nav-toggle{display:none !important}
+}
  
  /* 브랜드 OS 배지는 모바일에서 숨김 (공간 절약) */
  .brand-os-badge{display:none !important}
@@ -776,6 +792,7 @@ body.edit-mode-on .tab-btn .tab-name-edit{
       </div>
       <!-- 📱 모바일 전용 햄버거 토글 (헤더 액션 영역 접기/펴기) -->
       <button id="mobile-header-toggle" onclick="toggleMobileHeaderActions()" aria-label="헤더 메뉴 펼치기" style="display:none;background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.85);cursor:pointer;font-size:18px;padding:4px 10px;border-radius:5px;line-height:1;flex-shrink:0">☰</button>
+        <button id="pc-nav-toggle" onclick="togglePcNav_BOS()" aria-label="메뉴바 접기/펼치기" title="메뉴바 접기/펼치기 (Ctrl+\\)" style="display:none;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);cursor:pointer;font-size:13px;padding:3px 8px;border-radius:5px;line-height:1;flex-shrink:0;transition:transform .2s,background .15s"><span id="pc-nav-toggle-icon">≡</span></button>
     </div>
     <div class="hub-top-actions" id="hub-top-actions" style="display:flex;align-items:center;gap:4px;margin-top:4px;flex-wrap:wrap">
       <button class="hub-action-btn" data-icon="⚙" data-label="설정" onclick="toggleBrandSettings()" title="브랜드 설정" style="background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.8);cursor:pointer;font-size:11px;padding:2px 7px;border-radius:4px;line-height:1.4"><span class="hub-action-icon">⚙</span><span class="hub-action-text"> 설정</span></button>
@@ -851,10 +868,10 @@ body.edit-mode-on .tab-btn .tab-name-edit{
   <button class="undo-btn" id="redo-btn" onclick="redo()" disabled title="다시실행 (Ctrl+Y)">↪ 다시실행</button>
   <span class="undo-info" id="undo-info"></span>
   <!-- ━━ 이동: 저장됨 + 제품 스위처 + 진단 (로고 라인 → 액션 라인) ━━ -->
-  <div class="undo-bar-actions" style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap">
+  <div class="undo-bar-actions" style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:nowrap">
     <span class="save-indicator" id="save-indicator" title="저장 상태" style="font-size:10px;color:rgba(255,255,255,.5);white-space:nowrap">준비됨</span>
     <!-- Phase 3: 상단 제품 스위처 바 (상시 표시) -->
-      <div id="product-switcher-bar" class="product-switcher-bar" style="display:none;align-items:center;gap:6px;padding:3px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:5px;flex-wrap:wrap;max-width:100%;overflow:hidden"></div>
+      <div id="product-switcher-bar" class="product-switcher-bar" style="display:none;align-items:center;gap:6px;padding:3px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:5px;flex-wrap:nowrap;white-space:nowrap;max-width:100%;overflow:hidden"></div>
     <button class="hub-action-btn" onclick="showDiagnostic()" title="제품 분리 진단" style="background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:11px;padding:2px 7px;border-radius:4px;line-height:1.4;"><span class="hub-action-icon">🔍</span><span class="hub-action-text"> 진단</span></button>
   </div>
 </div>
@@ -12163,22 +12180,23 @@ function forceIsolationReset(){
       
       <!-- 테이블 -->
       <div style="overflow-x:auto;border:1px solid var(--bd);border-radius:8px">
-        <table id="sample-table-bos" style="width:100%;border-collapse:collapse;font-size:12px;min-width:1100px">
+        <table id="sample-table-bos" style="width:100%;border-collapse:collapse;font-size:12px;min-width:1300px">
           <thead style="background:#FAFAF8;border-bottom:2px solid var(--bd)">
             <tr>
-              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:140px">업체명</th>
-              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:100px">담당자</th>
-              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px">의뢰 샘플</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:130px">업체명</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">거래처 담당자</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">우리 담당자</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;width:200px">의뢰 샘플</th>
               <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">의뢰일</th>
-              <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:95px">예상소요</th>
-              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">도착일</th>
-              <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:95px">실제소요</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:155px">예상소요 → 도착일</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">실제 도착일</th>
+              <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:100px">실제소요</th>
               <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px">메모</th>
               <th style="padding:9px 8px;width:36px"></th>
             </tr>
           </thead>
           <tbody id="sample-tbody-bos">
-            <tr><td colspan="9" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">샘플 의뢰 내역이 없습니다. <b>＋ 샘플 의뢰 추가</b> 를 눌러 시작하세요.</td></tr>
+            <tr><td colspan="10" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">샘플 의뢰 내역이 없습니다. <b>＋ 샘플 의뢰 추가</b> 를 눌러 시작하세요.</td></tr>
           </tbody>
         </table>
       </div>
@@ -17366,15 +17384,46 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
       
       var statusBg = s.arrivalDate ? '#F0F9F4' : '#FFFBF0';
       
+      // ━━ 예상 도착일 자동 계산 (의뢰일 + 예상소요) ━━
+      var expectedArrival = '';
+      var expectedArrivalText = '';
+      if(s.requestDate && parseInt(s.expectedDays) > 0){
+        var reqD = new Date(s.requestDate + 'T00:00:00');
+        if(!isNaN(reqD.getTime())){
+          reqD.setDate(reqD.getDate() + parseInt(s.expectedDays));
+          var yy = reqD.getFullYear();
+          var mm = String(reqD.getMonth()+1).padStart(2,'0');
+          var dd = String(reqD.getDate()).padStart(2,'0');
+          expectedArrival = yy + '-' + mm + '-' + dd;
+          // 한국어 짧은 표기 (예: 8/22)
+          expectedArrivalText = '→ ' + (reqD.getMonth()+1) + '/' + reqD.getDate();
+        }
+      }
+      
       return '<tr style="border-bottom:1px solid var(--bd);background:' + statusBg + '" data-sample-id="' + s.id + '">'
+        // 1) 업체명
         + '<td style="padding:5px 6px"><input value="' + escAttr(s.vendor) + '" placeholder="업체명" oninput="updateSampleField_BOS(\'' + s.id + '\',\'vendor\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;font-weight:500;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
-        + '<td style="padding:5px 6px"><input value="' + escAttr(s.contact) + '" placeholder="담당자" oninput="updateSampleField_BOS(\'' + s.id + '\',\'contact\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        // 2) 거래처 담당자 (기존 contact 필드 호환 - 마이그레이션)
+        + '<td style="padding:5px 6px"><input value="' + escAttr(s.contactVendor || s.contact || '') + '" placeholder="거래처 담당자" oninput="updateSampleField_BOS(\'' + s.id + '\',\'contactVendor\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        // 3) 우리 담당자 (신규)
+        + '<td style="padding:5px 6px"><input value="' + escAttr(s.contactOurs || '') + '" placeholder="우리 담당자" oninput="updateSampleField_BOS(\'' + s.id + '\',\'contactOurs\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        // 4) 의뢰 샘플
         + '<td style="padding:5px 6px"><input value="' + escAttr(s.sampleName) + '" placeholder="제품명 / 사양" oninput="updateSampleField_BOS(\'' + s.id + '\',\'sampleName\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        // 5) 의뢰일
         + '<td style="padding:5px 6px"><input type="date" value="' + escAttr(s.requestDate) + '" oninput="updateSampleField_BOS(\'' + s.id + '\',\'requestDate\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff"></td>'
-        + '<td style="padding:5px 6px;text-align:center"><input type="number" value="' + escAttr(s.expectedDays) + '" placeholder="일" min="0" oninput="updateSampleField_BOS(\'' + s.id + '\',\'expectedDays\',this.value)" style="width:55px;padding:4px 4px;border:1px solid var(--bd);border-radius:4px;font-size:11px;text-align:center"><span style="font-size:10px;color:var(--mu);margin-left:3px">일</span></td>'
+        // 6) 예상소요 + 예상 도착일 자동 표시
+        + '<td style="padding:5px 6px"><div style="display:flex;align-items:center;gap:4px">'
+          + '<input type="number" value="' + escAttr(s.expectedDays) + '" placeholder="일" min="0" oninput="updateSampleField_BOS(\'' + s.id + '\',\'expectedDays\',this.value)" style="width:50px;padding:4px 4px;border:1px solid var(--bd);border-radius:4px;font-size:11px;text-align:center">'
+          + '<span style="font-size:10px;color:var(--mu)">일</span>'
+          + '<span class="expected-arrival-display" data-sample-id="' + s.id + '" title="' + escAttr(expectedArrival) + '" style="font-size:10.5px;color:#1976D2;font-weight:600;margin-left:3px;white-space:nowrap;font-family:\'Roboto Mono\',monospace">' + expectedArrivalText + '</span>'
+        + '</div></td>'
+        // 7) 실제 도착일
         + '<td style="padding:5px 6px"><input type="date" value="' + escAttr(s.arrivalDate) + '" oninput="updateSampleField_BOS(\'' + s.id + '\',\'arrivalDate\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff"></td>'
+        // 8) 실제소요 자동
         + '<td style="padding:5px 6px;text-align:center;font-size:11px">' + actualText + '</td>'
+        // 9) 메모
         + '<td style="padding:5px 6px"><input value="' + escAttr(s.memo) + '" placeholder="메모" oninput="updateSampleField_BOS(\'' + s.id + '\',\'memo\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11px;color:var(--mu);background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\';this.style.color=\'var(--tx)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\';this.style.color=\'var(--mu)\'"></td>'
+        // 10) 삭제
         + '<td style="padding:5px 4px;text-align:center"><button onclick="deleteSampleEntry_BOS(\'' + s.id + '\')" title="삭제" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:13px;padding:4px 6px">✕</button></td>'
         + '</tr>';
     }).join('');
@@ -17417,7 +17466,8 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
     data.unshift({
       id: 'smp_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
       vendor: '',
-      contact: '',
+      contactVendor: '',  // 거래처 담당자
+      contactOurs: '',    // 우리 담당자
       sampleName: '',
       requestDate: new Date().toISOString().slice(0,10),
       expectedDays: '',
@@ -17434,13 +17484,37 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
     if(!item) return;
     item[key] = val;
     saveSample(data);
-    // 의뢰일/도착일 변경 시 실제소요 셀만 갱신 - 전체 재렌더는 input focus 잃게 하니까 부분 갱신
+    
+    // ━━ 의뢰일/예상소요 변경 시 → 예상 도착일 셀 부분 갱신 ━━
+    if(key === 'requestDate' || key === 'expectedDays'){
+      var expDisp = document.querySelector('.expected-arrival-display[data-sample-id="' + id + '"]');
+      if(expDisp){
+        var expArrival = '';
+        var expText = '';
+        if(item.requestDate && parseInt(item.expectedDays) > 0){
+          var reqD = new Date(item.requestDate + 'T00:00:00');
+          if(!isNaN(reqD.getTime())){
+            reqD.setDate(reqD.getDate() + parseInt(item.expectedDays));
+            var yy = reqD.getFullYear();
+            var mm = String(reqD.getMonth()+1).padStart(2,'0');
+            var dd = String(reqD.getDate()).padStart(2,'0');
+            expArrival = yy + '-' + mm + '-' + dd;
+            expText = '→ ' + (reqD.getMonth()+1) + '/' + reqD.getDate();
+          }
+        }
+        expDisp.textContent = expText;
+        expDisp.setAttribute('title', expArrival);
+      }
+    }
+    
+    // ━━ 의뢰일/도착일 변경 시 → 실제소요 셀 부분 갱신 ━━
     if(key === 'requestDate' || key === 'arrivalDate'){
       var actual = daysBetween(item.requestDate, item.arrivalDate);
       var row = document.querySelector('[data-sample-id="' + id + '"]');
       if(row){
         var cells = row.querySelectorAll('td');
-        if(cells[6]){
+        // ★ 컬럼 인덱스 변경: 컬럼이 1개 늘었으므로 실제소요는 cells[7] (이전엔 cells[6])
+        if(cells[7]){
           if(actual !== null){
             var expected = parseInt(item.expectedDays) || 0;
             var diff = expected > 0 ? actual - expected : null;
@@ -17450,9 +17524,9 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
               else if(diff > 0){ diffColor = '#E74C3C'; diffLabel = ' (+' + diff + '일)'; }
               else { diffColor = '#7F8C8D'; diffLabel = ' (정시)'; }
             }
-            cells[6].innerHTML = '<span style="font-weight:600;color:' + diffColor + '">' + actual + '일' + diffLabel + '</span>';
+            cells[7].innerHTML = '<span style="font-weight:600;color:' + diffColor + '">' + actual + '일' + diffLabel + '</span>';
           } else {
-            cells[6].innerHTML = '<span style="color:var(--mu);font-size:10.5px">진행중</span>';
+            cells[7].innerHTML = '<span style="color:var(--mu);font-size:10.5px">진행중</span>';
           }
         }
         row.style.background = item.arrivalDate ? '#F0F9F4' : '#FFFBF0';
@@ -18332,6 +18406,64 @@ body.cal-highlighting .cal-item-card-bos:hover{
   }, 1000);
   
   console.log('[Sync Safety] 안전망 활성화됨 (beforeunload + visibility + 모달 닫기 시 저장)');
+})();
+</script>
+
+<!-- ━━━ 🖥 PC 메뉴바 토글 ━━━ -->
+<script id="pc-nav-toggle-script">
+(function(){
+  var LS_KEY = 'bos_pc_nav_collapsed';
+  
+  // PC 메뉴바 토글
+  window.togglePcNav_BOS = function(){
+    var body = document.body;
+    var collapsed = !body.classList.contains('pc-nav-collapsed');
+    body.classList.toggle('pc-nav-collapsed', collapsed);
+    try { localStorage.setItem(LS_KEY, collapsed ? '1' : '0'); } catch(e){}
+    // 토글 버튼 텍스트/aria-label 업데이트
+    var btn = document.getElementById('pc-nav-toggle');
+    if(btn){
+      btn.setAttribute('aria-label', collapsed ? '메뉴바 펼치기' : '메뉴바 접기');
+      btn.setAttribute('title', collapsed ? '메뉴바 펼치기 (Ctrl+\\)' : '메뉴바 접기 (Ctrl+\\)');
+    }
+    console.log('[PC Nav] ' + (collapsed ? '접힘' : '펼침'));
+  };
+  
+  // 페이지 로드 시 저장된 상태 복원
+  function restorePcNavState(){
+    try {
+      var saved = localStorage.getItem(LS_KEY);
+      if(saved === '1' && window.innerWidth > 768){
+        document.body.classList.add('pc-nav-collapsed');
+        var btn = document.getElementById('pc-nav-toggle');
+        if(btn){
+          btn.setAttribute('aria-label', '메뉴바 펼치기');
+          btn.setAttribute('title', '메뉴바 펼치기 (Ctrl+\\)');
+        }
+      }
+    } catch(e){}
+  }
+  
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', restorePcNavState);
+  } else {
+    restorePcNavState();
+  }
+  
+  // 단축키: Ctrl+\ (백슬래시) 로 토글
+  document.addEventListener('keydown', function(e){
+    if((e.ctrlKey || e.metaKey) && e.key === '\\'){
+      // input/textarea에 포커스 있으면 무시
+      var tag = (document.activeElement && document.activeElement.tagName) || '';
+      if(tag === 'INPUT' || tag === 'TEXTAREA') return;
+      e.preventDefault();
+      if(window.innerWidth > 768){
+        togglePcNav_BOS();
+      }
+    }
+  });
+  
+  console.log('[PC Nav] 토글 스크립트 준비됨 (Ctrl+\\)');
 })();
 </script>
 </body>
