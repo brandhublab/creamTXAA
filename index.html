@@ -13671,13 +13671,13 @@ function forceIsolationReset(){
         
         <div style="margin-bottom:10px">
           <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">GitHub Personal Access Token <a href="#" onclick="event.preventDefault();showGistTokenGuide()" style="font-size:10px;color:#2563EB;text-decoration:underline">📖 발급 가이드</a></label>
-          <input type="password" id="gist-token-input" placeholder="ghp_... 또는 github_pat_..." oninput="if(typeof syncAutoApplyInputs==='function')syncAutoApplyInputs()" style="width:100%;padding:7px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;font-family:'SF Mono',monospace">
+          <input type="password" id="gist-token-input" placeholder="ghp_... 또는 github_pat_..." oninput="if(typeof syncAutoApplyInputs==='function')syncAutoApplyInputs()" onblur="if(typeof syncAutoApplyInputs==='function')syncAutoApplyInputs()" onchange="if(typeof syncAutoApplyInputs==='function')syncAutoApplyInputs()" style="width:100%;padding:7px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;font-family:'SF Mono',monospace">
           <div style="font-size:10px;color:var(--mu);margin-top:3px">🔒 이 토큰은 <b>이 브라우저 localStorage에만</b> 저장됩니다 (외부 전송 없음)</div>
         </div>
         
         <div style="margin-bottom:10px">
           <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">Gist ID (선택 - 기존 Gist 사용 시)</label>
-          <input type="text" id="gist-id-input" placeholder="비워두면 새로 생성됨" oninput="if(typeof syncAutoApplyInputs==='function')syncAutoApplyInputs()" style="width:100%;padding:7px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;font-family:'SF Mono',monospace">
+          <input type="text" id="gist-id-input" placeholder="비워두면 새로 생성됨" oninput="if(typeof syncAutoApplyInputs==='function')syncAutoApplyInputs()" onblur="if(typeof syncAutoApplyInputs==='function')syncAutoApplyInputs()" onchange="if(typeof syncAutoApplyInputs==='function')syncAutoApplyInputs()" style="width:100%;padding:7px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;font-family:'SF Mono',monospace">
           <div style="font-size:10px;color:var(--mu);margin-top:3px">새 Gist를 만들면 자동으로 ID가 저장됩니다</div>
         </div>
         
@@ -13885,12 +13885,51 @@ function forceIsolationReset(){
       if(raw){
         Object.assign(syncSettings, JSON.parse(raw));
       }
-    } catch(e){}
+      
+      // ━━ 백업 키에서 복구 (메인 키에 값이 없으면) ━━
+      // Token / Gist ID 가 어떤 이유로든 메인 settings 에서 사라졌으면
+      // 별도 백업 키에서 복구
+      var recovered = false;
+      if(!syncSettings.gistId){
+        var backupId = localStorage.getItem('bos_gist_id_backup_v1');
+        if(backupId){
+          syncSettings.gistId = backupId;
+          console.warn('[Sync] ⚠ Gist ID 백업 키에서 복구:', backupId);
+          recovered = true;
+        }
+      }
+      if(!syncSettings.gistToken){
+        var backupToken = localStorage.getItem('bos_gist_token_backup_v1');
+        if(backupToken){
+          syncSettings.gistToken = backupToken;
+          console.warn('[Sync] ⚠ Token 백업 키에서 복구');
+          recovered = true;
+        }
+      }
+      // 복구됐으면 메인 키도 갱신
+      if(recovered){
+        try {
+          localStorage.setItem(SYNC_SETTINGS_KEY, JSON.stringify(syncSettings));
+          console.log('[Sync] 복구 후 메인 키 재저장');
+        } catch(e){}
+      }
+      
+      console.log('[Sync] settings 로드됨 - token:', !!syncSettings.gistToken, 'gistId:', syncSettings.gistId || '(없음)', recovered ? '⚠복구됨' : '');
+    } catch(e){ console.error('[Sync] load fail:', e); }
   }
   
   function saveSyncSettings(){
     try {
       localStorage.setItem(SYNC_SETTINGS_KEY, JSON.stringify(syncSettings));
+      // ━━ 이중 백업: Token / Gist ID 를 별도 키에도 저장 ━━
+      // 메인 settings가 어떤 이유로 사라져도 복구 가능
+      if(syncSettings.gistId){
+        localStorage.setItem('bos_gist_id_backup_v1', syncSettings.gistId);
+      }
+      if(syncSettings.gistToken){
+        localStorage.setItem('bos_gist_token_backup_v1', syncSettings.gistToken);
+      }
+      console.log('[Sync] settings 저장됨 - token:', !!syncSettings.gistToken, 'gistId:', syncSettings.gistId || '(없음)');
     } catch(e){ console.error('sync settings save fail', e); }
   }
   
@@ -18238,6 +18277,61 @@ body.cal-highlighting .cal-item-card-bos:hover{
   }, true);  // capture phase - 더 우선
   
   console.log('[ESC] 모달 닫기 핸들러 준비됨');
+})();
+</script>
+
+<!-- ━━━ 🛡 동기화 설정 안전망 (이중 백업 + 페이지 이탈 시 저장) ━━━ -->
+<script id="sync-settings-safety">
+(function(){
+  // ━━ 페이지 떠나기 직전에 input 값 강제 저장 ━━
+  window.addEventListener('beforeunload', function(){
+    try {
+      if(typeof syncAutoApplyInputs === 'function'){
+        syncAutoApplyInputs();
+      }
+    } catch(e){}
+  });
+  
+  // ━━ 페이지 가시성 변화 시 저장 (탭 전환, 최소화 등) ━━
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'hidden'){
+      try {
+        if(typeof syncAutoApplyInputs === 'function'){
+          syncAutoApplyInputs();
+        }
+      } catch(e){}
+    }
+  });
+  
+  // ━━ 모달 닫을 때도 한 번 더 저장 ━━
+  // closeSyncModal 래핑
+  if(typeof window.closeSyncModal === 'function' && !window.closeSyncModal._wrapped){
+    var _origClose = window.closeSyncModal;
+    window.closeSyncModal = function(){
+      try {
+        if(typeof syncAutoApplyInputs === 'function') syncAutoApplyInputs();
+      } catch(e){}
+      _origClose.apply(this, arguments);
+    };
+    window.closeSyncModal._wrapped = true;
+  }
+  
+  // ━━ 시작 시 진단 ━━
+  setTimeout(function(){
+    try {
+      var settings = JSON.parse(localStorage.getItem('bos_sync_settings_v1') || '{}');
+      var backupId = localStorage.getItem('bos_gist_id_backup_v1');
+      var backupToken = localStorage.getItem('bos_gist_token_backup_v1');
+      console.log('[Sync Safety] 시작 시점 상태:', {
+        '메인 token': !!settings.gistToken,
+        '메인 gistId': settings.gistId || '(없음)',
+        '백업 gistId': backupId || '(없음)',
+        '백업 token': !!backupToken
+      });
+    } catch(e){}
+  }, 1000);
+  
+  console.log('[Sync Safety] 안전망 활성화됨 (beforeunload + visibility + 모달 닫기 시 저장)');
 })();
 </script>
 </body>
