@@ -13715,9 +13715,9 @@ function forceIsolationReset(){
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button onclick="gistPush()" style="padding:9px 14px;background:#1A6B4A;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">⬆️ Gist로 푸시</button>
           <button onclick="gistPull()" style="padding:9px 14px;background:#2563EB;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">⬇️ Gist에서 풀</button>
-          <button onclick="inspectSyncData()" style="padding:9px 14px;background:#fff;color:#8B5E00;border:1px solid #e8d4a8;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🔍 데이터 점검</button>
-          <button onclick="inspectGistData()" style="padding:9px 14px;background:#fff;color:#8B5E00;border:1px solid #e8d4a8;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">📡 Gist 내용 확인</button>
-    <button class="sync-btn" onclick="autoFindBrandoskitGist_BOS()" style="background:#FFF3E0;border-color:#FB8C00;color:#E65100" title="Token만 있어도 BrandOSKIT Gist 자동 검색">🔍 Gist 자동찾기</button>
+          <button onclick="inspectSyncData()" title="이 브라우저(이 컴퓨터)에 저장된 데이터 현황을 보여줍니다.&#10;푸시 전에 '내 데이터가 제대로 있나' 확인용." style="padding:9px 14px;background:#fff;color:#8B5E00;border:1px solid #e8d4a8;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">💻 이 컴퓨터 데이터 점검</button>
+          <button onclick="inspectGistData()" title="클라우드(Gist)에 올라가 있는 데이터 현황을 보여줍니다.&#10;'노트북에서 푸시한 게 클라우드에 잘 올라갔나' 확인용.&#10;여기 표시된 갱신 시각이 최신이어야 풀해도 최신 데이터를 받습니다." style="padding:9px 14px;background:#fff;color:#8B5E00;border:1px solid #e8d4a8;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">☁️ 클라우드 데이터 확인</button>
+    <button class="sync-btn" onclick="autoFindBrandoskitGist_BOS()" style="background:#FFF3E0;border:1px solid #FB8C00;color:#E65100;padding:9px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Gist ID를 잊어버렸을 때 사용.&#10;Token만 있으면 내 GitHub 계정의 Gist 중 BrandOSKIT 데이터를 자동으로 찾아 ID를 복구합니다.">🔍 Gist ID 자동복구</button>
         </div>
       </div>
       
@@ -14146,6 +14146,17 @@ function forceIsolationReset(){
   // ━━━━━ 모달 컨트롤 ━━━━━
   window.openSyncModal = function(){
     document.getElementById('sync-modal').style.display = 'flex';
+    // ━━ 저장된 Token / Gist ID 를 입력칸에 자동 표시 (매번 재입력 불필요) ━━
+    try {
+      var tokenEl = document.getElementById('gist-token-input');
+      var idEl = document.getElementById('gist-id-input');
+      if(tokenEl && !tokenEl.value && syncSettings.gistToken){
+        tokenEl.value = syncSettings.gistToken;
+      }
+      if(idEl && !idEl.value && syncSettings.gistId){
+        idEl.value = syncSettings.gistId;
+      }
+    } catch(e){}
     refreshDataSummary();
     refreshGistStatus();
     refreshStatusDetail();
@@ -14265,6 +14276,37 @@ function forceIsolationReset(){
   window.gistPush = function(){
     // 입력칸의 토큰/Gist ID가 저장된 값과 다르면 자동 반영
     syncAutoApplyInputs();
+    if(!syncSettings.gistToken){ syncToast('먼저 토큰을 입력하고 설정 저장하세요', 'warn'); return; }
+    
+    // ━━ ★ 새 Gist 난립 방지: gistId 없으면 먼저 기존 Gist 자동 검색 ━━
+    // (Gist ID가 어떤 이유로 사라진 상태에서 푸시하면 새 Gist가 만들어져서
+    //  노트북/PC가 서로 다른 Gist를 보게 되는 사고 방지)
+    if(!syncSettings.gistId && typeof findBrandoskitGist_BOS === 'function'){
+      syncToast('🔍 기존 BrandOSKIT Gist 검색 중... (새 Gist 난립 방지)', 'info');
+      findBrandoskitGist_BOS().then(function(foundId){
+        if(foundId){
+          syncSettings.gistId = foundId;
+          saveSyncSettings();
+          var inp = document.getElementById('gist-id-input');
+          if(inp) inp.value = foundId;
+          syncToast('✅ 기존 Gist 발견 (' + foundId.slice(0,10) + '...) — 그곳에 푸시합니다', 'ok');
+          console.log('[Sync] 푸시 전 기존 Gist 자동 발견:', foundId);
+        } else {
+          console.log('[Sync] 기존 Gist 없음 - 새로 생성 예정');
+        }
+        // 검색 끝난 후 푸시 재호출 (이번엔 gistId 있거나, 없으면 새로 생성)
+        setTimeout(function(){ window._gistPushCore(); }, 200);
+      }).catch(function(err){
+        console.warn('[Sync] 푸시 전 자동 검색 실패 (무시하고 진행):', err.message);
+        window._gistPushCore();
+      });
+      return;
+    }
+    
+    window._gistPushCore();
+  };
+  
+  window._gistPushCore = function(){
     if(!syncSettings.gistToken){ syncToast('먼저 토큰을 입력하고 설정 저장하세요', 'warn'); return; }
     
     // ━━ 1단계: 모든 메모리값을 localStorage에 강제 flush ━━
@@ -14747,11 +14789,15 @@ function forceIsolationReset(){
     var tokenEl = document.getElementById('gist-token-input');
     var idEl = document.getElementById('gist-id-input');
     var changed = false;
-    if(tokenEl && tokenEl.value && tokenEl.value.trim() !== syncSettings.gistToken){
+    // ★★ 핵심 규칙: 빈 값으로는 절대 덮어쓰지 않음 ★★
+    // (모달을 안 연 상태에서 input은 비어있는데, 그 빈 값이
+    //  저장된 Token/Gist ID를 지워버리는 버그가 있었음)
+    // 삭제는 오직 [설정 삭제] 버튼으로만 가능
+    if(tokenEl && tokenEl.value && tokenEl.value.trim() && tokenEl.value.trim() !== syncSettings.gistToken){
       syncSettings.gistToken = tokenEl.value.trim();
       changed = true;
     }
-    if(idEl && idEl.value !== undefined){
+    if(idEl && idEl.value && idEl.value.trim()){
       var newId = idEl.value.trim();
       if(newId !== (syncSettings.gistId||'')){
         syncSettings.gistId = newId;
@@ -14761,7 +14807,7 @@ function forceIsolationReset(){
     if(changed){
       saveSyncSettings();
       refreshGistStatus();
-      console.log('[Sync] 입력칸 값을 자동 적용');
+      console.log('[Sync] 입력칸 값을 자동 적용 (비어있지 않은 값만)');
     }
   }
   
@@ -14925,7 +14971,7 @@ function forceIsolationReset(){
     
     syncToast('⏳ Gist 데이터 조회 중...', 'info');
     
-    fetch('https://api.github.com/gists/' + syncSettings.gistId, {
+    fetch('https://api.github.com/gists/' + syncSettings.gistId + '?_cb=' + Date.now(), {
       method: 'GET',
       headers: {
         'Authorization': 'token ' + syncSettings.gistToken,
