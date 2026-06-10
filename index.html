@@ -41,7 +41,7 @@ body{font-family:var(--sa);background:var(--bg);color:var(--tx);font-size:14px;l
 .undo-btn{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);font-size:12px;padding:3px 9px;border-radius:4px;cursor:pointer;font-family:var(--sa);transition:background .15s}
 .undo-btn:hover:not(:disabled){background:rgba(255,255,255,.2);color:#FFF}
 .undo-btn:disabled{opacity:.3;cursor:not-allowed}
-.undo-info{font-size:10px;color:rgba(255,255,255,.4);margin-left:6px}
+.undo-info{font-size:10px;color:rgba(255,255,255,.4);margin-left:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:1}
 
 /* === EXPORT BAR === */
 .export-bar{background:var(--bg);border-bottom:1px solid var(--bd);padding:6px 16px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
@@ -845,7 +845,7 @@ html, body{
       <button class="tab-btn" onclick="showTab('t16',this)" title="⑯ 조직구성표"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">⑯ 조직구성표</span><button class="tab-del" onclick="deleteTabByBtn(this,'t16',event)">✕</button></button>
       <button class="tab-btn tab-secondary" onclick="showTab('t19',this)" title="🧠 설득심리·카피"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">🧠 설득심리·카피</span><button class="tab-del" onclick="deleteTabByBtn(this,'t19',event)">✕</button></button>
       <button class="tab-btn tab-secondary" onclick="showTab('t18',this)" title="🔬 임상체크"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">🔬 임상체크</span><button class="tab-del" onclick="deleteTabByBtn(this,'t18',event)">✕</button></button>
-      <button class="tab-btn tab-secondary" title="📅 캘린더" onclick="showTab('t20',this);initCalendarTab()"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">📅 캘린더</span><button class="tab-del" onclick="deleteTabByBtn(this,'t20',event)">✕</button></button>
+      <button class="tab-btn tab-secondary" title="📅 타임라인" onclick="showTab('t20',this);initCalendarTab()"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">📅 타임라인</span><button class="tab-del" onclick="deleteTabByBtn(this,'t20',event)">✕</button></button>
       <button class="tab-btn tab-secondary" title="📦 정보저장소" onclick="showTab('t21',this);initInfoStorage()"><span class="tab-name-edit" contenteditable="true" onblur="this.textContent=this.textContent.trim()">📦 정보저장소</span><button class="tab-del" onclick="deleteTabByBtn(this,'t21',event)">✕</button></button>
       <button class="tab-btn tab-secondary" onclick="document.getElementById('save-hist-wrap').style.display=document.getElementById('save-hist-wrap').style.display==='none'?'block':'none';updateSaveSizeLabel()" style="color:rgba(255,255,255,.6)"><span>💾 저장관리</span></button>
       <button class="tab-btn tab-secondary" onclick="openSyncModal()" style="color:rgba(255,255,255,.7)" title="여러 기기에서 같은 데이터 사용"><span>🔄 동기화</span></button>
@@ -893,10 +893,10 @@ html, body{
   <button class="undo-btn" id="redo-btn" onclick="redo()" disabled title="다시실행 (Ctrl+Y)">↪ 다시실행</button>
   <span class="undo-info" id="undo-info"></span>
   <!-- ━━ 이동: 저장됨 + 제품 스위처 + 진단 (로고 라인 → 액션 라인) ━━ -->
-  <div class="undo-bar-actions" style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:nowrap">
+  <div class="undo-bar-actions" style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:nowrap;flex:1;justify-content:flex-end;min-width:0">
     <span class="save-indicator" id="save-indicator" title="저장 상태" style="font-size:10px;color:rgba(255,255,255,.5);white-space:nowrap">준비됨</span>
     <!-- Phase 3: 상단 제품 스위처 바 (상시 표시) -->
-      <div id="product-switcher-bar" class="product-switcher-bar" style="display:none;align-items:center;gap:6px;padding:3px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:5px;flex-wrap:nowrap;white-space:nowrap;max-width:100%;overflow:hidden"></div>
+      <div id="product-switcher-bar" class="product-switcher-bar" style="display:none;align-items:center;gap:6px;padding:3px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:5px;flex-wrap:nowrap;white-space:nowrap;min-width:0"></div>
     <button class="hub-action-btn" onclick="showDiagnostic()" title="제품 분리 진단" style="background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:11px;padding:2px 7px;border-radius:4px;line-height:1.4;"><span class="hub-action-icon">🔍</span><span class="hub-action-text"> 진단</span></button>
   </div>
 </div>
@@ -5315,7 +5315,7 @@ function renderProductSwitcher(){
  // 라벨
  h += '<span style="font-size:10px;color:rgba(255,255,255,.5);white-space:nowrap;font-weight:500">🎯 제품</span>';
  // 드롭다운
- h += '<select onchange="activateProduct(this.value)" style="padding:3px 6px;border:1px solid rgba(255,255,255,.2);border-radius:4px;font-size:11px;background:rgba(255,255,255,.1);color:#FFF;outline:none;font-family:inherit;max-width:200px">';
+ h += '<select onchange="activateProduct(this.value)" style="padding:3px 6px;border:1px solid rgba(255,255,255,.2);border-radius:4px;font-size:11px;background:rgba(255,255,255,.1);color:#FFF;outline:none;font-family:inherit;max-width:220px;min-width:90px;flex-shrink:1;text-overflow:ellipsis">';
  productsRegistry.forEach(p=>{
   const icon = p.icon || '📦';
   const sel = p.id===activeProductId ? ' selected' : '';
@@ -5323,7 +5323,7 @@ function renderProductSwitcher(){
  });
  h += '</select>';
  // 라인업 바로가기 (칩은 공간 절약을 위해 제거)
- h += '<button onclick="goToLineup()" title="제품 라인업 탭으로 이동" style="padding:3px 8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);border-radius:4px;font-size:10px;cursor:pointer;font-family:inherit">🗂️</button>';
+ h += '<button onclick="goToLineup()" title="제품 라인업 탭으로 이동" style="padding:3px 8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);border-radius:4px;font-size:10px;cursor:pointer;font-family:inherit;flex-shrink:0">🗂️</button>';
 
  container.innerHTML = h;
 
@@ -11882,7 +11882,8 @@ function forceIsolationReset(){
       <button class="btn btn-grn-bos" onclick="addPowerContent_BOS()">＋ 컨텐츠 추가</button>
     </div>
     <div style="padding:0 18px 18px">
-      <div id="power-content-list" style="display:flex;flex-direction:column;gap:12px;margin-top:10px"></div>
+      <div id="power-content-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-bottom:8px;border-bottom:1px solid var(--bd)"></div>
+      <div id="power-content-list" style="display:flex;flex-direction:column;gap:12px;margin-top:12px"></div>
     </div>
   </div>
   
@@ -11896,7 +11897,8 @@ function forceIsolationReset(){
       <button class="btn btn-grn-bos" onclick="addDisplayBanner_BOS()">＋ 배너 추가</button>
     </div>
     <div style="padding:0 18px 18px">
-      <div id="display-banner-list" style="display:flex;flex-direction:column;gap:12px;margin-top:10px"></div>
+      <div id="display-banner-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-bottom:8px;border-bottom:1px solid var(--bd)"></div>
+      <div id="display-banner-list" style="display:flex;flex-direction:column;gap:12px;margin-top:12px"></div>
     </div>
   </div>
 </div>
@@ -12135,7 +12137,7 @@ function forceIsolationReset(){
   <!-- 서브탭 헤더 -->
   <div class="hbar" style="padding:10px 18px 0">
     <div style="display:flex;gap:4px;flex-wrap:wrap">
-      <button class="stab active" id="t20-sub-calendar-btn" onclick="showCalendarSubTab('calendar')">📅 캘린더</button>
+      <button class="stab active" id="t20-sub-calendar-btn" onclick="showCalendarSubTab('calendar')">📅 타임라인</button>
       <button class="stab" id="t20-sub-sample-btn" onclick="showCalendarSubTab('sample')">🧪 샘플</button>
       <button class="stab" id="t20-sub-outsource-btn" onclick="showCalendarSubTab('outsource')">🤝 아웃소싱</button>
     </div>
@@ -12198,7 +12200,7 @@ function forceIsolationReset(){
       
       <!-- 테이블 -->
       <div style="overflow-x:auto;border:1px solid var(--bd);border-radius:8px">
-        <table id="sample-table-bos" style="width:100%;border-collapse:collapse;font-size:12px;min-width:1300px">
+        <table id="sample-table-bos" style="width:100%;border-collapse:collapse;font-size:12px;min-width:1380px">
           <thead style="background:#FAFAF8;border-bottom:2px solid var(--bd)">
             <tr>
               <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:130px">업체명</th>
@@ -12209,12 +12211,13 @@ function forceIsolationReset(){
               <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:155px">예상소요 → 도착일</th>
               <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">실제 도착일</th>
               <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:100px">실제소요</th>
+              <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:54px" title="문안검수 · CT Test · 양산 일정">공정</th>
               <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px">메모</th>
               <th style="padding:9px 8px;width:36px"></th>
             </tr>
           </thead>
           <tbody id="sample-tbody-bos">
-            <tr><td colspan="10" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">샘플 의뢰 내역이 없습니다. <b>＋ 샘플 의뢰 추가</b> 를 눌러 시작하세요.</td></tr>
+            <tr><td colspan="11" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">샘플 의뢰 내역이 없습니다. <b>＋ 샘플 의뢰 추가</b> 를 눌러 시작하세요.</td></tr>
           </tbody>
         </table>
       </div>
@@ -12227,10 +12230,13 @@ function forceIsolationReset(){
       <div style="margin-top:18px;border-top:1px solid var(--bd);padding-top:16px">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
           <div style="font-size:13px;font-weight:700">🗓 샘플 일정 캘린더</div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:10.5px;color:var(--mu)">
+          <div style="display:flex;align-items:center;gap:10px;font-size:10.5px;color:var(--mu);flex-wrap:wrap">
             <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E67E22;vertical-align:middle"></span> 의뢰일</span>
             <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1976D2;vertical-align:middle"></span> 예상 도착</span>
             <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#27AE60;vertical-align:middle"></span> 실제 도착</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7A4AA8;vertical-align:middle"></span> 문안검수</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#C0392B;vertical-align:middle"></span> CT Test</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#16A085;vertical-align:middle"></span> 부자재·양산</span>
           </div>
         </div>
         <div id="sample-minical-bos"></div>
@@ -14264,7 +14270,7 @@ function forceIsolationReset(){
           'manifesto_v1': '📜 매니페스토',
           'products_store_v1': '📦 제품별 데이터 저장소',
           'writeup_v1': '✍ 글쓰기',
-          'bos_calendar_v1': '📅 캘린더',
+          'bos_calendar_v1': '📅 타임라인',
           'bos_extra_brand_subtabs': '➕ 추가 서브탭',
           'bos_info_storage_v1': '📦 정보저장소',
           'bos_info_custom_categories_v1': '🏷 정보저장소 분류',
@@ -17461,7 +17467,7 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
     var data = loadSample();
     
     if(data.length === 0){
-      tbody.innerHTML = '<tr><td colspan="9" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">샘플 의뢰 내역이 없습니다. <b>＋ 샘플 의뢰 추가</b> 를 눌러 시작하세요.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">샘플 의뢰 내역이 없습니다. <b>＋ 샘플 의뢰 추가</b> 를 눌러 시작하세요.</td></tr>';
       renderSampleSummary_BOS(data);
       return;
     }
@@ -17526,11 +17532,17 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
         + '<td style="padding:5px 6px"><input type="date" value="' + escAttr(s.arrivalDate) + '" oninput="updateSampleField_BOS(\'' + s.id + '\',\'arrivalDate\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff"></td>'
         // 8) 실제소요 자동
         + '<td style="padding:5px 6px;text-align:center;font-size:11px">' + actualText + '</td>'
+        // 8.5) ⚙ 공정 일정 토글 (문안검수 · CT Test · 양산)
+        + '<td style="padding:5px 4px;text-align:center">'
+          + '<button onclick="toggleSamplePhases_BOS(\'' + s.id + '\')" title="공정 일정 펼치기 (문안검수 · CT Test · 양산)" '
+          + 'style="background:' + ((s.reviewStart || s.ctStart || s.materialDate) ? '#EAF3EE' : 'none') + ';border:1px solid var(--bd);border-radius:4px;padding:3px 7px;font-size:12px;cursor:pointer;line-height:1">⚙</button>'
+        + '</td>'
         // 9) 메모
         + '<td style="padding:5px 6px"><input value="' + escAttr(s.memo) + '" placeholder="메모" oninput="updateSampleField_BOS(\'' + s.id + '\',\'memo\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11px;color:var(--mu);background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\';this.style.color=\'var(--tx)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\';this.style.color=\'var(--mu)\'"></td>'
         // 10) 삭제
         + '<td style="padding:5px 4px;text-align:center"><button onclick="deleteSampleEntry_BOS(\'' + s.id + '\')" title="삭제" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:13px;padding:4px 6px">✕</button></td>'
-        + '</tr>';
+        + '</tr>'
+        + ((typeof buildSampleDetailRow_BOS === 'function') ? buildSampleDetailRow_BOS(s) : '');
     }).join('');
     
     renderSampleSummary_BOS(data);
@@ -17863,10 +17875,10 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
     
     modal.innerHTML = '<div style="background:#fff;border-radius:14px;padding:22px;max-width:420px;width:92%;box-shadow:0 10px 40px rgba(0,0,0,.3)" onclick="event.stopPropagation()">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-bottom:12px;border-bottom:1px solid var(--bd)">'
-        + '<div style="font-size:15px;font-weight:700">⚙ 캘린더 연도 관리</div>'
+        + '<div style="font-size:15px;font-weight:700">⚙ 타임라인 연도 관리</div>'
         + '<button onclick="document.getElementById(\'cal-year-manager-modal\').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu);line-height:1;padding:0">×</button>'
       + '</div>'
-      + '<div style="font-size:11px;color:var(--mu);line-height:1.7;margin-bottom:14px">캘린더에 표시할 연도 범위를 설정합니다.<br>연도 삭제 = 범위를 줄이면 됩니다 (일정 데이터는 지워지지 않음)</div>'
+      + '<div style="font-size:11px;color:var(--mu);line-height:1.7;margin-bottom:14px">타임라인에 표시할 연도 범위를 설정합니다.<br>연도 삭제 = 범위를 줄이면 됩니다 (일정 데이터는 지워지지 않음)</div>'
       + '<label style="display:block;font-size:10.5px;font-weight:700;color:var(--mu);margin-bottom:4px">📅 시작 연도 (가장 과거)</label>'
       + '<input type="number" id="cym-min" value="' + minY + '" min="2000" max="' + thisYear + '" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;box-sizing:border-box;font-family:\'Roboto Mono\',monospace">'
       + '<label style="display:block;font-size:10.5px;font-weight:700;color:var(--mu);margin:12px 0 4px">📅 끝 연도 (가장 미래)</label>'
@@ -18241,6 +18253,16 @@ body.cal-highlighting .cal-item-card-bos:hover{
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 서브탭 전환
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  window.selectPowerContent_BOS = function(id){
+    window._powerSelId_BOS = id;
+    renderPowerContents_BOS();
+  };
+  
+  window.selectDisplayBanner_BOS = function(id){
+    window._bannerSelId_BOS = id;
+    renderDisplayBanners_BOS();
+  };
+  
   window.showAdSubTab = function(name){
     var subs = ['meta', 'power', 'display'];
     subs.forEach(function(s){
@@ -18267,10 +18289,12 @@ body.cal-highlighting .cal-item-card-bos:hover{
   
   window.renderPowerContents_BOS = function(){
     var listEl = document.getElementById('power-content-list');
+    var tabsEl = document.getElementById('power-content-tabs');
     if(!listEl) return;
     var data = loadPower();
     
     if(data.length === 0){
+      if(tabsEl) tabsEl.innerHTML = '';
       listEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--mu);font-size:12px;background:#FAFAF8;border-radius:8px;border:1px dashed var(--bd)">'
         + '파워 컨텐츠 기획안이 없습니다.<br><br>'
         + '<button class="btn btn-grn-bos" onclick="addPowerContent_BOS()">＋ 첫 컨텐츠 추가</button>'
@@ -18278,7 +18302,30 @@ body.cal-highlighting .cal-item-card-bos:hover{
       return;
     }
     
-    listEl.innerHTML = data.map(function(p, idx){
+    // ━━ 선택 항목 결정 (없거나 삭제됐으면 첫 항목) ━━
+    var selId = window._powerSelId_BOS;
+    if(!selId || !data.some(function(p){ return p.id === selId; })) selId = data[0].id;
+    window._powerSelId_BOS = selId;
+    
+    // ━━ 상단 탭 렌더 (짧은 제목 칩) ━━
+    if(tabsEl){
+      tabsEl.innerHTML = data.map(function(p, i){
+        var label = (p.title || '').trim() || ('컨텐츠 ' + (data.length - i));
+        if(label.length > 14) label = label.slice(0, 14) + '…';
+        var act = p.id === selId;
+        var st = STATUS_OPTS.find(function(s){ return s.key === p.status; }) || STATUS_OPTS[0];
+        return '<button onclick="selectPowerContent_BOS(\'' + p.id + '\')" data-power-tab="' + p.id + '" '
+          + 'style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:16px;font-size:11.5px;cursor:pointer;font-family:inherit;'
+          + 'background:' + (act ? '#1A1916' : '#fff') + ';color:' + (act ? '#fff' : 'var(--tx)') + ';'
+          + 'border:1px solid ' + (act ? '#1A1916' : 'var(--bd)') + ';font-weight:' + (act ? '700' : '500') + '">'
+          + '<span style="width:7px;height:7px;border-radius:50%;background:' + st.color + ';flex-shrink:0"></span>'
+          + escHtml(label)
+          + '</button>';
+      }).join('');
+    }
+    
+    // ━━ 선택된 항목 1건만 카드로 표시 ━━
+    listEl.innerHTML = data.filter(function(p){ return p.id === selId; }).map(function(p, idx){
       var statusInfo = STATUS_OPTS.find(function(s){ return s.key === p.status; }) || STATUS_OPTS[0];
       var platformOpts = PLATFORM_OPTS.map(function(opt){
         return '<option value="' + opt + '"' + (p.platform === opt ? ' selected' : '') + '>' + opt + '</option>';
@@ -18333,8 +18380,10 @@ body.cal-highlighting .cal-item-card-bos:hover{
   
   window.addPowerContent_BOS = function(){
     var data = loadPower();
+    var newId = 'pwr_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+    window._powerSelId_BOS = newId;  // 새 항목 자동 선택
     data.unshift({
-      id: 'pwr_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
+      id: newId,
       title: '',
       status: '기획',
       platform: '네이버 블로그',
@@ -18359,6 +18408,17 @@ body.cal-highlighting .cal-item-card-bos:hover{
     if(!item) return;
     item[key] = val;
     savePower(data);
+    // 제목 입력 중 탭 라벨 실시간 갱신 (포커스 유지 - 부분 갱신)
+    if(key === 'title'){
+      var tab = document.querySelector('[data-power-tab="' + id + '"]');
+      if(tab){
+        var label = (val || '').trim() || '컨텐츠';
+        if(label.length > 14) label = label.slice(0, 14) + '…';
+        // 첫 번째 텍스트 노드만 교체 (점 span은 유지)
+        var spans = tab.querySelectorAll('span');
+        tab.innerHTML = (spans[0] ? spans[0].outerHTML : '') + escHtml(label);
+      }
+    }
   };
   
   window.deletePowerContent_BOS = function(id){
@@ -18384,10 +18444,12 @@ body.cal-highlighting .cal-item-card-bos:hover{
   
   window.renderDisplayBanners_BOS = function(){
     var listEl = document.getElementById('display-banner-list');
+    var tabsEl = document.getElementById('display-banner-tabs');
     if(!listEl) return;
     var data = loadBanner();
     
     if(data.length === 0){
+      if(tabsEl) tabsEl.innerHTML = '';
       listEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--mu);font-size:12px;background:#FAFAF8;border-radius:8px;border:1px dashed var(--bd)">'
         + '디스플레이 배너 기획이 없습니다.<br><br>'
         + '<button class="btn btn-grn-bos" onclick="addDisplayBanner_BOS()">＋ 첫 배너 추가</button>'
@@ -18395,7 +18457,30 @@ body.cal-highlighting .cal-item-card-bos:hover{
       return;
     }
     
-    listEl.innerHTML = data.map(function(b){
+    // ━━ 선택 항목 결정 ━━
+    var selId = window._bannerSelId_BOS;
+    if(!selId || !data.some(function(b){ return b.id === selId; })) selId = data[0].id;
+    window._bannerSelId_BOS = selId;
+    
+    // ━━ 상단 탭 렌더 ━━
+    if(tabsEl){
+      tabsEl.innerHTML = data.map(function(b, i){
+        var label = (b.name || '').trim() || ('배너 ' + (data.length - i));
+        if(label.length > 14) label = label.slice(0, 14) + '…';
+        var act = b.id === selId;
+        var st = BANNER_STATUS.find(function(s){ return s.key === b.status; }) || BANNER_STATUS[0];
+        return '<button onclick="selectDisplayBanner_BOS(\'' + b.id + '\')" data-banner-tab="' + b.id + '" '
+          + 'style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:16px;font-size:11.5px;cursor:pointer;font-family:inherit;'
+          + 'background:' + (act ? '#1A1916' : '#fff') + ';color:' + (act ? '#fff' : 'var(--tx)') + ';'
+          + 'border:1px solid ' + (act ? '#1A1916' : 'var(--bd)') + ';font-weight:' + (act ? '700' : '500') + '">'
+          + '<span style="width:7px;height:7px;border-radius:50%;background:' + st.color + ';flex-shrink:0"></span>'
+          + escHtml(label)
+          + '</button>';
+      }).join('');
+    }
+    
+    // ━━ 선택된 항목 1건만 표시 ━━
+    listEl.innerHTML = data.filter(function(b){ return b.id === selId; }).map(function(b){
       var statusInfo = BANNER_STATUS.find(function(s){ return s.key === b.status; }) || BANNER_STATUS[0];
       var channelOpts = CHANNEL_OPTS.map(function(c){
         return '<option value="' + c + '"' + (b.channel === c ? ' selected' : '') + '>' + c + '</option>';
@@ -18472,8 +18557,10 @@ body.cal-highlighting .cal-item-card-bos:hover{
   
   window.addDisplayBanner_BOS = function(){
     var data = loadBanner();
+    var newId = 'bnr_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+    window._bannerSelId_BOS = newId;  // 새 항목 자동 선택
     data.unshift({
-      id: 'bnr_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
+      id: newId,
       name: '',
       status: '기획',
       channel: '네이버 GFA',
@@ -18500,6 +18587,16 @@ body.cal-highlighting .cal-item-card-bos:hover{
     if(!item) return;
     item[key] = val;
     saveBanner(data);
+    // 배너명 입력 중 탭 라벨 실시간 갱신
+    if(key === 'name'){
+      var tab = document.querySelector('[data-banner-tab="' + id + '"]');
+      if(tab){
+        var label = (val || '').trim() || '배너';
+        if(label.length > 14) label = label.slice(0, 14) + '…';
+        var spans = tab.querySelectorAll('span');
+        tab.innerHTML = (spans[0] ? spans[0].outerHTML : '') + escHtml(label);
+      }
+    }
   };
   
   window.deleteDisplayBanner_BOS = function(id){
@@ -18957,6 +19054,16 @@ body.cal-highlighting .cal-item-card-bos:hover{
         }
       }
       if(s.arrivalDate) events.push({date: s.arrivalDate, color:'#27AE60', label:'[도착 완료] ' + name});
+      // ━━ 공정 일정 (문안검수 / CT Test / 부자재·양산) ━━
+      if(typeof SAMPLE_PHASES_BOS !== 'undefined'){
+        SAMPLE_PHASES_BOS.forEach(function(ph){
+          var st = s[ph.startKey];
+          if(!st) return;
+          events.push({date: st, color: ph.color, label:'[' + ph.startLabel + '] ' + name});
+          var end = (typeof calcPhaseEnd_BOS === 'function') ? calcPhaseEnd_BOS(st, s[ph.durKey], s[ph.unitKey]) : '';
+          if(end && end !== st) events.push({date: end, color: ph.color, label:'[' + ph.endLabel + '] ' + name});
+        });
+      }
     });
     renderMiniCal('sample-minical-bos', events, 'sample');
   };
@@ -19168,6 +19275,167 @@ body.cal-highlighting .cal-item-card-bos:hover{
   
   console.log('[MiniCal+Contact] 미니 캘린더 + 연락처 카드 준비됨');
 })();
+</script>
+
+<!-- ━━━ 🏭 샘플 공정 일정 (문안검수 · CT Test · 양산) ━━━ -->
+<script id="sample-phases-script">
+(function(){
+  // ━━ 공정 정의 ━━
+  window.SAMPLE_PHASES_BOS = [
+    {key:'review', icon:'✍️', title:'문안검수',
+     startKey:'reviewStart', durKey:'reviewDur', unitKey:'reviewUnit',
+     startPh:'시작일', color:'#7A4AA8',
+     startLabel:'문안검수 시작', endLabel:'문안검수 종료 예정'},
+    {key:'ct', icon:'✅', title:'CT Test',
+     startKey:'ctStart', durKey:'ctDur', unitKey:'ctUnit',
+     startPh:'시작일', color:'#C0392B',
+     startLabel:'CT Test 시작', endLabel:'CT Test 종료 예정'},
+    {key:'prod', icon:'🏭', title:'양산 (부자재 입고 후)',
+     startKey:'materialDate', durKey:'prodDur', unitKey:'prodUnit',
+     startPh:'부자재 입고 예정일', color:'#16A085',
+     startLabel:'부자재 입고 예정', endLabel:'양산 완료 예상'}
+  ];
+  
+  window._sampleExpanded_BOS = window._sampleExpanded_BOS || {};
+  
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+  
+  // ━━ 종료일 계산: 시작일 + 기간(일/주) ━━
+  window.calcPhaseEnd_BOS = function(start, dur, unit){
+    if(!start) return '';
+    var n = parseInt(dur) || 0;
+    if(n <= 0) return '';
+    var days = n * (unit === 'w' ? 7 : 1);
+    var d = new Date(start + 'T00:00:00');
+    if(isNaN(d.getTime())) return '';
+    d.setDate(d.getDate() + days);
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  };
+  
+  function endDisplayHtml(s, ph){
+    var end = calcPhaseEnd_BOS(s[ph.startKey], s[ph.durKey], s[ph.unitKey]);
+    if(!end) return '';
+    var d = new Date(end + 'T00:00:00');
+    return '→ ' + (d.getMonth()+1) + '/' + d.getDate();
+  }
+  
+  // ━━ 펼침 패널 빌더 (행 렌더에서 호출) ━━
+  window.buildSampleDetailRow_BOS = function(s){
+    var open = !!window._sampleExpanded_BOS[s.id];
+    
+    var blocks = SAMPLE_PHASES_BOS.map(function(ph){
+      var unitVal = s[ph.unitKey] || 'd';
+      var endTxt = endDisplayHtml(s, ph);
+      var endIso = calcPhaseEnd_BOS(s[ph.startKey], s[ph.durKey], s[ph.unitKey]);
+      return '<div style="border:1px solid var(--bd);border-left:3px solid ' + ph.color + ';border-radius:6px;padding:9px 11px;background:#fff">'
+        + '<div style="font-size:11px;font-weight:700;margin-bottom:7px;color:' + ph.color + '">' + ph.icon + ' ' + ph.title + '</div>'
+        + '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">'
+          + '<div style="display:flex;flex-direction:column;gap:2px">'
+            + '<span style="font-size:9px;color:var(--mu);font-weight:600">' + ph.startPh + '</span>'
+            + '<input type="date" value="' + esc(s[ph.startKey]) + '" onchange="updateSampleField_BOS(\'' + s.id + '\',\'' + ph.startKey + '\',this.value)" style="padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff">'
+          + '</div>'
+          + '<div style="display:flex;flex-direction:column;gap:2px">'
+            + '<span style="font-size:9px;color:var(--mu);font-weight:600">소요기간</span>'
+            + '<div style="display:flex;align-items:center;gap:3px">'
+              + '<input type="number" value="' + esc(s[ph.durKey]) + '" min="0" placeholder="0" oninput="updateSampleField_BOS(\'' + s.id + '\',\'' + ph.durKey + '\',this.value)" style="width:52px;padding:4px 4px;border:1px solid var(--bd);border-radius:4px;font-size:11px;text-align:center">'
+              + '<select onchange="updateSampleField_BOS(\'' + s.id + '\',\'' + ph.unitKey + '\',this.value)" style="padding:4px 4px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff;cursor:pointer">'
+                + '<option value="d"' + (unitVal === 'd' ? ' selected' : '') + '>일</option>'
+                + '<option value="w"' + (unitVal === 'w' ? ' selected' : '') + '>주</option>'
+              + '</select>'
+            + '</div>'
+          + '</div>'
+          + '<span id="ph-end-' + s.id + '-' + ph.key + '" title="' + esc(endIso) + '" style="font-size:11px;color:' + ph.color + ';font-weight:700;font-family:\'Roboto Mono\',monospace;margin-left:2px;align-self:flex-end;padding-bottom:5px;white-space:nowrap">' + endTxt + '</span>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+    
+    return '<tr class="sample-detail-row" data-detail-for="' + s.id + '" style="display:' + (open ? 'table-row' : 'none') + ';background:#FBFAF7">'
+      + '<td colspan="11" style="padding:10px 14px;border-bottom:1px solid var(--bd)">'
+        + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px">' + blocks + '</div>'
+        + '<div style="font-size:9.5px;color:var(--mu);margin-top:7px">💡 입력한 일정은 아래 🗓 캘린더에 색 점으로 표시됩니다 (시작 + 종료 예정일)</div>'
+      + '</td>'
+    + '</tr>';
+  };
+  
+  // ━━ 펼침/접기 토글 ━━
+  window.toggleSamplePhases_BOS = function(id){
+    var row = document.querySelector('.sample-detail-row[data-detail-for="' + id + '"]');
+    if(!row) return;
+    var open = row.style.display === 'none';
+    row.style.display = open ? 'table-row' : 'none';
+    window._sampleExpanded_BOS[id] = open;
+  };
+  
+  // ━━ updateSampleField 래핑: 공정 키 변경 시 종료일 표시 + 미니캘 갱신 ━━
+  var PHASE_KEYS = [];
+  SAMPLE_PHASES_BOS.forEach(function(ph){
+    PHASE_KEYS.push(ph.startKey, ph.durKey, ph.unitKey);
+  });
+  
+  var _origUpd = window.updateSampleField_BOS;
+  if(typeof _origUpd === 'function' && !_origUpd._phaseWrapped){
+    window.updateSampleField_BOS = function(id, key, val){
+      _origUpd.apply(this, arguments);
+      if(PHASE_KEYS.indexOf(key) >= 0){
+        // 해당 공정의 종료일 span 부분 갱신
+        var ph = SAMPLE_PHASES_BOS.find(function(p){
+          return p.startKey === key || p.durKey === key || p.unitKey === key;
+        });
+        if(ph){
+          // 최신 데이터 다시 로드
+          var raw = null;
+          try { raw = localStorage.getItem('bos_sample_data_v1'); } catch(e){}
+          var data = [];
+          try { if(raw) data = JSON.parse(raw); } catch(e){}
+          var item = data.find(function(x){ return x.id === id; });
+          if(item){
+            var span = document.getElementById('ph-end-' + id + '-' + ph.key);
+            if(span){
+              var end = calcPhaseEnd_BOS(item[ph.startKey], item[ph.durKey], item[ph.unitKey]);
+              if(end){
+                var d = new Date(end + 'T00:00:00');
+                span.textContent = '→ ' + (d.getMonth()+1) + '/' + d.getDate();
+                span.setAttribute('title', end);
+              } else {
+                span.textContent = '';
+                span.setAttribute('title', '');
+              }
+            }
+            // ⚙ 버튼 배경 (데이터 있음 표시)
+            var mainRow = document.querySelector('tr[data-sample-id="' + id + '"]');
+            if(mainRow){
+              var gearBtn = mainRow.querySelector('button[title*="공정 일정"]');
+              if(gearBtn){
+                gearBtn.style.background = (item.reviewStart || item.ctStart || item.materialDate) ? '#EAF3EE' : 'none';
+              }
+            }
+          }
+        }
+        // 미니 캘린더 갱신
+        if(typeof renderSampleMiniCal_BOS === 'function'){
+          try { renderSampleMiniCal_BOS(); } catch(e){}
+        }
+      }
+    };
+    window.updateSampleField_BOS._phaseWrapped = true;
+    // 원본 함수에 래핑 플래그 (중복 래핑 방지)
+    _origUpd._phaseWrapped = true;
+  }
+  
+  console.log('[Sample Phases] 공정 일정 시스템 준비됨 (문안검수·CT Test·양산)');
+})();
+</script>
+
+<script id="t20-rename-migrate">
+// 저장된 탭 이름이 기본값(📅 캘린더)이면 타임라인으로 자동 교체
+setTimeout(function(){
+  try {
+    var btn = document.querySelector('button[onclick*="showTab(\'t20\'"] .tab-name-edit');
+    if(btn && btn.textContent.trim() === '📅 캘린더'){
+      btn.textContent = '📅 타임라인';
+    }
+  } catch(e){}
+}, 1200);
 </script>
 </body>
 </html>
