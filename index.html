@@ -616,6 +616,31 @@ body.edit-mode-on .tab-btn .tab-name-edit{
  }
 }
 </style>
+
+<!-- ━━━ 📱 모바일 가로 밀림 고정 ━━━ -->
+<style id="mobile-overflow-fix">
+/* 페이지 전체가 좌우로 끌려가며 흰 배경이 드러나는 현상 차단 */
+html, body{
+  overflow-x: hidden;
+  max-width: 100%;
+}
+@media (max-width: 768px){
+  html, body{
+    overflow-x: hidden !important;
+    width: 100%;
+    position: relative;
+    /* iOS 사파리 바운스 시 가로 끌림 방지 */
+    overscroll-behavior-x: none;
+  }
+  body{
+    touch-action: pan-y pinch-zoom; /* 세로 스크롤 + 확대만 허용 */
+  }
+  /* 넓은 테이블/그리드는 자신의 래퍼 안에서만 가로 스크롤 (기존 동작 유지) */
+  .tab-pane, .card, .section{
+    max-width: 100vw;
+  }
+}
+</style>
 </head>
 <body>
 <script id="tetrarix-data-injection">
@@ -12148,14 +12173,7 @@ function forceIsolationReset(){
 
     <div class="cal-controls-bos" style="margin-top:18px">
       <div class="cal-view-tabs-bos" id="cal-year-nav-bos">
-        <button class="cal-view-tab-bos" data-view="prev2" onclick="switchCalView_BOS('prev2')">2024</button>
-        <button class="cal-view-tab-bos" data-view="prev1" onclick="switchCalView_BOS('prev1')">2025</button>
-        <button class="cal-view-tab-bos active" data-view="single" onclick="switchCalView_BOS('single')">2026</button>
-        <button class="cal-view-tab-bos" data-view="next1" onclick="switchCalView_BOS('next1')">2027</button>
-        <button class="cal-view-tab-bos" data-view="next2" onclick="switchCalView_BOS('next2')">2028</button>
-        <button class="cal-view-tab-bos" data-view="past" onclick="switchCalView_BOS('past')" title="과거 3년 (2024~2026)">📜 과거 3년</button>
-        <button class="cal-view-tab-bos" data-view="future" onclick="switchCalView_BOS('future')" title="미래 3년 (2026~2028)">🔮 미래 3년</button>
-        <button class="cal-view-tab-bos" data-view="all" onclick="switchCalView_BOS('all')" title="전체 5년 (2024~2028)">🌐 전체 5년</button>
+        <!-- JS가 동적 생성: (올해-2) ~ 저장된 최대 연도 + 그룹 뷰 + 연도 추가 버튼 -->
       </div>
       <div style="font-size:11px;color:var(--mu)">🔵 오늘 / 🔘 항목별 색상</div>
     </div>
@@ -12204,6 +12222,19 @@ function forceIsolationReset(){
       <div style="margin-top:10px;font-size:10.5px;color:var(--mu);line-height:1.6">
         💡 <b>예상소요</b>는 의뢰 시 업체가 제시한 기간을 일 단위로 입력 · <b>실제소요</b>는 의뢰일↔도착일에서 자동 계산
       </div>
+      
+      <!-- 🗓 샘플 미니 캘린더 -->
+      <div style="margin-top:18px;border-top:1px solid var(--bd);padding-top:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:700">🗓 샘플 일정 캘린더</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:10.5px;color:var(--mu)">
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E67E22;vertical-align:middle"></span> 의뢰일</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1976D2;vertical-align:middle"></span> 예상 도착</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#27AE60;vertical-align:middle"></span> 실제 도착</span>
+          </div>
+        </div>
+        <div id="sample-minical-bos"></div>
+      </div>
     </div>
   </div>
   
@@ -12251,6 +12282,18 @@ function forceIsolationReset(){
       
       <div style="margin-top:10px;font-size:10.5px;color:var(--mu);line-height:1.6">
         💡 <b>업체 제안 결과물</b>은 의뢰 시 약속받은 산출물(예: 영상 2분 × 3편) · <b>실제 결과물</b>은 받은 결과(파일명 / 링크 / 코멘트)
+      </div>
+      
+      <!-- 🗓 아웃소싱 미니 캘린더 -->
+      <div style="margin-top:18px;border-top:1px solid var(--bd);padding-top:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:700">🗓 아웃소싱 일정 캘린더</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:10.5px;color:var(--mu)">
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E67E22;vertical-align:middle"></span> 의뢰일</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#27AE60;vertical-align:middle"></span> 결과물 도착</span>
+          </div>
+        </div>
+        <div id="outsource-minical-bos"></div>
       </div>
     </div>
   </div>
@@ -12821,6 +12864,8 @@ function forceIsolationReset(){
     else if(calCurrentView_BOS === 'past') years = [thisYear-2, thisYear-1, thisYear];
     else if(calCurrentView_BOS === 'future') years = [thisYear, thisYear+1, thisYear+2];
     else if(calCurrentView_BOS === 'all') years = [thisYear-2, thisYear-1, thisYear, thisYear+1, thisYear+2];
+    else if(/^y\d{4}$/.test(calCurrentView_BOS)) years = [parseInt(calCurrentView_BOS.slice(1))];  // 임의 연도 (y2030 등)
+    else years = [thisYear];  // 폴백
     
     var html = '';
     years.forEach(function(year){
@@ -13856,7 +13901,9 @@ function forceIsolationReset(){
     'bos_outsource_data_v1',   // 🤝 아웃소싱 데이터
     'bos_outsource_filter_v1', // 🤝 아웃소싱 카테고리 필터
     'bos_power_content_v1',    // 📝 파워 컨텐츠 (블로그)
-    'bos_display_banner_v1'    // 🖼 디스플레이 배너
+    'bos_display_banner_v1',   // 🖼 디스플레이 배너
+    'bos_cal_max_year',        // 📅 캘린더 최대 연도 (확장 상태)
+    'bos_contacts_v1'          // 📇 거래처 연락처 카드 (명함 이미지 포함)
   ];
   
   // ━━ 동적 키 prefix (제품별 데이터: epitect-v7__제품ID) ━━
@@ -17449,8 +17496,11 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
       return '<tr style="border-bottom:1px solid var(--bd);background:' + statusBg + '" data-sample-id="' + s.id + '">'
         // 1) 업체명
         + '<td style="padding:5px 6px"><input value="' + escAttr(s.vendor) + '" placeholder="업체명" oninput="updateSampleField_BOS(\'' + s.id + '\',\'vendor\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;font-weight:500;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
-        // 2) 거래처 담당자 (기존 contact 필드 호환 - 마이그레이션)
-        + '<td style="padding:5px 6px"><input value="' + escAttr(s.contactVendor || s.contact || '') + '" placeholder="거래처 담당자" oninput="updateSampleField_BOS(\'' + s.id + '\',\'contactVendor\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        // 2) 거래처 담당자 (📇 연락처 카드 버튼 포함)
+        + '<td style="padding:5px 6px"><div style="display:flex;align-items:center;gap:3px">'
+          + '<input value="' + escAttr(s.contactVendor || s.contact || '') + '" placeholder="거래처 담당자" oninput="updateSampleField_BOS(\'' + s.id + '\',\'contactVendor\',this.value)" style="flex:1;min-width:0;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">'
+          + '<button onclick="openContactCard_BOS(\'sample\',\'' + s.id + '\')" title="연락처 카드 (전화·이메일·명함)" style="background:none;border:1px solid var(--bd);border-radius:4px;padding:3px 5px;font-size:11px;cursor:pointer;flex-shrink:0;line-height:1">📇</button>'
+        + '</div></td>'
         // 3) 우리 담당자 (신규)
         + '<td style="padding:5px 6px"><input value="' + escAttr(s.contactOurs || '') + '" placeholder="우리 담당자" oninput="updateSampleField_BOS(\'' + s.id + '\',\'contactOurs\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
         // 4) 의뢰 샘플
@@ -17631,7 +17681,10 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
       return '<tr style="border-bottom:1px solid var(--bd);background:' + rowBg + ';border-left:3px solid ' + catInfo.color + '" data-outsource-id="' + o.id + '">'
         + '<td style="padding:5px 6px"><select onchange="updateOutsourceField_BOS(\'' + o.id + '\',\'category\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff;cursor:pointer">' + catOptions + '</select></td>'
         + '<td style="padding:5px 6px"><input value="' + escAttr(o.vendor) + '" placeholder="업체명" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'vendor\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;font-weight:500;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
-        + '<td style="padding:5px 6px"><input value="' + escAttr(o.contact) + '" placeholder="담당자" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'contact\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        + '<td style="padding:5px 6px"><div style="display:flex;align-items:center;gap:3px">'
+          + '<input value="' + escAttr(o.contact) + '" placeholder="담당자" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'contact\',this.value)" style="flex:1;min-width:0;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">'
+          + '<button onclick="openContactCard_BOS(\'outsource\',\'' + o.id + '\')" title="연락처 카드 (전화·이메일·명함)" style="background:none;border:1px solid var(--bd);border-radius:4px;padding:3px 5px;font-size:11px;cursor:pointer;flex-shrink:0;line-height:1">📇</button>'
+        + '</div></td>'
         + '<td style="padding:5px 6px"><input type="date" value="' + escAttr(o.requestDate) + '" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'requestDate\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff"></td>'
         + '<td style="padding:5px 6px"><textarea placeholder="예: 영상 2분 × 3편, 의뢰서 첨부" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'proposal\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11px;background:transparent;resize:vertical;min-height:28px;font-family:inherit" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">' + escHtml(o.proposal) + '</textarea></td>'
         + '<td style="padding:5px 6px"><input type="date" value="' + escAttr(o.deliveryDate) + '" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'deliveryDate\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff"></td>'
@@ -17731,26 +17784,57 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 📅 연도 라벨 자동 갱신 (오늘 기준 동적)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ━━ 연도 네비 동적 생성 (올해-2 ~ 저장된 최대 연도, 기본 2032) ━━
+  var CAL_MAX_YEAR_KEY = 'bos_cal_max_year';
+  
+  function getCalMaxYear(){
+    var thisYear = new Date().getFullYear();
+    var defMax = Math.max(thisYear + 2, 2032);  // 기본: 2032년까지 (최소 올해+2)
+    try {
+      var saved = parseInt(localStorage.getItem(CAL_MAX_YEAR_KEY));
+      if(saved && saved > thisYear) return Math.max(saved, defMax === 2032 ? saved : defMax);
+      if(saved && saved >= defMax) return saved;
+    } catch(e){}
+    return defMax;
+  }
+  
+  window.addCalYear_BOS = function(){
+    var cur = getCalMaxYear();
+    var next = cur + 1;
+    try { localStorage.setItem(CAL_MAX_YEAR_KEY, String(next)); } catch(e){}
+    updateCalYearLabels_BOS();
+    if(typeof syncToast === 'function') syncToast('📅 ' + next + '년까지 확장됨', 'ok');
+    else console.log('[Cal] ' + next + '년까지 확장');
+  };
+  
   window.updateCalYearLabels_BOS = function(){
+    var nav = document.getElementById('cal-year-nav-bos');
+    if(!nav) return;
     var y = new Date().getFullYear();
-    var map = {
-      'prev2': y - 2,
-      'prev1': y - 1,
-      'single': y,
-      'next1': y + 1,
-      'next2': y + 2
-    };
-    Object.keys(map).forEach(function(v){
-      var btn = document.querySelector('#cal-year-nav-bos button[data-view="' + v + '"]');
-      if(btn) btn.textContent = String(map[v]);
-    });
-    // 과거/미래/전체 버튼은 툴팁만 업데이트
-    var pastBtn = document.querySelector('#cal-year-nav-bos button[data-view="past"]');
-    if(pastBtn) pastBtn.title = '과거 3년 (' + (y-2) + '~' + y + ')';
-    var futureBtn = document.querySelector('#cal-year-nav-bos button[data-view="future"]');
-    if(futureBtn) futureBtn.title = '미래 3년 (' + y + '~' + (y+2) + ')';
-    var allBtn = document.querySelector('#cal-year-nav-bos button[data-view="all"]');
-    if(allBtn) allBtn.title = '전체 5년 (' + (y-2) + '~' + (y+2) + ')';
+    var maxYear = getCalMaxYear();
+    var currentView = (typeof calCurrentView_BOS !== 'undefined' && calCurrentView_BOS) || 'single';
+    
+    var h = '';
+    // 개별 연도 버튼: (올해-2) ~ maxYear
+    for(var yr = y - 2; yr <= maxYear; yr++){
+      var view;
+      if(yr === y - 2) view = 'prev2';
+      else if(yr === y - 1) view = 'prev1';
+      else if(yr === y) view = 'single';
+      else if(yr === y + 1) view = 'next1';
+      else if(yr === y + 2) view = 'next2';
+      else view = 'y' + yr;  // 임의 연도 뷰
+      var act = (currentView === view) ? ' active' : '';
+      h += '<button class="cal-view-tab-bos' + act + '" data-view="' + view + '" onclick="switchCalView_BOS(\'' + view + '\')">' + yr + '</button>';
+    }
+    // 그룹 뷰
+    h += '<button class="cal-view-tab-bos' + (currentView==='past'?' active':'') + '" data-view="past" onclick="switchCalView_BOS(\'past\')" title="과거 3년 (' + (y-2) + '~' + y + ')">📜 과거 3년</button>';
+    h += '<button class="cal-view-tab-bos' + (currentView==='future'?' active':'') + '" data-view="future" onclick="switchCalView_BOS(\'future\')" title="미래 3년 (' + y + '~' + (y+2) + ')">🔮 미래 3년</button>';
+    h += '<button class="cal-view-tab-bos' + (currentView==='all'?' active':'') + '" data-view="all" onclick="switchCalView_BOS(\'all\')" title="전체 5년 (' + (y-2) + '~' + (y+2) + ')">🌐 전체 5년</button>';
+    // 연도 추가 버튼
+    h += '<button class="cal-view-tab-bos" onclick="addCalYear_BOS()" title="연도 1년 추가 (현재 최대: ' + maxYear + '년)" style="border-style:dashed;color:var(--mu)">＋ 연도 추가</button>';
+    
+    nav.innerHTML = h;
   };
   
   // 페이지 로드 + showTab('t20') 호출 시 자동
@@ -18510,6 +18594,419 @@ body.cal-highlighting .cal-item-card-bos:hover{
   });
   
   console.log('[PC Nav] 토글 스크립트 준비됨 (Ctrl+\\)');
+})();
+</script>
+
+<!-- ━━━ 🗓 샘플/아웃소싱 미니 캘린더 + 📇 연락처 카드 ━━━ -->
+<style id="minical-contact-style">
+.minical-wrap-bos{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.minical-month-bos{border:1px solid var(--bd);border-radius:8px;padding:10px;background:#fff}
+.minical-head-bos{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.minical-title-bos{font-size:12px;font-weight:700}
+.minical-nav-btn-bos{background:none;border:1px solid var(--bd);border-radius:4px;padding:2px 8px;cursor:pointer;font-size:11px;color:var(--tx)}
+.minical-nav-btn-bos:hover{background:var(--bg)}
+.minical-grid-bos{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.minical-dow-bos{text-align:center;font-size:9px;color:var(--mu);font-weight:700;padding:2px 0}
+.minical-cell-bos{aspect-ratio:1;min-height:30px;border:1px solid transparent;border-radius:4px;padding:2px;font-size:10px;position:relative;display:flex;flex-direction:column;align-items:center}
+.minical-cell-bos.has-ev{background:#FAFAF8;border-color:var(--bd);cursor:default}
+.minical-cell-bos.today{border-color:#2563EB;border-width:2px;font-weight:700}
+.minical-day-bos{line-height:1.2}
+.minical-dots-bos{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:1px;max-width:100%}
+.minical-dot-bos{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+/* 호버 툴팁 - 기존 cal-tooltip 재사용 가능하지만 별도 간단 구현 */
+#minical-tip-bos{position:fixed;background:rgba(26,25,22,.96);color:#fff;padding:8px 11px;border-radius:7px;font-size:11px;pointer-events:none;z-index:10000;box-shadow:0 5px 18px rgba(0,0,0,.4);max-width:300px;display:none;line-height:1.5}
+
+/* 📇 연락처 카드 모달 */
+#contact-card-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9300;align-items:center;justify-content:center}
+#contact-card-modal .cc-card{background:#fff;border-radius:14px;padding:22px;max-width:520px;width:94%;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+#contact-card-modal label{display:block;font-size:10.5px;font-weight:700;color:var(--mu);margin:10px 0 4px}
+#contact-card-modal input[type=text], #contact-card-modal input[type=tel], #contact-card-modal input[type=email], #contact-card-modal textarea{width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12.5px;font-family:inherit;box-sizing:border-box}
+#contact-card-modal .cc-img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:8px}
+#contact-card-modal .cc-img-item{position:relative;border:1px solid var(--bd);border-radius:6px;overflow:hidden;aspect-ratio:1.6;background:#FAFAF8}
+#contact-card-modal .cc-img-item img{width:100%;height:100%;object-fit:cover;cursor:zoom-in}
+#contact-card-modal .cc-img-del{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:4px;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1}
+#contact-img-zoom-bos{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9400;align-items:center;justify-content:center;cursor:zoom-out}
+#contact-img-zoom-bos img{max-width:92vw;max-height:92vh;border-radius:8px}
+</style>
+
+<!-- 연락처 카드 모달 -->
+<div id="contact-card-modal">
+  <div class="cc-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;padding-bottom:12px;border-bottom:1px solid var(--bd)">
+      <div>
+        <div style="font-size:15px;font-weight:700">📇 연락처 카드</div>
+        <div id="cc-subtitle" style="font-size:11px;color:var(--mu);margin-top:3px"></div>
+      </div>
+      <button onclick="closeContactCard_BOS()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu);line-height:1;padding:0">×</button>
+    </div>
+    
+    <label>👤 담당자 이름</label>
+    <input type="text" id="cc-name" placeholder="이름 / 직급 (예: 김OO 부장)">
+    
+    <label>🏢 회사 / 부서</label>
+    <input type="text" id="cc-company" placeholder="회사명 · 부서">
+    
+    <label>📞 연락처</label>
+    <input type="tel" id="cc-phone" placeholder="010-0000-0000 / 02-000-0000">
+    
+    <label>✉️ 이메일</label>
+    <input type="email" id="cc-email" placeholder="name@company.com">
+    
+    <label>📝 메모</label>
+    <textarea id="cc-memo" rows="2" placeholder="응대 스타일, 통화 가능 시간 등" style="resize:vertical"></textarea>
+    
+    <label>🖼 명함 / 연락처 캡처 이미지</label>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button onclick="document.getElementById('cc-img-input').click()" style="background:#fff;border:1px dashed var(--bd);border-radius:6px;padding:8px 14px;font-size:11.5px;cursor:pointer;color:var(--tx)">＋ 이미지 추가 (명함·캡처)</button>
+      <span style="font-size:10px;color:var(--mu)">자동으로 용량 축소되어 저장됩니다</span>
+    </div>
+    <input type="file" id="cc-img-input" accept="image/*" multiple style="display:none" onchange="ccAddImages_BOS(this)">
+    <div class="cc-img-grid" id="cc-img-grid"></div>
+    
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--bd)">
+      <button onclick="closeContactCard_BOS()" style="background:#fff;border:1px solid var(--bd);border-radius:6px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer">취소</button>
+      <button onclick="saveContactCard_BOS()" style="background:#1A6B4A;color:#fff;border:none;border-radius:6px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer">💾 저장</button>
+    </div>
+  </div>
+</div>
+<div id="contact-img-zoom-bos" onclick="this.style.display='none'"><img id="contact-img-zoom-img" src=""></div>
+
+<script id="minical-contact-script">
+(function(){
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🗓 공용 미니 캘린더
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  var miniCalState = {
+    sample: null,     // {y, m} - null이면 현재 월
+    outsource: null
+  };
+  
+  function ensureMiniTip(){
+    var tip = document.getElementById('minical-tip-bos');
+    if(!tip){
+      tip = document.createElement('div');
+      tip.id = 'minical-tip-bos';
+      document.body.appendChild(tip);
+    }
+    return tip;
+  }
+  
+  window.miniCalHover_BOS = function(el, event){
+    var data = el.getAttribute('data-ev') || '';
+    if(!data) return;
+    var tip = ensureMiniTip();
+    tip.innerHTML = data.split('||').map(function(line){
+      var parts = line.split('::');  // color::text
+      return '<div style="display:flex;gap:6px;align-items:center;padding:2px 0">'
+        + '<span style="width:8px;height:8px;border-radius:50%;background:' + (parts[0]||'#888') + ';flex-shrink:0"></span>'
+        + '<span>' + (parts[1]||'') + '</span></div>';
+    }).join('');
+    tip.style.display = 'block';
+    var x = event.clientX + 12, y = event.clientY + 12;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    var r = tip.getBoundingClientRect();
+    if(x + r.width > window.innerWidth - 8) tip.style.left = (event.clientX - r.width - 12) + 'px';
+    if(y + r.height > window.innerHeight - 8) tip.style.top = (event.clientY - r.height - 12) + 'px';
+  };
+  window.miniCalLeave_BOS = function(){
+    var tip = document.getElementById('minical-tip-bos');
+    if(tip) tip.style.display = 'none';
+  };
+  
+  // events: [{date:'YYYY-MM-DD', color, label}]
+  function renderMiniCal(containerId, events, stateKey){
+    var container = document.getElementById(containerId);
+    if(!container) return;
+    
+    var now = new Date();
+    var st = miniCalState[stateKey];
+    var y = st ? st.y : now.getFullYear();
+    var m = st ? st.m : now.getMonth();
+    
+    // 날짜별 이벤트 맵
+    var evMap = {};
+    (events||[]).forEach(function(ev){
+      if(!ev.date) return;
+      if(!evMap[ev.date]) evMap[ev.date] = [];
+      evMap[ev.date].push(ev);
+    });
+    
+    var firstDay = new Date(y, m, 1);
+    var lastDay = new Date(y, m+1, 0);
+    var startDow = firstDay.getDay();
+    var days = lastDay.getDate();
+    var todayIso = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+    
+    var dows = ['일','월','화','수','목','금','토'];
+    var h = '<div class="minical-month-bos">';
+    h += '<div class="minical-head-bos">';
+    h += '<button class="minical-nav-btn-bos" onclick="miniCalNav_BOS(\'' + stateKey + '\',-1)">◀</button>';
+    h += '<span class="minical-title-bos">' + y + '년 ' + (m+1) + '월</span>';
+    h += '<button class="minical-nav-btn-bos" onclick="miniCalNav_BOS(\'' + stateKey + '\',1)">▶</button>';
+    h += '</div>';
+    h += '<div class="minical-grid-bos">';
+    dows.forEach(function(d, i){
+      var c = i===0 ? 'color:#C0392B' : (i===6 ? 'color:#2563EB' : '');
+      h += '<div class="minical-dow-bos" style="' + c + '">' + d + '</div>';
+    });
+    for(var i=0; i<startDow; i++) h += '<div class="minical-cell-bos"></div>';
+    for(var d=1; d<=days; d++){
+      var iso = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      var evs = evMap[iso] || [];
+      var isToday = iso === todayIso;
+      var cls = 'minical-cell-bos' + (evs.length ? ' has-ev' : '') + (isToday ? ' today' : '');
+      // 툴팁 데이터: color::label||color::label
+      var tipData = evs.map(function(e){ return e.color + '::' + String(e.label||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }).join('||');
+      var hover = evs.length ? ' data-ev="' + tipData + '" onmouseenter="miniCalHover_BOS(this,event)" onmousemove="miniCalHover_BOS(this,event)" onmouseleave="miniCalLeave_BOS()"' : '';
+      h += '<div class="' + cls + '"' + hover + '>';
+      h += '<span class="minical-day-bos">' + d + '</span>';
+      if(evs.length){
+        h += '<span class="minical-dots-bos">';
+        evs.slice(0,4).forEach(function(e){ h += '<span class="minical-dot-bos" style="background:' + e.color + '"></span>'; });
+        if(evs.length > 4) h += '<span style="font-size:8px;color:var(--mu)">+' + (evs.length-4) + '</span>';
+        h += '</span>';
+      }
+      h += '</div>';
+    }
+    h += '</div></div>';
+    container.innerHTML = '<div class="minical-wrap-bos">' + h + '</div>';
+  }
+  
+  window.miniCalNav_BOS = function(stateKey, delta){
+    var now = new Date();
+    var st = miniCalState[stateKey] || {y: now.getFullYear(), m: now.getMonth()};
+    st.m += delta;
+    if(st.m < 0){ st.m = 11; st.y--; }
+    if(st.m > 11){ st.m = 0; st.y++; }
+    miniCalState[stateKey] = st;
+    if(stateKey === 'sample') renderSampleMiniCal_BOS();
+    else renderOutsourceMiniCal_BOS();
+  };
+  
+  // ━━ 샘플 이벤트 수집 ━━
+  window.renderSampleMiniCal_BOS = function(){
+    var raw = null;
+    try { raw = localStorage.getItem('bos_sample_data_v1'); } catch(e){}
+    var data = [];
+    try { if(raw) data = JSON.parse(raw); } catch(e){}
+    
+    var events = [];
+    data.forEach(function(s){
+      var name = (s.vendor||'업체') + ' · ' + (s.sampleName||'샘플');
+      if(s.requestDate) events.push({date: s.requestDate, color:'#E67E22', label:'[의뢰] ' + name});
+      // 예상 도착일 = 의뢰일 + 예상소요
+      if(s.requestDate && parseInt(s.expectedDays) > 0 && !s.arrivalDate){
+        var d = new Date(s.requestDate + 'T00:00:00');
+        if(!isNaN(d.getTime())){
+          d.setDate(d.getDate() + parseInt(s.expectedDays));
+          var iso = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+          events.push({date: iso, color:'#1976D2', label:'[예상 도착] ' + name});
+        }
+      }
+      if(s.arrivalDate) events.push({date: s.arrivalDate, color:'#27AE60', label:'[도착 완료] ' + name});
+    });
+    renderMiniCal('sample-minical-bos', events, 'sample');
+  };
+  
+  // ━━ 아웃소싱 이벤트 수집 ━━
+  window.renderOutsourceMiniCal_BOS = function(){
+    var raw = null;
+    try { raw = localStorage.getItem('bos_outsource_data_v1'); } catch(e){}
+    var data = [];
+    try { if(raw) data = JSON.parse(raw); } catch(e){}
+    
+    var events = [];
+    data.forEach(function(o){
+      var name = (o.category||'') + ' · ' + (o.vendor||'업체');
+      if(o.requestDate) events.push({date: o.requestDate, color:'#E67E22', label:'[의뢰] ' + name});
+      if(o.deliveryDate) events.push({date: o.deliveryDate, color:'#27AE60', label:'[결과물 도착] ' + name});
+    });
+    renderMiniCal('outsource-minical-bos', events, 'outsource');
+  };
+  
+  // ━━ 기존 렌더 함수 래핑: 테이블 렌더 후 미니캘도 함께 ━━
+  function wrapRender(fnName, miniFn){
+    var orig = window[fnName];
+    if(typeof orig === 'function' && !orig._miniWrapped){
+      window[fnName] = function(){
+        orig.apply(this, arguments);
+        try { miniFn(); } catch(e){ console.warn('[MiniCal]', e); }
+      };
+      window[fnName]._miniWrapped = true;
+    }
+  }
+  wrapRender('renderSampleTable_BOS', function(){ renderSampleMiniCal_BOS(); });
+  wrapRender('renderOutsourceTable_BOS', function(){ renderOutsourceMiniCal_BOS(); });
+  
+  // 날짜 필드 변경 시 미니캘 갱신 (updateSampleField/updateOutsourceField 래핑)
+  function wrapUpdate(fnName, dateKeys, miniFn){
+    var orig = window[fnName];
+    if(typeof orig === 'function' && !orig._miniWrapped){
+      window[fnName] = function(id, key, val){
+        orig.apply(this, arguments);
+        if(dateKeys.indexOf(key) >= 0){
+          try { miniFn(); } catch(e){}
+        }
+      };
+      window[fnName]._miniWrapped = true;
+    }
+  }
+  wrapUpdate('updateSampleField_BOS', ['requestDate','expectedDays','arrivalDate','vendor','sampleName'], function(){ renderSampleMiniCal_BOS(); });
+  wrapUpdate('updateOutsourceField_BOS', ['requestDate','deliveryDate','vendor','category'], function(){ renderOutsourceMiniCal_BOS(); });
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 📇 연락처 카드
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  var CONTACTS_KEY = 'bos_contacts_v1';
+  var _ccCurrent = null;  // {key, source, itemId}
+  var _ccImages = [];     // 현재 편집 중 이미지 배열
+  
+  function loadContacts(){
+    try { var raw = localStorage.getItem(CONTACTS_KEY); return raw ? JSON.parse(raw) : {}; }
+    catch(e){ return {}; }
+  }
+  function saveContacts(obj){
+    try { 
+      localStorage.setItem(CONTACTS_KEY, JSON.stringify(obj)); 
+      if(typeof updateSaveTime==='function') updateSaveTime();
+    } catch(e){
+      if(e && (e.name === 'QuotaExceededError' || String(e).indexOf('quota') >= 0)){
+        alert('⚠ 저장 공간 부족: 이미지가 너무 많습니다. 안 쓰는 명함 이미지를 삭제해주세요.');
+      }
+    }
+  }
+  
+  function getItemInfo(source, itemId){
+    var lsKey = source === 'sample' ? 'bos_sample_data_v1' : 'bos_outsource_data_v1';
+    var raw = null;
+    try { raw = localStorage.getItem(lsKey); } catch(e){}
+    var data = [];
+    try { if(raw) data = JSON.parse(raw); } catch(e){}
+    var item = data.find(function(x){ return x.id === itemId; });
+    if(!item) return null;
+    var vendor = item.vendor || '';
+    var name = source === 'sample' ? (item.contactVendor || item.contact || '') : (item.contact || '');
+    return {vendor: vendor, name: name};
+  }
+  
+  window.openContactCard_BOS = function(source, itemId){
+    var info = getItemInfo(source, itemId);
+    if(!info){ alert('항목을 찾을 수 없습니다'); return; }
+    
+    // 키: 업체|담당자 (이름 없으면 업체만)
+    var key = (info.vendor || '(업체미상)') + '|' + (info.name || '(담당자미상)');
+    _ccCurrent = {key: key, source: source, itemId: itemId};
+    
+    var contacts = loadContacts();
+    var c = contacts[key] || {};
+    
+    document.getElementById('cc-subtitle').textContent = info.vendor + (info.name ? ' — ' + info.name : '');
+    document.getElementById('cc-name').value = c.name || info.name || '';
+    document.getElementById('cc-company').value = c.company || info.vendor || '';
+    document.getElementById('cc-phone').value = c.phone || '';
+    document.getElementById('cc-email').value = c.email || '';
+    document.getElementById('cc-memo').value = c.memo || '';
+    _ccImages = (c.images || []).slice();
+    renderCcImages();
+    
+    document.getElementById('contact-card-modal').style.display = 'flex';
+  };
+  
+  window.closeContactCard_BOS = function(){
+    document.getElementById('contact-card-modal').style.display = 'none';
+    _ccCurrent = null;
+    _ccImages = [];
+  };
+  
+  function renderCcImages(){
+    var grid = document.getElementById('cc-img-grid');
+    if(!grid) return;
+    grid.innerHTML = _ccImages.map(function(src, i){
+      return '<div class="cc-img-item">'
+        + '<img src="' + src + '" onclick="ccZoomImage_BOS(' + i + ')" title="클릭하여 크게 보기">'
+        + '<button class="cc-img-del" onclick="ccDelImage_BOS(' + i + ')" title="이미지 삭제">✕</button>'
+        + '</div>';
+    }).join('');
+  }
+  
+  window.ccZoomImage_BOS = function(i){
+    var src = _ccImages[i];
+    if(!src) return;
+    document.getElementById('contact-img-zoom-img').src = src;
+    document.getElementById('contact-img-zoom-bos').style.display = 'flex';
+  };
+  
+  window.ccDelImage_BOS = function(i){
+    if(!confirm('이 이미지를 삭제하시겠습니까?')) return;
+    _ccImages.splice(i, 1);
+    renderCcImages();
+  };
+  
+  // 이미지 추가 - canvas 리사이즈 (긴 변 900px, JPEG 0.72) 후 base64 저장
+  window.ccAddImages_BOS = function(input){
+    var files = Array.prototype.slice.call(input.files || []);
+    if(!files.length) return;
+    
+    files.forEach(function(file){
+      if(!file.type || file.type.indexOf('image') !== 0) return;
+      var reader = new FileReader();
+      reader.onload = function(e){
+        var img = new Image();
+        img.onload = function(){
+          var MAX = 900;
+          var w = img.width, h = img.height;
+          if(w > MAX || h > MAX){
+            if(w >= h){ h = Math.round(h * MAX / w); w = MAX; }
+            else { w = Math.round(w * MAX / h); h = MAX; }
+          }
+          var canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          var dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+          _ccImages.push(dataUrl);
+          renderCcImages();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+    input.value = '';  // 같은 파일 재선택 가능하도록
+  };
+  
+  window.saveContactCard_BOS = function(){
+    if(!_ccCurrent) return;
+    var contacts = loadContacts();
+    contacts[_ccCurrent.key] = {
+      name: document.getElementById('cc-name').value.trim(),
+      company: document.getElementById('cc-company').value.trim(),
+      phone: document.getElementById('cc-phone').value.trim(),
+      email: document.getElementById('cc-email').value.trim(),
+      memo: document.getElementById('cc-memo').value.trim(),
+      images: _ccImages,
+      updatedAt: new Date().toISOString()
+    };
+    saveContacts(contacts);
+    if(typeof syncToast === 'function') syncToast('📇 연락처 카드 저장됨', 'ok');
+    closeContactCard_BOS();
+  };
+  
+  // ESC 닫기 (줌 → 카드 순서)
+  document.addEventListener('keydown', function(e){
+    if(e.key !== 'Escape' || e.isComposing) return;
+    var zoom = document.getElementById('contact-img-zoom-bos');
+    if(zoom && zoom.style.display === 'flex'){
+      zoom.style.display = 'none';
+      e.preventDefault(); e.stopPropagation();
+      return;
+    }
+    var modal = document.getElementById('contact-card-modal');
+    if(modal && modal.style.display === 'flex'){
+      closeContactCard_BOS();
+      e.preventDefault(); e.stopPropagation();
+    }
+  }, true);
+  
+  console.log('[MiniCal+Contact] 미니 캘린더 + 연락처 카드 준비됨');
 })();
 </script>
 </body>
