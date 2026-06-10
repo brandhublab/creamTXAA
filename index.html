@@ -12865,6 +12865,13 @@ function forceIsolationReset(){
     else if(calCurrentView_BOS === 'future') years = [thisYear, thisYear+1, thisYear+2];
     else if(calCurrentView_BOS === 'all') years = [thisYear-2, thisYear-1, thisYear, thisYear+1, thisYear+2];
     else if(/^y\d{4}$/.test(calCurrentView_BOS)) years = [parseInt(calCurrentView_BOS.slice(1))];  // 임의 연도 (y2030 등)
+    else if(calCurrentView_BOS === 'range'){
+      // 사용자가 직접 선택한 기간
+      var rg = (typeof getCalRange_BOS === 'function') ? getCalRange_BOS() : null;
+      if(rg && rg.from && rg.to){
+        for(var ry = rg.from; ry <= rg.to && years.length < 12; ry++) years.push(ry);
+      } else years = [thisYear];
+    }
     else years = [thisYear];  // 폴백
     
     var html = '';
@@ -13903,6 +13910,8 @@ function forceIsolationReset(){
     'bos_power_content_v1',    // 📝 파워 컨텐츠 (블로그)
     'bos_display_banner_v1',   // 🖼 디스플레이 배너
     'bos_cal_max_year',        // 📅 캘린더 최대 연도 (확장 상태)
+    'bos_cal_min_year',        // 📅 캘린더 최소 연도
+    'bos_cal_range_v1',        // 📅 직접 선택한 기간
     'bos_contacts_v1'          // 📇 거래처 연락처 카드 (명함 이미지 포함)
   ];
   
@@ -17784,55 +17793,172 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 📅 연도 라벨 자동 갱신 (오늘 기준 동적)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // ━━ 연도 네비 동적 생성 (올해-2 ~ 저장된 최대 연도, 기본 2032) ━━
+  // ━━ 연도 네비 동적 생성 (연도 관리 + 직접 기간 선택) ━━
   var CAL_MAX_YEAR_KEY = 'bos_cal_max_year';
+  var CAL_MIN_YEAR_KEY = 'bos_cal_min_year';
+  var CAL_RANGE_KEY = 'bos_cal_range_v1';
+  
+  function getCalMinYear(){
+    var thisYear = new Date().getFullYear();
+    var defMin = thisYear - 2;
+    try {
+      var saved = parseInt(localStorage.getItem(CAL_MIN_YEAR_KEY));
+      if(saved && saved >= 2000 && saved <= thisYear) return saved;
+    } catch(e){}
+    return defMin;
+  }
   
   function getCalMaxYear(){
     var thisYear = new Date().getFullYear();
-    var defMax = Math.max(thisYear + 2, 2032);  // 기본: 2032년까지 (최소 올해+2)
+    var defMax = Math.max(thisYear + 2, 2032);  // 기본: 2032년까지
     try {
       var saved = parseInt(localStorage.getItem(CAL_MAX_YEAR_KEY));
-      if(saved && saved > thisYear) return Math.max(saved, defMax === 2032 ? saved : defMax);
-      if(saved && saved >= defMax) return saved;
+      if(saved && saved >= thisYear) return saved;
     } catch(e){}
     return defMax;
   }
   
+  window.getCalRange_BOS = function(){
+    try {
+      var raw = localStorage.getItem(CAL_RANGE_KEY);
+      if(raw){
+        var r = JSON.parse(raw);
+        if(r && r.from && r.to && r.from <= r.to) return r;
+      }
+    } catch(e){}
+    var y = new Date().getFullYear();
+    return {from: y, to: y + 2};
+  };
+  
+  // ━━ 기간 직접 선택 적용 ━━
+  window.applyCalRange_BOS = function(){
+    var fromEl = document.getElementById('cal-range-from');
+    var toEl = document.getElementById('cal-range-to');
+    if(!fromEl || !toEl) return;
+    var from = parseInt(fromEl.value);
+    var to = parseInt(toEl.value);
+    if(isNaN(from) || isNaN(to)){ return; }
+    if(from > to){ var t = from; from = to; to = t; }  // 자동 교환
+    if(to - from > 11){
+      alert('한 번에 최대 12년까지 볼 수 있습니다.');
+      to = from + 11;
+    }
+    try { localStorage.setItem(CAL_RANGE_KEY, JSON.stringify({from: from, to: to})); } catch(e){}
+    switchCalView_BOS('range');
+    updateCalYearLabels_BOS();
+  };
+  
+  // ━━ 연도 관리 모달 ━━
+  window.openCalYearManager_BOS = function(){
+    var existing = document.getElementById('cal-year-manager-modal');
+    if(existing) existing.remove();
+    
+    var minY = getCalMinYear();
+    var maxY = getCalMaxYear();
+    var thisYear = new Date().getFullYear();
+    
+    var modal = document.createElement('div');
+    modal.id = 'cal-year-manager-modal';
+    modal.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9300;align-items:center;justify-content:center';
+    
+    modal.innerHTML = '<div style="background:#fff;border-radius:14px;padding:22px;max-width:420px;width:92%;box-shadow:0 10px 40px rgba(0,0,0,.3)" onclick="event.stopPropagation()">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-bottom:12px;border-bottom:1px solid var(--bd)">'
+        + '<div style="font-size:15px;font-weight:700">⚙ 캘린더 연도 관리</div>'
+        + '<button onclick="document.getElementById(\'cal-year-manager-modal\').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu);line-height:1;padding:0">×</button>'
+      + '</div>'
+      + '<div style="font-size:11px;color:var(--mu);line-height:1.7;margin-bottom:14px">캘린더에 표시할 연도 범위를 설정합니다.<br>연도 삭제 = 범위를 줄이면 됩니다 (일정 데이터는 지워지지 않음)</div>'
+      + '<label style="display:block;font-size:10.5px;font-weight:700;color:var(--mu);margin-bottom:4px">📅 시작 연도 (가장 과거)</label>'
+      + '<input type="number" id="cym-min" value="' + minY + '" min="2000" max="' + thisYear + '" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;box-sizing:border-box;font-family:\'Roboto Mono\',monospace">'
+      + '<label style="display:block;font-size:10.5px;font-weight:700;color:var(--mu);margin:12px 0 4px">📅 끝 연도 (가장 미래)</label>'
+      + '<input type="number" id="cym-max" value="' + maxY + '" min="' + thisYear + '" max="2099" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;box-sizing:border-box;font-family:\'Roboto Mono\',monospace">'
+      + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'
+        + '<button onclick="document.getElementById(\'cym-max\').value = parseInt(document.getElementById(\'cym-max\').value||' + maxY + ') + 1" style="background:#fff;border:1px solid var(--bd);border-radius:5px;padding:5px 10px;font-size:11px;cursor:pointer">끝 연도 +1</button>'
+        + '<button onclick="document.getElementById(\'cym-max\').value = Math.max(' + thisYear + ', parseInt(document.getElementById(\'cym-max\').value||' + maxY + ') - 1)" style="background:#fff;border:1px solid var(--bd);border-radius:5px;padding:5px 10px;font-size:11px;cursor:pointer">끝 연도 -1</button>'
+        + '<button onclick="document.getElementById(\'cym-min\').value=' + (thisYear-2) + ';document.getElementById(\'cym-max\').value=' + Math.max(thisYear+2, 2032) + '" style="background:#fff;border:1px solid var(--bd);border-radius:5px;padding:5px 10px;font-size:11px;cursor:pointer;color:var(--mu)">기본값 복원</button>'
+      + '</div>'
+      + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--bd)">'
+        + '<button onclick="document.getElementById(\'cal-year-manager-modal\').remove()" style="background:#fff;border:1px solid var(--bd);border-radius:6px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer">취소</button>'
+        + '<button onclick="saveCalYearManager_BOS()" style="background:#1A6B4A;color:#fff;border:none;border-radius:6px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer">💾 저장</button>'
+      + '</div>'
+    + '</div>';
+    
+    document.body.appendChild(modal);
+  };
+  
+  window.saveCalYearManager_BOS = function(){
+    var thisYear = new Date().getFullYear();
+    var minEl = document.getElementById('cym-min');
+    var maxEl = document.getElementById('cym-max');
+    var minY = parseInt(minEl && minEl.value) || (thisYear - 2);
+    var maxY = parseInt(maxEl && maxEl.value) || Math.max(thisYear + 2, 2032);
+    
+    if(minY > thisYear) minY = thisYear;
+    if(maxY < thisYear) maxY = thisYear;
+    if(minY < 2000) minY = 2000;
+    if(maxY > 2099) maxY = 2099;
+    
+    try {
+      localStorage.setItem(CAL_MIN_YEAR_KEY, String(minY));
+      localStorage.setItem(CAL_MAX_YEAR_KEY, String(maxY));
+    } catch(e){}
+    
+    var modal = document.getElementById('cal-year-manager-modal');
+    if(modal) modal.remove();
+    
+    updateCalYearLabels_BOS();
+    if(typeof syncToast === 'function') syncToast('📅 연도 범위: ' + minY + ' ~ ' + maxY, 'ok');
+  };
+  
+  // (구버전 호환) 연도 1년 추가
   window.addCalYear_BOS = function(){
     var cur = getCalMaxYear();
-    var next = cur + 1;
-    try { localStorage.setItem(CAL_MAX_YEAR_KEY, String(next)); } catch(e){}
+    try { localStorage.setItem(CAL_MAX_YEAR_KEY, String(cur + 1)); } catch(e){}
     updateCalYearLabels_BOS();
-    if(typeof syncToast === 'function') syncToast('📅 ' + next + '년까지 확장됨', 'ok');
-    else console.log('[Cal] ' + next + '년까지 확장');
   };
   
   window.updateCalYearLabels_BOS = function(){
     var nav = document.getElementById('cal-year-nav-bos');
     if(!nav) return;
     var y = new Date().getFullYear();
+    var minYear = getCalMinYear();
     var maxYear = getCalMaxYear();
     var currentView = (typeof calCurrentView_BOS !== 'undefined' && calCurrentView_BOS) || 'single';
+    var rg = getCalRange_BOS();
     
     var h = '';
-    // 개별 연도 버튼: (올해-2) ~ maxYear
-    for(var yr = y - 2; yr <= maxYear; yr++){
+    // ━━ 개별 연도 버튼 ━━
+    for(var yr = minYear; yr <= maxYear; yr++){
+      // 올해±2 는 기존 뷰명 유지 (다른 코드 호환), 그 외엔 yNNNN
       var view;
       if(yr === y - 2) view = 'prev2';
       else if(yr === y - 1) view = 'prev1';
       else if(yr === y) view = 'single';
       else if(yr === y + 1) view = 'next1';
       else if(yr === y + 2) view = 'next2';
-      else view = 'y' + yr;  // 임의 연도 뷰
+      else view = 'y' + yr;
       var act = (currentView === view) ? ' active' : '';
-      h += '<button class="cal-view-tab-bos' + act + '" data-view="' + view + '" onclick="switchCalView_BOS(\'' + view + '\')">' + yr + '</button>';
+      var todayMark = (yr === y) ? ' style="font-weight:700"' : '';
+      h += '<button class="cal-view-tab-bos' + act + '" data-view="' + view + '"' + todayMark + ' onclick="switchCalView_BOS(\'' + view + '\')">' + yr + '</button>';
     }
-    // 그룹 뷰
-    h += '<button class="cal-view-tab-bos' + (currentView==='past'?' active':'') + '" data-view="past" onclick="switchCalView_BOS(\'past\')" title="과거 3년 (' + (y-2) + '~' + y + ')">📜 과거 3년</button>';
-    h += '<button class="cal-view-tab-bos' + (currentView==='future'?' active':'') + '" data-view="future" onclick="switchCalView_BOS(\'future\')" title="미래 3년 (' + y + '~' + (y+2) + ')">🔮 미래 3년</button>';
-    h += '<button class="cal-view-tab-bos' + (currentView==='all'?' active':'') + '" data-view="all" onclick="switchCalView_BOS(\'all\')" title="전체 5년 (' + (y-2) + '~' + (y+2) + ')">🌐 전체 5년</button>';
-    // 연도 추가 버튼
-    h += '<button class="cal-view-tab-bos" onclick="addCalYear_BOS()" title="연도 1년 추가 (현재 최대: ' + maxYear + '년)" style="border-style:dashed;color:var(--mu)">＋ 연도 추가</button>';
+    
+    // ━━ 직접 기간 선택 (과거3년/미래3년/전체5년 대체) ━━
+    var yearOpts = function(sel){
+      var o = '';
+      for(var yy = minYear; yy <= maxYear; yy++){
+        o += '<option value="' + yy + '"' + (yy === sel ? ' selected' : '') + '>' + yy + '</option>';
+      }
+      return o;
+    };
+    h += '<span style="display:inline-flex;align-items:center;gap:4px;margin-left:8px;padding:2px 8px;background:var(--bg);border:1px solid var(--bd);border-radius:6px">';
+    h += '<span style="font-size:10px;color:var(--mu);font-weight:600">기간</span>';
+    h += '<select id="cal-range-from" style="padding:3px 4px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff;font-family:\'Roboto Mono\',monospace">' + yearOpts(rg.from) + '</select>';
+    h += '<span style="font-size:11px;color:var(--mu)">~</span>';
+    h += '<select id="cal-range-to" style="padding:3px 4px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff;font-family:\'Roboto Mono\',monospace">' + yearOpts(rg.to) + '</select>';
+    h += '<button class="cal-view-tab-bos' + (currentView==='range' ? ' active' : '') + '" data-view="range" onclick="applyCalRange_BOS()" title="선택한 기간의 연도들을 한 번에 표시">📊 기간 보기</button>';
+    h += '</span>';
+    
+    // ━━ 연도 관리 ━━
+    h += '<button class="cal-view-tab-bos" onclick="openCalYearManager_BOS()" title="연도 추가/삭제 (표시 범위 설정)" style="border-style:dashed;color:var(--mu);margin-left:4px">⚙ 연도 관리</button>';
     
     nav.innerHTML = h;
   };
@@ -18599,7 +18725,7 @@ body.cal-highlighting .cal-item-card-bos:hover{
 
 <!-- ━━━ 🗓 샘플/아웃소싱 미니 캘린더 + 📇 연락처 카드 ━━━ -->
 <style id="minical-contact-style">
-.minical-wrap-bos{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.minical-wrap-bos{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
 .minical-month-bos{border:1px solid var(--bd);border-radius:8px;padding:10px;background:#fff}
 .minical-head-bos{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .minical-title-bos{font-size:12px;font-weight:700}
@@ -18714,36 +18840,16 @@ body.cal-highlighting .cal-item-card-bos:hover{
   };
   
   // events: [{date:'YYYY-MM-DD', color, label}]
-  function renderMiniCal(containerId, events, stateKey){
-    var container = document.getElementById(containerId);
-    if(!container) return;
-    
-    var now = new Date();
-    var st = miniCalState[stateKey];
-    var y = st ? st.y : now.getFullYear();
-    var m = st ? st.m : now.getMonth();
-    
-    // 날짜별 이벤트 맵
-    var evMap = {};
-    (events||[]).forEach(function(ev){
-      if(!ev.date) return;
-      if(!evMap[ev.date]) evMap[ev.date] = [];
-      evMap[ev.date].push(ev);
-    });
-    
+  // ━━ 연도 전체(12개월) 렌더 + 연도 넘기기 ━━
+  function renderOneMiniMonth(y, m, evMap, todayIso){
     var firstDay = new Date(y, m, 1);
     var lastDay = new Date(y, m+1, 0);
     var startDow = firstDay.getDay();
     var days = lastDay.getDate();
-    var todayIso = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
-    
     var dows = ['일','월','화','수','목','금','토'];
+    
     var h = '<div class="minical-month-bos">';
-    h += '<div class="minical-head-bos">';
-    h += '<button class="minical-nav-btn-bos" onclick="miniCalNav_BOS(\'' + stateKey + '\',-1)">◀</button>';
-    h += '<span class="minical-title-bos">' + y + '년 ' + (m+1) + '월</span>';
-    h += '<button class="minical-nav-btn-bos" onclick="miniCalNav_BOS(\'' + stateKey + '\',1)">▶</button>';
-    h += '</div>';
+    h += '<div style="text-align:center;font-size:12px;font-weight:700;margin-bottom:6px">' + (m+1) + '월</div>';
     h += '<div class="minical-grid-bos">';
     dows.forEach(function(d, i){
       var c = i===0 ? 'color:#C0392B' : (i===6 ? 'color:#2563EB' : '');
@@ -18755,7 +18861,6 @@ body.cal-highlighting .cal-item-card-bos:hover{
       var evs = evMap[iso] || [];
       var isToday = iso === todayIso;
       var cls = 'minical-cell-bos' + (evs.length ? ' has-ev' : '') + (isToday ? ' today' : '');
-      // 툴팁 데이터: color::label||color::label
       var tipData = evs.map(function(e){ return e.color + '::' + String(e.label||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }).join('||');
       var hover = evs.length ? ' data-ev="' + tipData + '" onmouseenter="miniCalHover_BOS(this,event)" onmousemove="miniCalHover_BOS(this,event)" onmouseleave="miniCalLeave_BOS()"' : '';
       h += '<div class="' + cls + '"' + hover + '>';
@@ -18769,16 +18874,64 @@ body.cal-highlighting .cal-item-card-bos:hover{
       h += '</div>';
     }
     h += '</div></div>';
-    container.innerHTML = '<div class="minical-wrap-bos">' + h + '</div>';
+    return h;
+  }
+  
+  function renderMiniCal(containerId, events, stateKey){
+    var container = document.getElementById(containerId);
+    if(!container) return;
+    
+    var now = new Date();
+    var st = miniCalState[stateKey];
+    var y = st ? st.y : now.getFullYear();
+    
+    // 날짜별 이벤트 맵
+    var evMap = {};
+    (events||[]).forEach(function(ev){
+      if(!ev.date) return;
+      if(!evMap[ev.date]) evMap[ev.date] = [];
+      evMap[ev.date].push(ev);
+    });
+    
+    var todayIso = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+    
+    // 이 연도에 이벤트가 있는 월 개수 (참고 표시용)
+    var evMonths = {};
+    Object.keys(evMap).forEach(function(iso){
+      if(iso.indexOf(String(y) + '-') === 0) evMonths[iso.slice(5,7)] = true;
+    });
+    
+    // ━━ 연도 네비게이션 헤더 ━━
+    var h = '<div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:12px">';
+    h += '<button class="minical-nav-btn-bos" onclick="miniCalNav_BOS(\'' + stateKey + '\',-1)" title="이전 연도">◀ ' + (y-1) + '</button>';
+    h += '<span style="font-size:15px;font-weight:700">' + y + '년</span>';
+    h += '<button class="minical-nav-btn-bos" onclick="miniCalNav_BOS(\'' + stateKey + '\',1)" title="다음 연도">' + (y+1) + ' ▶</button>';
+    if(y !== now.getFullYear()){
+      h += '<button class="minical-nav-btn-bos" onclick="miniCalToday_BOS(\'' + stateKey + '\')" style="color:#2563EB" title="올해로 돌아가기">📍 올해</button>';
+    }
+    h += '</div>';
+    
+    // ━━ 12개월 전체 ━━
+    h += '<div class="minical-wrap-bos">';
+    for(var m2 = 0; m2 < 12; m2++){
+      h += renderOneMiniMonth(y, m2, evMap, todayIso);
+    }
+    h += '</div>';
+    
+    container.innerHTML = h;
   }
   
   window.miniCalNav_BOS = function(stateKey, delta){
     var now = new Date();
-    var st = miniCalState[stateKey] || {y: now.getFullYear(), m: now.getMonth()};
-    st.m += delta;
-    if(st.m < 0){ st.m = 11; st.y--; }
-    if(st.m > 11){ st.m = 0; st.y++; }
+    var st = miniCalState[stateKey] || {y: now.getFullYear()};
+    st.y = (st.y || now.getFullYear()) + delta;
     miniCalState[stateKey] = st;
+    if(stateKey === 'sample') renderSampleMiniCal_BOS();
+    else renderOutsourceMiniCal_BOS();
+  };
+  
+  window.miniCalToday_BOS = function(stateKey){
+    miniCalState[stateKey] = {y: new Date().getFullYear()};
     if(stateKey === 'sample') renderSampleMiniCal_BOS();
     else renderOutsourceMiniCal_BOS();
   };
@@ -19002,6 +19155,13 @@ body.cal-highlighting .cal-item-card-bos:hover{
     var modal = document.getElementById('contact-card-modal');
     if(modal && modal.style.display === 'flex'){
       closeContactCard_BOS();
+      e.preventDefault(); e.stopPropagation();
+      return;
+    }
+    // 연도 관리 모달도 ESC 닫기
+    var ym = document.getElementById('cal-year-manager-modal');
+    if(ym){
+      ym.remove();
       e.preventDefault(); e.stopPropagation();
     }
   }, true);
