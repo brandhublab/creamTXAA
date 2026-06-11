@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title id="hub-title">Brand OS KIT · TETRARIX</title>
+<title id="hub-title">Brand OS KIT</title>
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <meta name="googlebot" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
@@ -134,7 +134,7 @@ select.sm{padding:5px 7px;border:1px solid var(--bd);border-radius:5px;font-fami
 .dot-c{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;border:2px solid rgba(255,255,255,.8);box-shadow:0 2px 8px rgba(0,0,0,.15);transition:transform .1s}
 .dot-c:hover{transform:scale(1.1)}
 .dot-l{font-size:9px;font-weight:500;color:var(--tx);background:rgba(255,255,255,.9);padding:1px 4px;border-radius:3px;border:.5px solid var(--bd);white-space:nowrap;max-width:72px;overflow:hidden;text-overflow:ellipsis}
-.epitect-dot .dot-c{border:2px solid #1A1916;box-shadow:0 0 0 3px rgba(26,25,22,.15)}
+.mybrand-dot .dot-c{border:2px solid #1A1916;box-shadow:0 0 0 3px rgba(26,25,22,.15)}
 .map-item-add{display:flex;gap:7px;padding:10px 16px;border-top:1px solid var(--bd);background:var(--bg);align-items:center;flex-wrap:wrap}
 
 /* === PROGRESS === */
@@ -531,7 +531,7 @@ body.edit-mode-on .tab-btn .tab-name-edit{
  .hub-top-actions.mobile-open{display:flex !important}
  
  /* ━━ 까만 헤더 전체 접기/펼치기 (탭 + 실행취소 + 저장 + 제품 + 설정) ━━ */
- /* body.mobile-nav-collapsed 일 때: 헤더 펼침 영역 모두 숨김 (TETRARIX + ☰만 보임) */
+ /* body.mobile-nav-collapsed 일 때: 헤더 펼침 영역 모두 숨김 (브랜드명 + ☰만 보임) */
  body.mobile-nav-collapsed .nav-tabs-wrap{display:none !important}
  body.mobile-nav-collapsed .undo-bar{display:none !important}
  body.mobile-nav-collapsed .hub-top-actions{display:none !important}
@@ -645,40 +645,69 @@ html, body{
 <body>
 <script id="tetrarix-data-injection">
 // ============================================================
-// TETRARIX 초기 데이터 자동 주입
+// Brand OS KIT — 초기 샘플 데이터 자동 주입
 // localStorage가 비어있을 때만 동작 (기존 데이터 덮어쓰기 방지)
 // ============================================================
 (function(){
   var SK_BASE = 'epitect-v7';
-  var TETRARIX_INJECTED_FLAG = 'tetrarix_injected_v1';
-  
-  if(localStorage.getItem(TETRARIX_INJECTED_FLAG) === '1'){
-    console.log('[TETRARIX] 이미 주입 완료됨');
+  var INIT_DATA_FLAG = 'tetrarix_injected_v1';
+
+  if(localStorage.getItem(INIT_DATA_FLAG) === '1'){
+    console.log('[InitData] 이미 주입 완료됨');
     return;
   }
-  
+
   var existing = localStorage.getItem(SK_BASE);
   if(existing){
     try {
       var parsed = JSON.parse(existing);
-      if(parsed && (
-        (parsed.idea && parsed.idea.name && parsed.idea.name.length > 5) ||
-        (parsed.brands && parsed.brands.length > 0) ||
-        (parsed.hubSettings && parsed.hubSettings.brandName && parsed.hubSettings.brandName !== 'MGS')
-      )){
-        console.log('[TETRARIX] 기존 사용자 데이터 발견 - 주입 건너뜀');
-        localStorage.setItem(TETRARIX_INJECTED_FLAG, '1');
+      if(parsed && parsed.hubSettings && parsed.hubSettings.brandName && parsed.hubSettings.brandName !== 'MGS'){
+        console.log('[InitData] 기존 사용자 데이터 발견 - 주입 건너뜀');
+        localStorage.setItem(INIT_DATA_FLAG, '1');
         return;
       }
     } catch(e){}
   }
-  
-  var DATA = {"ideaData": {"name": "TETRARIX · TX MELA REPAIR CREAM (RX-001)", "slogan": "기미 케어, 단편이 아닌 4단계 처방으로.", "tagline": "science-based pigmentation care", "positioning": "더마 코스메틱 · 색소침착 케어 카테고리.\n처방의 신뢰(약국 OTC) + 일상 사용성(코스메틱) 사이의 RX 라인업 포지션.\n4단계 시스템(Defend·Block·Inhibit·Renew)으로 단편 미백 시장과 차별.\n공개 함량(ppm 단위)·노벨 5종 메커니즘·민감 피부 검증의 3축 신뢰 신호.\n시술 후 케어 secondary 포지션 동시 점유 — 시술+홈케어 LTV 사이클.", "target": "35~45세 여성 (코어 38~42).\n호르몬성 기미·잡티 보유 + 시술 누적 + 민감해진 피부 + 갱년기 진입.\n피부과 시술 + 홈케어 사이클 반복형.\n성분·함량 검색 익숙(올영·디시·블라인드), 약국 OTC도 활용(La Roche·Bepanthen).\n인플루언서보다 후기·임상 데이터 신뢰. 가성비형보다 검증형 소비.", "ingr_concept": "처방 v13: 59성분 · 활성 84.36% · 5·5·5·3·2·1% 공개 함량 사다리.\n\n[공개 함량 hero 9종]\nTXA 50,000 ppm · 나이아신 50,000 ppm · 비타민C 50,000 ppm (MAP 3 + 에틸 1 + 글루코사이드 1) · 판테놀 30,000 ppm · NAG 20,000 ppm · 비사보롤 10,000 ppm · 베어베리 15,000 ppm · 마데카소사이드 2,000 ppm · 아스타잔틴 500 ppm\n\n[4-STEP RX SYSTEM]\n01 Defend — 환경 방어 (포토라이아제 DNA 복구 + 아스타잔틴 + 마룰라)\n02 Block — 신호 차단 (TXA 5% + 데카펩타이드-12)\n03 Inhibit — 합성 억제 (3층: NAG 상류 + 비사보롤·비타민C·한방 4종 중류 + 나이아신 하류)\n04 Renew — 청소·재생 (사카로마이세스·트레할로스·부활초 자가포식 + 마데카소사이드)\n\n[차별 시스템]\n· 라멜라 1:1:1 황금비 (Elias 비율)\n· 8중 히알루론산 (분자량 5 + 변형 3)\n· 한방 미백 4종 (닥나무·상백피·황금·감초)\n· 아프리카 8종 식물 (스투키 40% + 마룰라 + 부활초 + 바오밥 + 시어 + 알로에페록스 + 루이보스 + 마다가스카르 센텔라)\n· 5개 노벨상 매핑 (2015 DNA복구 · 2016 자가포식 · 1984 SPPS · 1937 비타민C · 카로티노이드)\n· 무향료 · 자연향만 (캐모마일수 + 로즈수)\n· 무첨가 (페녹시·파라벤·인공색소·동물성·EGF)", "diff": "TETRARIX vs 미백 카테고리 — 7축 압도, 1축 진행 중.\n\n✓ TXA 농도              5% (시장 1% 대비 5배)\n✓ 4-STEP RX SYSTEM     단편 vs 시스템\n✓ 5개 노벨 매핑        사이언스 anchor (경쟁사 부재)\n✓ 한방 4종             닥나무·상백피·황금·감초 (경쟁사 부재)\n✓ 자가포식 3중          스페르미딘·트레할로스·부활초 (경쟁사 부재)\n✓ DNA 복구 (포토라이아제) UV 손상 회복 (경쟁사 부재)\n✓ 라멜라 1:1:1         Elias 황금비 (경쟁사 부재)\n✓ 아프리카 8종 narrative K-시카·한방 시장의 정반대 (유일)\n○ 인체적용시험          RFP 진행 중 (완료 시 8축 완성)\n\n직접 비교:\n· Gringd Vita C 트라넥사믹: TXA ~1%, 자가포식·한방·DNA 복구 부재\n· 성분에디터 Active Marine: 미백 직접 활성 약함, RX system 부재", "naming": "브랜드명: TETRARIX (테트라릭스)\n  · 어원: TETRA (4) + RX (처방) = 4단계 처방\n  · 영문 표기: TETRARIX\n  · 브랜드 마크: 2×2 사각형 4개 그리드 (4-STEP 시각화)\n\n제품 명명 규칙:\n  · 시리즈 코드 — RX-NNN (001부터 순차)\n  · 약어 — TX(Tranexamic), MELA(Melasma), TONEUP, BARRIER\n  · 형태 — CREAM, TONER, AMPOULE, MASK, SUN\n\n라인업 로드맵:\n  RX-001  TX MELA REPAIR CREAM       (현재 진행 — 50g 미백·주름 크림)\n  RX-002  TX MELA TONER              (예정 — 4단계 전용 액티브 토너)\n  RX-003  TX MELA AMPOULE            (예정 — 농축 활성 앰플)\n  RX-004  TX TONEUP SUN              (예정 — SPF 별도 라인)\n  RX-005  TX BARRIER NIGHT MASK      (예정 — 야간 라멜라 마스크)", "price": "제품 가격: ₩38,000 ~ ₩42,000 / 50g (RX-001)\n\n포지션:\n  · 매스마켓 미백 크림 (₩25,000 이하)보다 prestige\n  · 럭셔리 derma (₩60,000+)보다 접근성\n  · La Roche·CeraVe·SkinCeuticals 라인업과 같은 mid-prestige 더마 구간\n\n원가 구조:\n  · 원료비 ~₩780 (50g, v13 기준)\n  · OEM 가공·용기 추가 약 ₩2,500~3,500 추정\n  · 마진율 약 80~85% 확보 (₩38k 기준)\n\n할인·번들 전략:\n  · 첫 구매: 회원가입 10% 할인\n  · 2개 묶음 15% / 3개 묶음 20%\n  · 시술 후 케어 LTV 사이클 활용 — 정기구독 검토", "ad_concept": "채널별 leading hero — 5개 carousel/단편/롱폼 angle.\n\n[A] 함량 임팩트 (3초 캐치 · 릴스·인스타)\n  '트라넥삼산 50,000 ppm. 시장의 5배.'\n  → 숫자 카드 1장 + 시장 평균 비교 그래픽\n\n[B] 시스템 narrative (정독 시작 · 상세페이지 도입)\n  '기미 케어, 단편이 아닌 4단계 처방으로.'\n  → 4단계 컬러바 + 각 단계 활성 매핑\n\n[C] 시술 후 케어 (재방문 · 이메일·SMS)\n  '시술 받은 날 저녁에도, 부드럽게.'\n  → 마데카소사이드 + 판테놀 3% + 라멜라 시각화\n\n[D] 사이언스 신뢰 (정독 콘텐츠 · 블로그·유튜브)\n  '5개 노벨상이 들어간 크림.'\n  → 5 노벨 카드 시리즈 (각 노벨 인물·발견·AURA 적용)\n\n[E] 정체성 (브랜드 anchor · 패키지·OOH)\n  '아프리카 8종 식물 + 마다가스카르 센텔라.'\n  → 8개 식물 카드 + origin 지도\n\n타깃팅:\n  · 1차: 35-45 여성 · 기미·잡티·시술 후 케어 키워드 검색자\n  · 2차: 더마·기능성·고함량 관심 lookalike\n  · 3차: 임신·출산·갱년기 관련 카테고리", "success_risk": "[성공 요인]\n✓ 처방 정교성 — 59성분·활성 84.36%·5·5·5·3·2·1 사다리·5 노벨 (시장 최상위)\n✓ narrative 차별 — 아프리카 8종 + 4-STEP RX SYSTEM (유일)\n✓ 함량 정직 공개 — 시장 인디 가운데서도 정직 공개 최상위\n✓ 시술 후 secondary 포지션 — 35-45 행동 패턴에 정확 맞춤\n✓ 다층 카피 카드 30+ — 청중·채널별 leading hero 가능\n\n[리스크 — 발견·대응]\n⚠ 인체적용시험 데이터 부재 — RFP 즉시 진행 (5개 기관 동시 발송)\n⚠ 출시 8월말 빠듯 — OEM 1차 응답 후 일정 조정 (10~11월 현실적)\n⚠ OEM 보조 15.64% 하단 — 글리세린 3→2.5% 미세 조정으로 16.14% 확보\n⚠ TETRARIX 상표·도메인 — KIPRIS 검색 + tetrarix.co.kr/.com 확보 필요\n⚠ 단일 제품 출시 → LTV 한계 — RX-002·003 라인업 빠른 후속 진행\n⚠ 35-45 정독 타깃 → 도달 비용 ↑ — 인플루언서보다 후기·임상 데이터 콘텐츠\n\n[Make-or-Break 1개]\n인체적용시험 데이터 8주 완주 — 이것 없이는 효능 정량 클레임 불가.\n처방 8할은 이미 손에 있고, 시험으로 2할만 채우면 끝."}, "designData": {"color": "메인: 화이트 #FFFFFF + 코발트 블루 (라벨 강조)\n보조: 다크 #1A1916 (typography) · 라이트 그레이 #EEEEEE (테이블 배경)\n액센트: 체크 블루 (체크박스)\n\n무드: 의료적 신뢰 (RX 처방전) + 사이언스 (laboratory) + 미니멀 (Swiss design)\n거리 두기: 색조 화장품 화려함 ✗ · K-뷰티 발랄함 ✗ · 럭셔리 prestige ✗\n지향점: La Roche-Posay × CeraVe × SkinCeuticals × Aesop minimal\n\n5감각 키워드:\n  시각  흰 가운, 처방전, 유리병, microscope, lab notebook, blueprint\n  촉각  매끄러운 종이 라벨, 광택 없는 매트 튜브, 차가운 유리\n  청각  조용한 클리닉, 종이 넘기는 소리\n  후각  소독제, 라벤더 약초 (실제는 무향료)\n  미각  깨끗한 물, 차가운 민트", "logo": "브랜드 마크: 2×2 그리드 사각형 4개 (4-STEP의 시각화)\n워드마크: TETRARIX (대문자 산세리프, 두꺼움 medium~bold)\n태그라인: science-based pigmentation care (소문자 산세리프, light)\n\n서체:\n  영문 헤드라인  Helvetica Neue / Inter / IBM Plex Sans (geometric clean)\n  영문 본문     같은 패밀리, 가벼운 weight\n  한글         Pretendard / Spoqa Han Sans Neo\n  숫자·코드    IBM Plex Mono / DM Mono (정확함·과학)\n\n응용 마크:\n  · 4 square mark (단독 사용 가능 · 인스타 프로필 등)\n  · TETRARIX 워드마크 (가로 배열)\n  · 4 square + TETRARIX (조합 마크 · 메인 사용)\n\n금지:\n  · 컬러풀한 로고\n  · 손글씨·필기체\n  · 그라데이션·그림자\n  · 트렌드성 sans-serif (Comic·Pacifico 류)", "package": "제품 용기: 50g 압출 튜브 (PE 또는 알루미늄)\n박스: 직육면체 150mm × 55mm × 55mm\n표면 마감: 매트 (광택 없음 · 의약품 느낌)\n\n라벨 구성 (튜브·박스 공통):\n  · 상단: 4-square 마크 → TETRARIX 워드마크 → 태그라인 → 코드 (RX-001)\n  · PRODUCT 박스: TX MELA REPAIR CREAM\n  · RX SYSTEM 박스: TETRARIX 4-STEP RX SYSTEM\n  · DERMA ACTIVES 영역 (블루 헤더):\n      Tranexamic Acid 50,000 ppm\n      Niacinamide 50,000 ppm\n      Vitamin C Complex 40,000 ppm\n      Alpha-Bisabolol 10,000 ppm\n  · NATURE ACTIVES 영역 (블루 헤더):\n      Astaxanthin\n      Micrococcus Ferment Lysate\n      Arctostaphylos Uva-Ursi Leaf Extract\n      Saccharomyces Ferment Filtrate\n  · FUNCTIONAL CARE 체크박스:\n      ☑ 미백  ☑ 주름개선  ☑ 기미완화  ☑ 저자극\n  · VOLUME: 50 g / 1.69 fl. oz.\n  · 신뢰 마크: DERMATOLOGICALLY TESTED FOR SENSITIVE SKIN\n\n박스 측면: 한글 전성분·주의사항·제조사·유통기한 등 의무 표기\n박스 후면: 사용법·4-STEP 그래픽·QR 코드 (상세페이지 연결)"}, "moodData": {"chosen": "피부과 진료실의 처방전 — 의사가 4단계로 적어 내려간 흰 종이 위, 파란 잉크의 단정한 글씨.", "keywords": "흰 가운, 처방전, 4단계, 파란 잉크, 실험실 유리, 정확한 함량, 검증된 과학, 클리닉의 고요, 사각형 그리드, 매트 마감", "desc": "TETRARIX를 본 고객은 — 약국에서 의사 처방을 받아온 듯한 신뢰감을 느껴야 합니다.\n화려하거나 트렌디하지 않습니다. 광택이 아닌 매트. 가벼운 향이 아닌 무향료.\n숫자가 정확하고, 단계가 분명하고, 약속이 단정합니다.\n'기적'이나 '바꿔드린다' 같은 카피는 없습니다.\n대신 '5단계로 다룬다', '50,000 ppm', '노벨상 메커니즘 위에 설계' 같은 사실의 언어.\n차가워 보이지만, 그 차가움이 곧 케어의 정확함이라는 신뢰로 읽힙니다.\n의사 가운 + 실험실 유리 + 처방전의 단정함 — 이 세 가지가 한 통의 크림 안에 있습니다."}, "hubSettings": {"name": "TETRARIX", "brandName": "TETRARIX", "productName": "TX MELA REPAIR CREAM (RX-001)", "productDesc": "science-based pigmentation care", "tabs": {}}, "manifesto": {"title": "TETRARIX 브랜드 매니페스토 — 처방으로 다루는, 4단계의 약속", "body": "기미는 끈질깁니다.\n\n자외선이 활성산소를 만들고,\n그 손상이 멜라닌을 만들라는 신호로 이어집니다.\n신호는 효소를 깨우고,\n색소는 표피에 쌓입니다.\n그 사이 약해진 장벽은 작은 염증을 끊임없이 끌어오고,\n염증은 다시 신호를 만듭니다.\n\n— 그래서 한 가지 활성으로는 옅어지지 않습니다.\n\n\nTETRARIX는 그 끈질김을 단편이 아닌, 네 단계로 마주합니다.\n\n  01 환경 방어 — 자외선이 만든 첫 번째 손상을 거른다.\n  02 신호 차단 — 멜라닌을 만들라는 신호를 끊는다.\n  03 합성 억제 — 효소가 멜라닌을 만드는 단계를 막는다.\n  04 청소·재생 — 이미 침착된 색소를 스스로 비워내게.\n\n각 단계는 다른 일을 합니다.\n한 활성이 약해도, 시스템은 흔들리지 않습니다.\n\n\n우리는 함량을 숨기지 않습니다.\n\n트라넥삼산 50,000 ppm. 시장의 5배.\n나이아신아마이드 50,000 ppm.\n비타민C 50,000 ppm — 3가지 유도체의 cascade.\n판테놀 30,000 ppm — 더마 리페어 등급.\n\n콤플렉스 이름 뒤에 숨기지 않고,\n무엇이 얼마나 들어갔는지 정확히 보여드립니다.\n\n\n우리는 근거 없이 만들지 않습니다.\n\n처방의 모든 단계마다, 검증된 과학이 있습니다.\n2015년 노벨상이 규명한 DNA 복구.\n1937년 노벨상이 규명한 비타민C.\n1984년 노벨상이 연 펩타이드의 길.\n2016년 노벨상이 밝힌 자가포식.\n\n근거 없는 마케팅이 아닌,\n노벨상이 인정한 메커니즘 위에 처방을 설계했습니다.\n\n\n우리는 가장 가혹한 땅에서 영감을 얻습니다.\n\n동아프리카 건조지대의 스투키.\n나미브 사막에서 되살아나는 부활초.\n1,000년을 사는 마다가스카르의 바오밥.\n남아공 시더베르그에서만 자라는 루이보스.\n\n가장 가혹한 곳에서 가장 강한 식물이 자랍니다.\n그 분자들을 TETRARIX는 처방 안에 가져왔습니다.\n\n\n우리는 시술 받은 저녁에도 발릴 수 있는 부드러움을 약속합니다.\n\n레이저 토닝, 피코, 비립종 제거 — 그날 저녁부터.\n마데카소사이드 + 판테놀 3% + 라멜라 1:1:1로\n민감해진 피부에도 부담을 주지 않습니다.\n\n향료는 넣지 않습니다.\n캐모마일과 로즈, 두 송이 식물수의 자연향만.\n\n\nTETRARIX.\nTETRA(4) + RX(처방).\n기미 케어, 단편이 아닌 시스템으로.\n\n— RX-001부터 시작합니다."}, "brands": [{"name": "Gringd Vita C 트라넥사믹", "category": "직접 · 미백", "keyActive": "TXA + Vit C (49성분)", "price": "중급 (~₩30k)", "note": "TXA 1/5, 자가포식·한방·DNA 복구 부재. 인체시험 21명/2주/30.30% 보유", "subtab": 0}, {"name": "성분에디터 Active Marine 아스타잔틴", "category": "직접 · 미백·항산화", "keyActive": "아스타잔틴 110ppm 풀라인 4종", "price": "premium (~₩45k)", "note": "미백 직접 활성 약함, RX system 부재. 캡슐 공법 차별", "subtab": 0}, {"name": "이지듀 EGF", "category": "간접 · 시술 후", "keyActive": "EGF (성장인자)", "price": "중상급", "note": "EGF 단속·중국 차단·임신 우려 — TETRARIX가 카운터로 흡수", "subtab": 0}, {"name": "La Roche-Posay", "category": "간접 · 약국 derma", "keyActive": "나이아신 · 시카", "price": "중상급", "note": "임상 신뢰·민감 피부 — 톤 학습 대상", "subtab": 2}, {"name": "CeraVe", "category": "간접 · 더마 보습", "keyActive": "세라마이드·HA", "price": "중급", "note": "라멜라 narrative 학습 — TETRARIX는 더 정교 (1:1:1)", "subtab": 2}, {"name": "SkinCeuticals", "category": "간접 · 사이언스 derma", "keyActive": "비타민C·페룰릭산", "price": "luxury (~₩200k)", "note": "함량·임상 공개 톤 학습 — TETRARIX는 같은 톤, mid-price", "subtab": 2}]};
-  
+
+  // ━━ 중립 샘플 데이터 (사용자가 본인 브랜드로 교체해서 사용) ━━
+  var DATA = {
+    "ideaData": {
+      "name": "내 브랜드 · 샘플 제품",
+      "slogan": "여기에 브랜드 슬로건을 입력하세요",
+      "tagline": "한 줄 태그라인",
+      "pos": "포지셔닝: 누구를 위해, 무엇을, 어떻게 다르게 제공하는가를 적어보세요.",
+      "diff": "경쟁사 대비 차별점을 정리해 보세요.",
+      "naming": "브랜드명의 어원과 의미, 제품 명명 규칙을 적어보세요.",
+      "desc": "고객이 이 브랜드를 처음 만났을 때 느꼈으면 하는 감정을 적어보세요."
+    },
+    "designData": {
+      "logo": "로고/워드마크 방향을 적어보세요.",
+      "mood": "브랜드 무드 키워드를 적어보세요.",
+      "colors": "메인/서브 컬러 팔레트",
+      "typography": "타이포그래피 방향"
+    },
+    "moodData": {
+      "keywords": "무드 키워드 (쉼표로 구분)",
+      "desc": "비주얼 톤앤매너 설명"
+    },
+    "hubSettings": {
+      "name": "Brand OS KIT",
+      "brandName": "내 브랜드",
+      "productName": "샘플 제품",
+      "productDesc": "제품 한 줄 설명",
+      "tabs": {}
+    },
+    "manifesto": {
+      "title": "브랜드 매니페스토 (샘플)",
+      "body": "여기에 우리 브랜드의 철학과 약속을 적어보세요.\n\n① 우리는 누구를 위해 존재하는가\n② 무엇을 다르게 하는가\n③ 고객에게 무엇을 약속하는가\n\n— 이 문서는 모든 마케팅 메시지의 기준점이 됩니다."
+    },
+    "brands": []
+  };
+
   var snap = {
     brands: DATA.brands.map(function(b, i){
       return {
-        id: 'b_tetrarix_' + i,
+        id: 'b_demo_' + i,
         name: b.name,
         category: b.category,
         keyActive: b.keyActive,
@@ -718,23 +747,20 @@ html, body{
     benchmarks: [
       {brand:'La Roche-Posay', mood:'약국 신뢰 · 임상 검증', color:'화이트 + 시안 블루', note:'의료 라벨식 정보 정리'},
       {brand:'CeraVe', mood:'피부과 권장 · 무자극', color:'화이트 + 그레이 + 핑크', note:'피부 장벽 narrative'},
-      {brand:'SkinCeuticals', mood:'사이언스 · premium derma', color:'화이트 + 다크 액센트', note:'함량 공개·임상 데이터 노출'},
-      {brand:'Olay Pro-X', mood:'임상 derma · 미국 prestige', color:'화이트 + 골드', note:'NAG + 나이아신 시너지 임상'},
-      {brand:'Aesop', mood:'미니멀 · 럭셔리', color:'앰버 + 베이지', note:'타이포 위주 미니멀 라벨'},
-      {brand:'Bepanthen', mood:'의약외품 · 더마 표준', color:'화이트 + 다크 블루', note:'판테놀 5% 등 농도 anchor'}
+      {brand:'Aesop', mood:'미니멀 · 럭셔리', color:'앰버 + 베이지', note:'타이포 위주 미니멀 라벨'}
     ],
     saveHistory: [],
     productsRegistry: [],
     activeProductId: ''
   };
-  
+
   try {
     localStorage.setItem(SK_BASE, JSON.stringify(snap));
     localStorage.setItem('manifesto_v1', JSON.stringify(DATA.manifesto));
-    localStorage.setItem(TETRARIX_INJECTED_FLAG, '1');
-    console.log('[TETRARIX] ✓ 초기 데이터 주입 완료 — 21개 필드 + 매니페스토 + 경쟁사 6곳 + 벤치마킹 6곳');
+    localStorage.setItem(INIT_DATA_FLAG, '1');
+    console.log('[InitData] ✓ 샘플 데이터 주입 완료');
   } catch(e){
-    console.error('[TETRARIX] 주입 실패:', e);
+    console.error('[InitData] 주입 실패:', e);
   }
 })();
 </script>
@@ -813,7 +839,7 @@ html, body{
       <div style="display:flex;align-items:center;gap:6px;min-width:0;flex:1">
         <span id="hub-icon" style="font-size:16px">◈</span>
         <span class="brand-os-badge" style="font-size:9px;color:rgba(255,255,255,.35);font-weight:500;letter-spacing:.5px;margin-right:6px;padding:2px 6px;background:rgba(255,255,255,.06);border-radius:3px;white-space:nowrap" title="Brand Operating System KIT · Cosmetics Edition v1.0">Brand OS KIT</span>
-        <input class="nav-brand-edit" id="hub-name-input" value="TETRARIX" onchange="updateHubName(this.value)" title="클릭하여 이름 수정">
+        <input class="nav-brand-edit" id="hub-name-input" value="Brand OS KIT" onchange="updateHubName(this.value)" title="클릭하여 이름 수정">
       </div>
       <!-- 📱 모바일 전용 햄버거 토글 (헤더 액션 영역 접기/펴기) -->
       <button id="mobile-header-toggle" onclick="toggleMobileHeaderActions()" aria-label="헤더 메뉴 펼치기" style="display:none;background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.85);cursor:pointer;font-size:18px;padding:4px 10px;border-radius:5px;line-height:1;flex-shrink:0">☰</button>
@@ -1267,6 +1293,32 @@ html, body{
   </div>
   <div id="cost-tab-panel">
 <div style="padding:12px 18px">
+    <!-- 💰 준비비용 예산 요약 (생산 양식과 동일) -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px">
+      <div style="background:var(--sur);border:1px solid var(--bd);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--mu);margin-bottom:3px">준비비용 예산</div>
+        <input id="cost-budget-input" type="number" placeholder="0" oninput="updateCostBudgetSummary_BOS(true)"
+          style="width:100%;border:none;border-bottom:2px solid var(--bd);background:transparent;font-size:15px;font-weight:600;text-align:center;color:var(--tx);outline:none;font-family:var(--mn)">
+        <div style="font-size:9px;color:var(--mu);margin-top:2px">원</div>
+      </div>
+      <div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:#8B5E00;margin-bottom:3px">사용 예산 (VAT포함)</div>
+        <div style="font-size:15px;font-weight:600;font-family:var(--mn);color:var(--red)" id="cost-sum-used">0원</div>
+      </div>
+      <div style="background:#E8F5E9;border:1px solid #A5D6A7;border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:#2E7D32;margin-bottom:3px">잔여 예산</div>
+        <div style="font-size:15px;font-weight:600;font-family:var(--mn);color:var(--green)" id="cost-sum-remain">0원</div>
+      </div>
+      <div style="background:#F3E5F5;border:1px solid #CE93D8;border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:#6A1B9A;margin-bottom:3px">예산 대비</div>
+        <div style="font-size:15px;font-weight:600;font-family:var(--mn);color:#6A1B9A" id="cost-sum-pct">0%</div>
+      </div>
+      <div style="background:#E3F2FD;border:1px solid #90CAF9;border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:#1565C0;margin-bottom:3px">초도 필요 투자금 합계</div>
+        <div style="font-size:13px;font-weight:600;font-family:var(--mn);color:#1565C0" id="cost-sum-invest">—</div>
+        <div style="font-size:9px;color:#42A5F5;margin-top:2px">준비비용 + 생산 초도투자</div>
+      </div>
+    </div>
     <div class="section">
       <div class="sec-head"><h3>📋 준비 비용 항목</h3><span style="font-size:10px;color:var(--mu)">금액 클릭 후 직접 입력 · 항목명도 수정 가능</span></div>
       <table class="cost-table" id="cost-tbl">
@@ -1392,6 +1444,46 @@ html, body{
 </div>
 
 <div id="adbudget-tab-panel" style="display:none;padding:12px 18px">
+  <!-- 🎯 3개월 광고 예산 플래너 -->
+  <div class="section">
+    <div class="sec-head"><h3>🎯 3개월 광고 예산 플래너</h3>
+      <span style="font-size:10px;color:var(--mu)">총 예산 입력 후 채널별 <b>비율 또는 금액</b> 중 하나만 입력하면 나머지가 자동 계산됩니다</span>
+    </div>
+    <div class="sec-body">
+      <!-- 총 예산 입력 -->
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 14px;background:#F7F5F0;border:1px solid var(--bd);border-radius:8px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;font-weight:700">💰 3개월 총 광고 예산</span>
+          <input id="ad3m-total" type="number" placeholder="0" oninput="recalcAd3m_BOS('total')" style="width:160px;padding:7px 10px;border:1px solid var(--bd);border-radius:6px;font-size:14px;font-weight:600;text-align:right;font-family:var(--mn);background:#fff">
+          <span style="font-size:11px;color:var(--mu)">원</span>
+        </div>
+        <div style="font-size:11px;color:var(--mu)">월 평균 <b id="ad3m-monthly-avg" style="color:#1565C0;font-family:var(--mn)">0원</b> / 월</div>
+      </div>
+      <!-- 채널 테이블 -->
+      <table class="cost-table" id="ad3m-tbl" style="margin:0">
+        <thead><tr>
+          <th>광고 채널</th>
+          <th style="width:110px">비율 (%)</th>
+          <th style="width:150px">3개월 금액 (원)</th>
+          <th style="width:140px">월 환산 (자동)</th>
+          <th style="width:32px"></th>
+        </tr></thead>
+        <tbody id="ad3m-body"></tbody>
+        <tfoot><tr class="tot-row">
+          <td>합계</td>
+          <td id="ad3m-sum-pct" style="font-family:var(--mn)">0%</td>
+          <td id="ad3m-sum-amt" style="font-family:var(--mn)">0원</td>
+          <td id="ad3m-sum-month" style="font-family:var(--mn)">0원/월</td>
+          <td></td>
+        </tr></tfoot>
+      </table>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:8px">
+        <button class="btn" onclick="addAd3mChannel_BOS()" style="font-size:11px">＋ 채널 추가</button>
+        <div id="ad3m-unalloc" style="font-size:11px;color:var(--mu)"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="section">
     <div class="sec-head"><h3>📢 초기 광고비 예산 (월별)</h3>
       <span style="font-size:10px;color:var(--mu)">광고비를 별도로 정밀하게 관리. 총 예산·월별 현금흐름·통합 매출 예측에 자동 반영</span>
@@ -1481,7 +1573,7 @@ html, body{
       <div style="font-size:15px;font-weight:600;font-family:var(--mn);color:#6A1B9A" id="prod-pct">0%</div>
     </div>
     <div style="background:#E3F2FD;border:1px solid #90CAF9;border-radius:8px;padding:10px;text-align:center">
-      <div style="font-size:10px;color:#1565C0;margin-bottom:3px">초도 투자금 합계</div>
+      <div style="font-size:10px;color:#1565C0;margin-bottom:3px">초도 필요 투자금 합계</div>
       <div style="font-size:13px;font-weight:600;font-family:var(--mn);color:#1565C0" id="cogs-total-invest">—</div>
       <div style="font-size:9px;color:#42A5F5;margin-top:2px">MOQ × 단가 합산</div>
     </div>
@@ -1516,9 +1608,11 @@ html, body{
       <div class="sec-head">
         <h3>💰 전성분 배합비 & 원가</h3>
         <div style="display:flex;gap:5px;flex-wrap:wrap">
-          <button class="btn" onclick="downloadCogsTemplate()" title="CSV 양식 다운로드" style="font-size:11px;padding:4px 8px">📄 양식</button>
+          <button class="btn" onclick="downloadCogsTemplate()" title="현재 입력된 항목들을 CSV로 내보내기 (수정 후 불러오기 가능)" style="font-size:11px;padding:4px 8px">📄 CSV 내보내기</button>
           <button class="btn" onclick="document.getElementById('cogs-file-upload').click()" title="CSV/Excel 파일 업로드" style="font-size:11px;padding:4px 8px;background:#F0F4F8;border-color:#B5C9E8;color:#2563EB">📂 불러오기</button>
           <input type="file" id="cogs-file-upload" accept=".csv,.txt,.tsv" style="display:none" onchange="uploadCogsFile(event)">
+          <button class="btn" onclick="bulkSetCogs_BOS('moq')" title="모든 항목의 MOQ수량을 한 번에 입력" style="font-size:11px;padding:4px 8px;background:#FFF8E1;border-color:#FFE082;color:#8B5E00">⚡ MOQ 일괄</button>
+          <button class="btn" onclick="bulkSetCogs_BOS('prodQty')" title="모든 항목의 생산수량(초도생산)을 한 번에 입력" style="font-size:11px;padding:4px 8px;background:#E8F5E9;border-color:#A5D6A7;color:#2E7D32">⚡ 초도생산 일괄</button>
           <button class="btn" onclick="addCogsRow()" style="font-size:11px;padding:4px 8px">+ 항목 추가</button>
         </div>
       </div>
@@ -1530,7 +1624,7 @@ html, body{
             <th style="padding:5px 8px;text-align:right;width:65px">MOQ수량</th>
             <th style="padding:5px 8px;text-align:right;width:65px">생산수량</th>
             <th style="padding:5px 8px;text-align:right;width:45px">비율</th>
-            <th style="padding:5px 8px;text-align:right;width:80px">초도투자금</th>
+            <th style="padding:5px 8px;text-align:right;width:80px">초도 필요<br>투자금</th>
             <th style="padding:5px 8px;text-align:right;width:80px">잔여잔고</th>
             <th style="width:24px"></th>
           </tr></thead>
@@ -2390,7 +2484,7 @@ Object.defineProperty(window, 'SK', {
  configurable: true
 });
 let allData=[],revData=[],ideaData={},mapPos={},mapCustomItems=[],costData=[],expenseData=[],vendorData=[],mktPlan=[],progressData={},analysisData={},personaData=[],devForms=[],wigData={},saveHistory=[];
-let hubSettings={name:'TETRARIX',brandName:'TETRARIX',productName:'TX MELA REPAIR CREAM (RX-001)',productDesc:'science-based pigmentation care',tabs:{}};
+let hubSettings={name:'Brand OS KIT',brandName:'내 브랜드',productName:'샘플 제품',productDesc:'science-based pigmentation care',tabs:{}};
 let designData={color:'',logo:'',package:''},designConcepts=[],detailPageData={hook:'',story:'',ingredients:'',cta:'',notes:''},benchmarks=[
  {brand:'아비브',mood:'극도의 미니멀 + 자연소재 연상 컬러',color:'크림 화이트 + 올리브 그린',note:'★★★ 브랜딩 핵심 레퍼런스 - 인테리어처럼 아름다운 패키지'},
  {brand:'메디큐브',mood:'레드 캡슐 강렬 + 블랙/화이트 미니멀',color:'레드 + 블랙/화이트',note:'제형 비주얼이 소재가 되는 방식 참고'},
@@ -2454,7 +2548,7 @@ let deadlineData={
    {id:'ad-review',name:'광고 성과 분석',offsetDays:7,durationDays:7,color:'#BA68C8',note:'D+7일까지',done:false}
   ]
  }
-},adPlans=[{id:'ap1',name:'기획안 1',videoUrl:'',appeal:'출산 후 기미 손실 회피',product:'신규진행 제품',script:'기미가 보이기 시작한다면, 이미 늦었다.\n출산 후 갑자기 생긴 기미, 레이저 대신 매일 이걸 바르세요.\n트라넥삼산 5% 임상 완료. 황칠 항산화 방어층으로 기미를 막습니다.',hook:'기미가 보이기 시작한다면, 이미 늦었다.',cta:'지금 바로 시작하세요',format:'영상 (15초)',status:'기획중'}],orgData={leader:{name:'대표 (Chase)',role:'CEO / 1인 대표',memo:'전략·광고·운영 총괄'},teams:[
+},adPlans=[{id:'ap1',name:'기획안 1',videoUrl:'',appeal:'출산 후 기미 손실 회피',product:'신규진행 제품',script:'기미가 보이기 시작한다면, 이미 늦었다.\n출산 후 갑자기 생긴 기미, 레이저 대신 매일 이걸 바르세요.\n트라넥삼산 5% 임상 완료. 황칠 항산화 방어층으로 기미를 막습니다.',hook:'기미가 보이기 시작한다면, 이미 늦었다.',cta:'지금 바로 시작하세요',format:'영상 (15초)',status:'기획중'}],orgData={leader:{name:'대표 (사용자)',role:'CEO / 1인 대표',memo:'전략·광고·운영 총괄'},teams:[
  {id:'ot1',name:'제품팀',color:'#1A6B4A',members:[{name:'(담당자 미정)',role:'제품 기획·ODM 관리'}]},
  {id:'ot2',name:'광고/컨텐츠팀',color:'#2196F3',members:[{name:'(담당자 미정)',role:'Meta·Google 광고 집행'}]},
  {id:'ot3',name:'디자인팀',color:'#9C27B0',members:[{name:'(담당자 미정)',role:'패키지·상세페이지·SNS 디자인'}]},
@@ -2801,7 +2895,7 @@ const DEF_PROGRESS = [
   {id:'p9',text:'초도 발주 계약 및 입금',sub:'MOQ 3,000개 기준',done:false,startDate:'',endDate:''},
  ]},
  {phase:'Phase 3 — 웹사이트 & 시스템',color:'#2563EB',tasks:[
-  {id:'p10',text:'도메인 구매 + 호스팅 세팅',sub:'epitect.co.kr 또는 {제품명}.kr',done:false,startDate:'',endDate:''},
+  {id:'p10',text:'도메인 구매 + 호스팅 세팅',sub:'{브랜드명}.co.kr 또는 {제품명}.kr',done:false,startDate:'',endDate:''},
   {id:'p11',text:'쇼핑몰 디자인 설치 (카페24/고도몰)',sub:'모바일 최적화 필수',done:false,startDate:'',endDate:''},
   {id:'p12',text:'PG 연결 (KG 이니시스)',sub:'신용카드+계좌이체+무통장',done:false,startDate:'',endDate:''},
   {id:'p13',text:'SNS 간편결제 연결 (네이버페이/카카오페이/토스)',sub:'전환율 향상 필수',done:false,startDate:'',endDate:''},
@@ -2834,7 +2928,7 @@ const DEF_PROGRESS = [
 const DEF_DEV_FORMS = [
  {id:'df1',title:'신규 제품명 개발 의뢰서',
   manager:'체이스 (대표)',targetDate:'2026-06-19',date:'',
-  registered_as_seller:'있음 (아로필 명의)',registered_as_mfg:'미정',
+  registered_as_seller:'있음 (사업자 명의)',registered_as_mfg:'미정',
   vendor:'미정 (ODM 공장 섭외 중)',hasTarget:true,targetPrice:'미정',
   devName:'신규 제품명',sampleQty:'5',qty:'3000',
   notes:'트라베란™: 트라넥삼산5%+이데베논0.3%+황칠나무2% / 연꽃꽃수 베이스 / 100g 단지형',
@@ -6872,11 +6966,11 @@ function buildMap(){
  const map=document.getElementById('posmap');if(!map)return;
  map.querySelectorAll('.brand-dot').forEach(e=>e.remove());
  const leg=document.getElementById('map-legend');if(leg)leg.innerHTML='';
- const epitect={id:'epi',brand:(hubSettings&&hubSettings.brandName||'우리 브랜드')+' (목표)',mapX:72,mapY:68,isTarget:true};
+ const myBrandDot={id:'epi',brand:(hubSettings&&hubSettings.brandName||'우리 브랜드')+' (목표)',mapX:72,mapY:68,isTarget:true};
  const items=[...allData.filter((d,i,a)=>a.findIndex(x=>x.brand===d.brand)===i),...mapCustomItems,epitect];
  items.forEach((d,i)=>{
   const x=mapPos[d.id+'x']??d.mapX??50,y=mapPos[d.id+'y']??d.mapY??50;
-  const el=document.createElement('div');el.className='brand-dot'+(d.isTarget?' epitect-dot':'');el.id='dot'+d.id;
+  const el=document.createElement('div');el.className='brand-dot'+(d.isTarget?' mybrand-dot':'');el.id='dot'+d.id;
   el.style.left=x+'%';el.style.top=(100-y)+'%';
   const color=d.isTarget?'#1A1916':(d.color_custom||MAP_COLORS[i%MAP_COLORS.length]);
   const init=(d.brand||'').substring(0,2);
@@ -9488,7 +9582,7 @@ function removeClinicalInstitution(i){if(confirm('삭제?')){clinicalInstitution
 function saveClinical(){sv();showToast('임상 체크리스트 저장 완료');}
 
 var draftSections=[
- {id:'ds1',title:'① 임상 수치 (First Fold)',content:'겉기미 20.78% 개선 | 속기미 18.03% 개선\nP&K 피부임상연구센터 | 23명 | 4주\n\n[핵심] 상세 첫 화면에 고민+임상 수치 = 구매 전환\n→ 테라로직이 Chase를 잡은 방식 그대로'},
+ {id:'ds1',title:'① 임상 수치 (First Fold)',content:'겉기미 20.78% 개선 | 속기미 18.03% 개선\nP&K 피부임상연구센터 | 23명 | 4주\n\n[핵심] 상세 첫 화면에 고민+임상 수치 = 구매 전환\n→ 테라로직이 고객을 잡은 방식 그대로'},
  {id:'ds2',title:'② 후킹 카피',content:'기미가 보이기 시작한다면, 이미 늦었다.\n생기기 전에 막아야 기미다.\n— 트라베란™ 4중 기미 방어 메커니즘'},
  {id:'ds3',title:'③ 신뢰 레이어',content:'[권위] 피부과 전문의 성분 검토\n[증거] 무자극 0.00 | 미백 기능성 | 여드름성 피부 사용 적합'},
  {id:'ds4',title:'④ 4중 방어 메커니즘',content:'[방어선 0] 이데베논 0.3% → ROS 중화\n[방어선 1] 트라넥삼산 5% → 멜라닌 신호 억제\n[방어선 2] 황칠나무 2% + 알파아르부틴 1% → 티로시나제 억제\n[방어선 3] 나이아신아마이드 5% → 멜라닌 전이 차단'},
@@ -10051,29 +10145,29 @@ function addCogsRow(){cogsData.push({name:'새 항목',unitPrice:0,amount:0,moq:
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 window.downloadCogsTemplate = function(){
   var csv = '\ufeff';  // UTF-8 BOM (한글 엑셀 호환)
-  // 헤더
   csv += '항목명,단가(원),MOQ수량,생산수량\n';
-  // 예시 행들
-  csv += '정제수,50,1000,3000\n';
-  csv += '글리세린,1200,500,3000\n';
-  csv += '히알루론산,8500,100,3000\n';
-  csv += '나이아신아마이드,3200,500,3000\n';
-  csv += '판테놀,2800,500,3000\n';
-  csv += '용기 (튜브 50g),350,5000,3000\n';
-  csv += '박스 (단상자),180,5000,3000\n';
-  csv += '라벨,80,5000,3000\n';
-  csv += '충진/포장 수수료,500,3000,3000\n';
+  // ★ 현재 입력된 실제 데이터를 그대로 내보냄 (양식 겸 백업)
+  var rows = (typeof cogsData !== 'undefined' && Array.isArray(cogsData) && cogsData.length) ? cogsData : [];
+  if(rows.length){
+    rows.forEach(function(r){
+      var nm = String(r.name||'').replace(/,/g, ' ');  // 쉼표 충돌 방지
+      csv += nm + ',' + (r.unitPrice||r.amount||0) + ',' + (r.moq||0) + ',' + (r.prodQty||0) + '\n';
+    });
+  } else {
+    // 데이터가 없을 때만 작성 안내 1행
+    csv += '(여기에 항목명 입력),0,0,0\n';
+  }
   
   var blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.href = url;
-  a.download = '전성분_원가_양식.csv';
+  a.download = '전성분_원가_' + new Date().toISOString().slice(0,10) + '.csv';
   document.body.appendChild(a);
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-  if(typeof showToast === 'function') showToast('양식 다운로드 완료');
+  if(typeof showToast === 'function') showToast(rows.length ? '현재 데이터 ' + rows.length + '개 항목 내보내기 완료' : '빈 양식 다운로드 완료');
 };
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -11932,7 +12026,7 @@ function forceIsolationReset(){
     </div>
     <div class="fi full" style="margin-bottom:12px">
       <label>Claude 응답 JSON 붙여넣기</label>
-      <textarea id="idea-ai-paste" rows="8" placeholder='{"name":"기미방패","slogan":"기미가 생기기 전에, 먼저 막는다.","tagline":"피부장벽이 곧 방어선","positioning":"기미 예방 사전 방어 포지션","target":"30-40대 여성","ingr_concept":"트라넥삼산 5%+황칠추출물","ad_angle":"손실 회피 + 비포애프터","price_range":"35,000~45,000원","diff":"함량 공개+예방 포지셔닝","score":88}'></textarea>
+      <textarea id="idea-ai-paste" rows="8" placeholder='{"name":"샘플 브랜드","slogan":"한 줄 슬로건 예시","tagline":"한 줄 태그라인","positioning":"기미 예방 사전 방어 포지션","target":"30-40대 여성","ingr_concept":"트라넥삼산 5%+황칠추출물","ad_angle":"손실 회피 + 비포애프터","price_range":"35,000~45,000원","diff":"함량 공개+예방 포지셔닝","score":88}'></textarea>
     </div>
     <div class="ma">
       <button class="bm" onclick="closeIdeaAI()">취소</button>
@@ -13905,7 +13999,7 @@ function forceIsolationReset(){
     'bos_info_storage_v1',     // 정보저장소
     'bos_info_custom_categories_v1',  // 정보저장소 사용자 정의 분류
     'bos_edit_mode_v1',        // 편집 모드 상태
-    'tetrarix_injected_v1',    // TETRARIX 데이터 주입 플래그
+    'tetrarix_injected_v1',    // 초기 샘플 데이터 주입 플래그
     'bos_ingred_files_v1',     // 🧪 성분 컨셉 HTML 파일 목록
     'bos_ingred_current_v1',   // 🧪 성분 컨셉 현재 선택 인덱스
     'bos_detailhtml_files_v1', // 🌐 상세페이지 HTML 파일 목록
@@ -13915,6 +14009,8 @@ function forceIsolationReset(){
     'bos_outsource_filter_v1', // 🤝 아웃소싱 카테고리 필터
     'bos_power_content_v1',    // 📝 파워 컨텐츠 (블로그)
     'bos_display_banner_v1',   // 🖼 디스플레이 배너
+    'bos_cost_budget_v1',      // 💰 준비비용 예산
+    'bos_ad3m_budget_v1',      // 🎯 3개월 광고 예산 플래너
     'bos_cal_max_year',        // 📅 캘린더 최대 연도 (확장 상태)
     'bos_cal_min_year',        // 📅 캘린더 최소 연도
     'bos_cal_range_v1',        // 📅 직접 선택한 기간
@@ -14275,7 +14371,7 @@ function forceIsolationReset(){
           'bos_info_storage_v1': '📦 정보저장소',
           'bos_info_custom_categories_v1': '🏷 정보저장소 분류',
           'bos_edit_mode_v1': '✏ 편집 모드 상태',
-          'tetrarix_injected_v1': '💉 TETRARIX 주입 플래그'
+          'tetrarix_injected_v1': '💉 초기 데이터 주입 플래그'
         })[k] || ('📋 ' + k + ' (동적)');
         lines.push('<div>• ' + label + ' <span style="color:var(--mu);font-size:10px">' + formatSize(sz) + '</span></div>');
       }
@@ -15725,7 +15821,7 @@ window.addEventListener('resize', function(){
     } catch(e){}
     // 기본값 (사용자가 처음 들어왔을 때 예시)
     return [
-      {name:'TX MELA REPAIR CREAM · 성분 컨셉', url:'./ingredi.html'}
+      {name:'샘플 제품 · 성분 컨셉', url:'./ingredi.html'}
     ];
   }
   
@@ -19436,6 +19532,271 @@ setTimeout(function(){
     }
   } catch(e){}
 }, 1200);
+</script>
+
+<!-- ━━━ 💰 준비비용 요약 + 🎯 3개월 광고 플래너 + ⚡ 일괄입력 ━━━ -->
+<script id="t5-upgrade-script">
+(function(){
+  var N = function(n){ return (n||0).toLocaleString('ko-KR'); };
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 💰 준비비용 예산 요약 카드
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  var COST_BUDGET_KEY = 'bos_cost_budget_v1';
+  
+  window.updateCostBudgetSummary_BOS = function(saveBudget){
+    var inp = document.getElementById('cost-budget-input');
+    if(!inp) return;
+    
+    if(saveBudget){
+      try { localStorage.setItem(COST_BUDGET_KEY, inp.value || '0'); } catch(e){}
+    }
+    
+    var budget = parseInt(inp.value) || 0;
+    // 사용 예산 = costData VAT 포함 합계
+    var used = 0;
+    if(typeof costData !== 'undefined' && Array.isArray(costData)){
+      used = costData.reduce(function(s, c){ return s + Math.round((parseInt(c.ex)||0) * 1.1); }, 0);
+    }
+    var remain = budget - used;
+    var pct = budget > 0 ? Math.round(used / budget * 100) : 0;
+    
+    // 초도 필요 투자금 = 준비비용(VAT포함) + 생산 초도투자(단가×MOQ×1.1)
+    var prodInvest = 0;
+    if(typeof cogsData !== 'undefined' && Array.isArray(cogsData)){
+      prodInvest = Math.round(cogsData.reduce(function(s, r){
+        return s + (r.unitPrice||r.amount||0) * (r.moq||0);
+      }, 0) * 1.1);
+    }
+    var totalInvest = used + prodInvest;
+    
+    var el;
+    el = document.getElementById('cost-sum-used');   if(el) el.textContent = N(used) + '원';
+    el = document.getElementById('cost-sum-remain'); if(el){ el.textContent = N(remain) + '원'; el.style.color = remain < 0 ? 'var(--red)' : 'var(--green)'; }
+    el = document.getElementById('cost-sum-pct');    if(el){ el.textContent = pct + '%'; el.style.color = pct <= 80 ? '#6A1B9A' : (pct <= 100 ? 'var(--amber)' : 'var(--red)'); }
+    el = document.getElementById('cost-sum-invest'); if(el) el.textContent = N(totalInvest) + '원';
+  };
+  
+  // 로드 시 예산 복원
+  function restoreCostBudget(){
+    try {
+      var saved = localStorage.getItem(COST_BUDGET_KEY);
+      var inp = document.getElementById('cost-budget-input');
+      if(inp && saved && parseInt(saved) > 0) inp.value = saved;
+    } catch(e){}
+    updateCostBudgetSummary_BOS(false);
+  }
+  
+  // updateCostTotals 래핑 - 항목 변경 시 요약도 갱신
+  setTimeout(function(){
+    if(typeof window.updateCostTotals === 'function' && !window.updateCostTotals._budgetWrapped){
+      var _orig = window.updateCostTotals;
+      window.updateCostTotals = function(){
+        _orig.apply(this, arguments);
+        try { updateCostBudgetSummary_BOS(false); } catch(e){}
+      };
+      window.updateCostTotals._budgetWrapped = true;
+    }
+    // updateCogsTotal 래핑 - 생산 초도투자 변경도 반영
+    if(typeof window.updateCogsTotal === 'function' && !window.updateCogsTotal._budgetWrapped){
+      var _orig2 = window.updateCogsTotal;
+      window.updateCogsTotal = function(){
+        _orig2.apply(this, arguments);
+        try { updateCostBudgetSummary_BOS(false); } catch(e){}
+      };
+      window.updateCogsTotal._budgetWrapped = true;
+    }
+    restoreCostBudget();
+  }, 600);
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🎯 3개월 광고 예산 플래너
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  var AD3M_KEY = 'bos_ad3m_budget_v1';
+  var AD3M_MONTHS = 3;
+  var DEFAULT_CHANNELS = ['메타', '구글', '네이버DA', '네이버SA', '틱톡', '협찬', '기타마케팅'];
+  
+  function loadAd3m(){
+    try {
+      var raw = localStorage.getItem(AD3M_KEY);
+      if(raw){
+        var d = JSON.parse(raw);
+        if(d && Array.isArray(d.channels)) return d;
+      }
+    } catch(e){}
+    return {
+      total: 0,
+      channels: DEFAULT_CHANNELS.map(function(n){ return {name: n, pct: 0, amt: 0, lastEdit: 'pct'}; })
+    };
+  }
+  function saveAd3m(d){
+    try { localStorage.setItem(AD3M_KEY, JSON.stringify(d)); if(typeof updateSaveTime==='function') updateSaveTime(); } catch(e){}
+  }
+  
+  var ad3mData = null;
+  function getAd3m(){ if(!ad3mData) ad3mData = loadAd3m(); return ad3mData; }
+  
+  function escA(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+  
+  // ━━ 전체 렌더 (행 추가/삭제/최초 시) ━━
+  window.renderAd3m_BOS = function(){
+    var body = document.getElementById('ad3m-body');
+    if(!body) return;
+    var d = getAd3m();
+    
+    var totalInp = document.getElementById('ad3m-total');
+    if(totalInp && document.activeElement !== totalInp) totalInp.value = d.total || '';
+    
+    body.innerHTML = d.channels.map(function(ch, i){
+      var monthly = Math.round((ch.amt||0) / AD3M_MONTHS);
+      return '<tr>'
+        + '<td><input value="' + escA(ch.name) + '" onchange="updateAd3mName_BOS(' + i + ',this.value)" style="width:100%;border:none;background:transparent;font-size:12px;padding:2px 4px;outline:none;font-weight:500"></td>'
+        + '<td><div style="display:flex;align-items:center;gap:3px"><input type="number" id="ad3m-pct-' + i + '" value="' + (ch.pct||'') + '" min="0" max="100" step="0.5" placeholder="0" oninput="recalcAd3m_BOS(\'pct\',' + i + ')" style="width:65px;border:none;border-bottom:1px dashed var(--bd);background:transparent;font-family:var(--mn);font-size:12px;text-align:right;outline:none"><span style="font-size:10px;color:var(--mu)">%</span></div></td>'
+        + '<td><input type="number" id="ad3m-amt-' + i + '" value="' + (ch.amt||'') + '" min="0" step="10000" placeholder="0" oninput="recalcAd3m_BOS(\'amt\',' + i + ')" style="width:100%;border:none;border-bottom:1px dashed var(--bd);background:transparent;font-family:var(--mn);font-size:12px;text-align:right;outline:none"></td>'
+        + '<td id="ad3m-month-' + i + '" style="font-family:var(--mn);font-size:12px;text-align:right;color:#1565C0;font-weight:600">' + N(monthly) + '원/월</td>'
+        + '<td style="text-align:center"><button onclick="delAd3mChannel_BOS(' + i + ')" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:12px;padding:2px 5px">✕</button></td>'
+        + '</tr>';
+    }).join('');
+    
+    updateAd3mSums_BOS();
+  };
+  
+  // ━━ 합계/미배분 갱신 ━━
+  window.updateAd3mSums_BOS = function(){
+    var d = getAd3m();
+    var sumPct = 0, sumAmt = 0;
+    d.channels.forEach(function(ch){ sumPct += parseFloat(ch.pct)||0; sumAmt += parseInt(ch.amt)||0; });
+    
+    var el;
+    el = document.getElementById('ad3m-sum-pct');   if(el){ el.textContent = (Math.round(sumPct*10)/10) + '%'; el.style.color = Math.abs(sumPct-100) < 0.5 ? 'var(--green)' : (sumPct > 100 ? 'var(--red)' : 'inherit'); }
+    el = document.getElementById('ad3m-sum-amt');   if(el) el.textContent = N(sumAmt) + '원';
+    el = document.getElementById('ad3m-sum-month'); if(el) el.textContent = N(Math.round(sumAmt/AD3M_MONTHS)) + '원/월';
+    el = document.getElementById('ad3m-monthly-avg'); if(el) el.textContent = N(Math.round((d.total||0)/AD3M_MONTHS)) + '원';
+    
+    var un = document.getElementById('ad3m-unalloc');
+    if(un){
+      var diff = (d.total||0) - sumAmt;
+      if(!d.total){
+        un.innerHTML = '💡 상단에 총 예산을 먼저 입력하세요';
+      } else if(diff > 0){
+        un.innerHTML = '미배분 예산: <b style="color:var(--amber);font-family:var(--mn)">' + N(diff) + '원</b>';
+      } else if(diff < 0){
+        un.innerHTML = '⚠ 예산 초과: <b style="color:var(--red);font-family:var(--mn)">' + N(-diff) + '원</b>';
+      } else {
+        un.innerHTML = '<span style="color:var(--green)">✓ 예산 100% 배분 완료</span>';
+      }
+    }
+  };
+  
+  // ━━ 상호 자동계산 (포커스 유지 - 부분 갱신) ━━
+  window.recalcAd3m_BOS = function(source, idx){
+    var d = getAd3m();
+    
+    if(source === 'total'){
+      var totalInp = document.getElementById('ad3m-total');
+      d.total = parseInt(totalInp && totalInp.value) || 0;
+      // 각 채널: 마지막 편집 기준으로 반대편 재계산
+      d.channels.forEach(function(ch, i){
+        if(ch.lastEdit === 'amt' && d.total > 0){
+          ch.pct = Math.round((ch.amt||0) / d.total * 1000) / 10;
+          var pctEl = document.getElementById('ad3m-pct-' + i);
+          if(pctEl && document.activeElement !== pctEl) pctEl.value = ch.pct || '';
+        } else {
+          ch.amt = Math.round(d.total * (parseFloat(ch.pct)||0) / 100);
+          var amtEl = document.getElementById('ad3m-amt-' + i);
+          if(amtEl && document.activeElement !== amtEl) amtEl.value = ch.amt || '';
+        }
+        var mEl = document.getElementById('ad3m-month-' + i);
+        if(mEl) mEl.textContent = N(Math.round((ch.amt||0)/AD3M_MONTHS)) + '원/월';
+      });
+    } else if(source === 'pct'){
+      var pctInp = document.getElementById('ad3m-pct-' + idx);
+      var ch1 = d.channels[idx];
+      if(!ch1) return;
+      ch1.pct = parseFloat(pctInp && pctInp.value) || 0;
+      ch1.lastEdit = 'pct';
+      ch1.amt = Math.round((d.total||0) * ch1.pct / 100);
+      var amtEl1 = document.getElementById('ad3m-amt-' + idx);
+      if(amtEl1) amtEl1.value = ch1.amt || '';
+      var mEl1 = document.getElementById('ad3m-month-' + idx);
+      if(mEl1) mEl1.textContent = N(Math.round(ch1.amt/AD3M_MONTHS)) + '원/월';
+    } else if(source === 'amt'){
+      var amtInp = document.getElementById('ad3m-amt-' + idx);
+      var ch2 = d.channels[idx];
+      if(!ch2) return;
+      ch2.amt = parseInt(amtInp && amtInp.value) || 0;
+      ch2.lastEdit = 'amt';
+      if(d.total > 0){
+        ch2.pct = Math.round(ch2.amt / d.total * 1000) / 10;
+        var pctEl2 = document.getElementById('ad3m-pct-' + idx);
+        if(pctEl2) pctEl2.value = ch2.pct || '';
+      }
+      var mEl2 = document.getElementById('ad3m-month-' + idx);
+      if(mEl2) mEl2.textContent = N(Math.round(ch2.amt/AD3M_MONTHS)) + '원/월';
+    }
+    
+    saveAd3m(d);
+    updateAd3mSums_BOS();
+  };
+  
+  window.updateAd3mName_BOS = function(idx, val){
+    var d = getAd3m();
+    if(d.channels[idx]){ d.channels[idx].name = val; saveAd3m(d); }
+  };
+  
+  window.addAd3mChannel_BOS = function(){
+    var d = getAd3m();
+    d.channels.push({name: '새 채널', pct: 0, amt: 0, lastEdit: 'pct'});
+    saveAd3m(d);
+    renderAd3m_BOS();
+  };
+  
+  window.delAd3mChannel_BOS = function(idx){
+    var d = getAd3m();
+    if(!d.channels[idx]) return;
+    if(!confirm('"' + d.channels[idx].name + '" 채널을 삭제하시겠습니까?')) return;
+    d.channels.splice(idx, 1);
+    saveAd3m(d);
+    renderAd3m_BOS();
+  };
+  
+  // adbudget 탭 진입 시 렌더 - showCostTab 래핑
+  setTimeout(function(){
+    if(typeof window.showCostTab === 'function' && !window.showCostTab._ad3mWrapped){
+      var _origShow = window.showCostTab;
+      window.showCostTab = function(name){
+        _origShow.apply(this, arguments);
+        if(name === 'adbudget'){ try { renderAd3m_BOS(); } catch(e){} }
+        if(name === 'cost'){ try { restoreCostBudget(); } catch(e){} }
+      };
+      window.showCostTab._ad3mWrapped = true;
+    }
+    renderAd3m_BOS();
+  }, 700);
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ⚡ MOQ / 초도생산 일괄입력
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  window.bulkSetCogs_BOS = function(field){
+    if(typeof cogsData === 'undefined' || !Array.isArray(cogsData) || !cogsData.length){
+      alert('항목이 없습니다. 먼저 항목을 추가하세요.');
+      return;
+    }
+    var label = field === 'moq' ? 'MOQ수량' : '생산수량 (초도생산)';
+    var val = prompt('전체 ' + cogsData.length + '개 항목에 일괄 적용할 ' + label + '을 입력하세요:', '');
+    if(val === null) return;
+    var num = parseInt(String(val).replace(/[^0-9]/g, ''));
+    if(isNaN(num) || num < 0){ alert('올바른 숫자를 입력하세요'); return; }
+    
+    cogsData.forEach(function(r){ r[field] = num; });
+    if(typeof renderCogsTable === 'function') renderCogsTable();
+    if(typeof updateCogsTotal === 'function') updateCogsTotal();
+    if(typeof sv === 'function') sv(label + ' 일괄입력');
+    if(typeof showToast === 'function') showToast('✓ ' + cogsData.length + '개 항목에 ' + label + ' ' + num.toLocaleString('ko-KR') + ' 적용됨');
+  };
+  
+  console.log('[T5] 준비비용 요약 + 3개월 광고 플래너 + 일괄입력 준비됨');
+})();
 </script>
 </body>
 </html>
