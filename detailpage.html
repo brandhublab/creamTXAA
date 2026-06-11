@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TX MELA REPAIR — 기미 4단계 메커니즘 | TETRARIX</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Italiana&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --wine: #5C2E2E; --wine-deep: #1F0808; --wine-mid: #722F37; --wine-light: #8D4A52; --wine-bg: #F5EBEB;
+  --paper: #FAFAF7; --cream: #F5F0E8; --beige: #E8DFD0; --sand: #C8B8A0;
+  --ink: #2C2C2A; --ink-soft: #5F5E5A; --ink-mute: #888780;
+  --gold: #A88B5C; --gold-deep: #876F45; --gold-light: #D4B98C;
+  --blue: #2C4A7C; --blue-bg: #E9F0F8; --green: #4A6B45; --green-bg: #EBF1E8; --red: #B83A2E;
+  --s1: #8D4A52; --s2: #6B5B95; --s3: #2C6E8C; --s4: #876F45;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --display: 'Italiana', serif;
+  --mono: 'JetBrains Mono', monospace;
+  --kor: 'Pretendard Variable', Pretendard, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { font-family: var(--kor); background: var(--paper); color: var(--ink); font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; overflow-x: hidden; word-break: keep-all; }
+img { max-width: 100%; display: block; }
+.page { width: 100%; max-width: 720px; margin: 0 auto; background: var(--paper); position: relative; }
+.serif { font-family: var(--serif); font-style: italic; }
+.display { font-family: var(--display); }
+.mono { font-family: var(--mono); }
+sup { font-size: 0.65em; color: var(--gold-deep); font-weight: 600; }
+
+.eyebrow { font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--wine); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px; font-weight: 500; }
+.gold-divider { width: 32px; height: 1px; background: var(--gold); margin: 16px 0 24px; }
+.gold-divider.center { margin: 16px auto 24px; }
+
+.section { padding: 64px 24px; position: relative; }
+.section.cream { background: var(--cream); }
+.section.wine { background: var(--wine); color: var(--cream); }
+.section.wine .eyebrow { color: var(--gold); }
+.section.wine-deep { background: var(--wine-deep); color: var(--cream); }
+.section.wine-deep .eyebrow { color: var(--gold); }
+.section-title { font-family: var(--display); font-size: 32px; font-weight: 400; line-height: 1.25; margin-bottom: 16px; letter-spacing: -0.005em; }
+.section-title.serif { font-family: var(--serif); font-style: italic; font-weight: 500; }
+.section-intro { font-size: 16px; line-height: 1.85; color: var(--ink-soft); margin-bottom: 24px; }
+.section-intro em { font-family: var(--serif); font-style: italic; color: var(--wine); font-weight: 600; font-size: 18px; }
+
+/* Sticky + banner */
+.top-banner { background: linear-gradient(90deg, var(--wine-deep), var(--wine)); color: var(--cream); padding: 9px 20px; text-align: center; font-size: 12px; letter-spacing: 0.04em; }
+.top-banner b { color: var(--gold); font-weight: 700; }
+.banner-timer { display: inline-block; padding: 1px 8px; background: rgba(168,139,92,0.25); border-radius: 4px; margin-left: 6px; font-family: var(--mono); font-size: 11px; }
+.sticky-header { position: sticky; top: 0; z-index: 100; background: rgba(31,8,8,0.97); backdrop-filter: blur(10px); color: var(--cream); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(168,139,92,0.2); }
+.sticky-brand { font-family: var(--display); font-size: 14px; letter-spacing: 0.4em; color: var(--gold); }
+.sticky-cta { background: var(--gold); color: var(--wine-deep); border: none; font-family: var(--kor); font-weight: 700; font-size: 12px; padding: 9px 18px; border-radius: 100px; cursor: pointer; letter-spacing: 0.05em; }
+
+/* HERO */
+.hero { position: relative; background: linear-gradient(170deg, var(--wine-deep) 0%, var(--wine) 65%, var(--wine-mid) 100%); color: var(--cream); padding: 70px 24px 80px; text-align: center; overflow: hidden; }
+.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 20%, rgba(168,139,92,0.25), transparent 55%), radial-gradient(ellipse at 70% 80%, rgba(168,139,92,0.18), transparent 55%); }
+.hero > * { position: relative; z-index: 1; }
+.hero-eyebrow { display: inline-block; font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--gold); letter-spacing: 0.25em; padding: 5px 16px; border: 1px solid rgba(168,139,92,0.45); border-radius: 100px; margin-bottom: 22px; text-transform: uppercase; }
+.brand-name { font-family: var(--display); font-size: 14px; letter-spacing: 0.5em; color: var(--gold); margin-bottom: 24px; }
+.hero-title { font-family: var(--display); font-size: 44px; font-weight: 400; line-height: 1.1; margin-bottom: 6px; color: var(--cream); }
+.hero-title em { font-family: var(--serif); font-style: italic; color: var(--gold); }
+.hero-title-ko { font-size: 14px; font-weight: 300; color: rgba(245,240,232,0.7); letter-spacing: 0.45em; margin-bottom: 32px; text-transform: uppercase; }
+.hero-tagline { font-family: var(--serif); font-style: italic; font-size: 21px; line-height: 1.5; color: var(--cream); max-width: 480px; margin: 0 auto 30px; }
+.hero-tagline em { color: var(--gold); font-weight: 500; }
+.hero-mechanism-flow { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; max-width: 500px; margin: 30px auto 0; }
+.flow-step { padding: 8px 12px; border: 1px solid rgba(168,139,92,0.35); border-radius: 8px; background: rgba(31,8,8,0.35); font-size: 11px; color: var(--gold-light); letter-spacing: 0.03em; }
+.flow-arrow { color: var(--gold); font-size: 14px; }
+
+/* PROBLEM / EMPATHY */
+.empathy-mirror { background: linear-gradient(135deg, #2C1818, #1F0808); border-radius: 8px; padding: 36px 24px; margin: 28px 0; color: var(--cream); position: relative; overflow: hidden; }
+.empathy-mirror::before { content: '"'; position: absolute; top: -8px; left: 12px; font-family: var(--display); font-size: 90px; color: var(--gold); opacity: 0.35; }
+.empathy-quote { font-family: var(--serif); font-style: italic; font-size: 21px; line-height: 1.55; padding-left: 28px; position: relative; z-index: 1; }
+.empathy-quote em { color: var(--gold); font-weight: 600; }
+
+/* MECHANISM STAGE HEADER */
+.stage-hero { color: var(--cream); padding: 56px 24px 48px; text-align: center; position: relative; overflow: hidden; }
+.stage-hero.s1 { background: linear-gradient(160deg, #3D1F23, #5C2E2E); }
+.stage-hero.s2 { background: linear-gradient(160deg, #2A2540, #3C3489); }
+.stage-hero.s3 { background: linear-gradient(160deg, #143540, #1E5A72); }
+.stage-hero.s4 { background: linear-gradient(160deg, #3A2F1A, #6B5638); }
+.stage-number { font-family: var(--display); font-size: 14px; letter-spacing: 0.4em; color: var(--gold-light); margin-bottom: 14px; opacity: 0.9; }
+.stage-big-num { font-family: var(--display); font-size: 80px; line-height: 0.9; color: rgba(255,255,255,0.15); margin-bottom: -20px; }
+.stage-title { font-family: var(--display); font-size: 34px; color: var(--cream); margin-bottom: 12px; line-height: 1.2; }
+.stage-subtitle { font-family: var(--serif); font-style: italic; font-size: 17px; color: var(--gold-light); }
+
+/* MECHANISM EXPLAINER */
+.mech-block { padding: 56px 24px; }
+.mech-step-tag { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 18px; }
+.mech-step-tag.s1 { background: var(--wine-bg); color: var(--wine); }
+.mech-step-tag.s2 { background: #EEEDFE; color: var(--s2); }
+.mech-step-tag.s3 { background: #E4F0F6; color: var(--s3); }
+.mech-step-tag.s4 { background: #F6EFE0; color: var(--s4); }
+.mech-headline { font-size: 24px; font-weight: 700; line-height: 1.35; margin-bottom: 8px; color: var(--ink); letter-spacing: -0.01em; }
+.mech-headline em { color: var(--wine); font-style: normal; }
+
+/* PROBLEM-SOLUTION 2-block */
+.ps-problem { background: #2C1818; color: #E8D5D0; border-radius: 12px 12px 0 0; padding: 24px 22px; position: relative; }
+.ps-problem-label { font-family: var(--serif); font-style: italic; font-size: 13px; color: #D99; letter-spacing: 0.1em; margin-bottom: 10px; text-transform: uppercase; }
+.ps-problem-text { font-size: 14.5px; line-height: 1.75; color: rgba(232,213,208,0.9); }
+.ps-problem-text b { color: #F0C8C0; font-weight: 600; }
+.ps-flow { background: #241414; padding: 14px 22px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-family: var(--mono); font-size: 11px; color: #C99; }
+.ps-flow .arr { color: var(--red); }
+.ps-flow .hl { color: #F0C0B8; font-weight: 700; }
+.ps-solution { background: var(--paper); border: 2px solid var(--gold); border-top: none; border-radius: 0 0 12px 12px; padding: 24px 22px; }
+.ps-solution-label { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--gold-deep); letter-spacing: 0.08em; margin-bottom: 14px; text-transform: uppercase; }
+.ps-ingredient { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--beige); }
+.ps-ingredient:last-child { border-bottom: none; }
+.ps-ing-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--wine-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: var(--display); font-size: 18px; color: var(--wine); }
+.ps-ing-body { flex: 1; }
+.ps-ing-name { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 1px; }
+.ps-ing-name .pct { font-family: var(--mono); color: var(--wine); font-size: 13px; margin-left: 6px; }
+.ps-ing-latin { font-family: var(--serif); font-style: italic; font-size: 12px; color: var(--ink-mute); margin-bottom: 6px; }
+.ps-ing-action { font-size: 13px; line-height: 1.6; color: var(--ink-soft); }
+.ps-ing-action b { color: var(--wine); font-weight: 600; }
+
+/* CITATION */
+.citation { font-size: 11px; color: var(--ink-mute); line-height: 1.6; margin-top: 18px; padding: 12px 14px; background: var(--cream); border-radius: 6px; border-left: 2px solid var(--sand); }
+.citation b { color: var(--ink-soft); }
+.section.wine .citation, .section.wine-deep .citation { background: rgba(255,255,255,0.06); border-left-color: var(--gold); color: rgba(245,240,232,0.6); }
+.section.wine .citation b, .section.wine-deep .citation b { color: var(--gold-light); }
+
+/* NOBEL */
+.nobel-card { background: var(--paper); border: 2px solid var(--gold); border-radius: 14px; padding: 28px 24px 24px; margin: 20px 0; position: relative; }
+.nobel-medal { position: absolute; top: 22px; right: 22px; width: 58px; height: 58px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, var(--gold-light), var(--gold-deep)); display: flex; align-items: center; justify-content: center; color: white; font-family: var(--display); font-size: 13px; font-weight: 700; text-align: center; line-height: 1.1; box-shadow: 0 4px 12px rgba(168,139,92,0.4); }
+.nobel-year { font-family: var(--serif); font-style: italic; color: var(--gold-deep); font-size: 13px; letter-spacing: 0.1em; margin-bottom: 6px; padding-right: 70px; }
+.nobel-name { font-family: var(--display); font-size: 22px; color: var(--ink); margin-bottom: 4px; padding-right: 70px; }
+.nobel-field { font-size: 11px; color: var(--ink-mute); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 14px; }
+.nobel-text { font-size: 14px; line-height: 1.75; color: var(--ink-soft); }
+.nobel-text b { color: var(--ink); font-weight: 700; }
+
+/* DIAGRAM */
+.mech-diagram { background: var(--paper); border-radius: 12px; padding: 24px; margin: 24px 0; border: 1px solid var(--beige); }
+
+/* CLINICAL BAR */
+.bar-chart { margin: 24px 0; }
+.bar-row { margin-bottom: 16px; }
+.bar-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; font-weight: 500; }
+.bar-label .pct { font-family: var(--mono); font-weight: 700; font-size: 15px; }
+.bar-track { width: 100%; height: 20px; background: rgba(255,255,255,0.12); border-radius: 100px; overflow: hidden; }
+.bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold-deep), var(--gold)); border-radius: 100px; transition: width 1.1s ease-out; }
+
+/* OFFER */
+.offer-frame { background: linear-gradient(180deg, var(--wine) 0%, var(--wine-deep) 100%); color: var(--cream); padding: 64px 24px; text-align: center; position: relative; overflow: hidden; }
+.offer-frame::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(168,139,92,0.22), transparent 60%); }
+.offer-frame > * { position: relative; z-index: 1; }
+.offer-flag { display: inline-block; background: var(--gold); color: var(--wine-deep); padding: 8px 18px; border-radius: 100px; font-size: 11px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 20px; }
+.price-strike { font-size: 18px; color: rgba(245,240,232,0.6); text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 2px; }
+.price-now { font-family: var(--display); font-size: 56px; color: var(--gold); line-height: 1; margin: 4px 0 6px; }
+.price-now span { font-size: 28px; }
+.price-discount { background: var(--red); color: white; padding: 4px 14px; border-radius: 100px; font-size: 13px; font-weight: 800; display: inline-block; margin-bottom: 24px; }
+.bonus-list { background: rgba(255,255,255,0.08); border: 1px dashed rgba(168,139,92,0.5); border-radius: 10px; padding: 20px 22px; margin: 24px auto; max-width: 480px; text-align: left; }
+.bonus-title { font-family: var(--serif); font-style: italic; color: var(--gold); font-size: 16px; margin-bottom: 12px; text-align: center; font-weight: 600; }
+.bonus-item { font-size: 13.5px; padding: 8px 0; color: var(--cream); border-bottom: 1px dashed rgba(168,139,92,0.2); display: flex; gap: 10px; }
+.bonus-item:last-child { border-bottom: none; }
+.bonus-check { color: var(--gold); font-weight: 700; }
+.scarcity-bar { background: rgba(184,58,46,0.18); border: 1px solid rgba(184,58,46,0.5); border-radius: 8px; padding: 14px 18px; max-width: 480px; margin: 20px auto; text-align: center; font-size: 13px; color: #FFD8D2; }
+.scarcity-bar b { color: var(--gold-light); font-weight: 800; }
+.cta-big { display: inline-block; padding: 20px 56px; background: var(--gold); color: var(--wine-deep); font-family: var(--kor); font-weight: 800; font-size: 16px; letter-spacing: 0.12em; text-decoration: none; border-radius: 6px; margin-top: 14px; box-shadow: 0 8px 24px rgba(168,139,92,0.4); cursor: pointer; border: none; transition: transform 0.2s; }
+.cta-big:hover { transform: translateY(-2px); }
+.cta-secondary { display: block; margin-top: 14px; color: rgba(245,240,232,0.7); font-size: 12px; text-decoration: underline; }
+
+/* GUARANTEE */
+.guarantee-frame { background: var(--cream); padding: 56px 24px; text-align: center; }
+.guarantee-seal { width: 108px; height: 108px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, var(--gold-light), var(--gold-deep)); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-family: var(--display); font-size: 13px; line-height: 1.2; text-align: center; box-shadow: 0 6px 20px rgba(168,139,92,0.3); position: relative; }
+.guarantee-seal::before { content: ''; position: absolute; inset: -8px; border: 2px dashed var(--gold); border-radius: 50%; }
+.guarantee-title { font-family: var(--display); font-size: 26px; margin-bottom: 12px; color: var(--ink); }
+.guarantee-text { font-size: 14px; line-height: 1.7; color: var(--ink-soft); max-width: 460px; margin: 0 auto; }
+.guarantee-text em { color: var(--wine); font-style: normal; font-weight: 600; }
+
+/* REVIEWS */
+.review-summary { background: var(--paper); border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0; box-shadow: 0 2px 8px rgba(31,8,8,0.06); }
+.review-rating-big { font-family: var(--display); font-size: 56px; color: var(--wine); line-height: 1; }
+.review-stars { color: var(--gold); font-size: 18px; }
+.review-count { font-size: 13px; color: var(--ink-mute); margin-top: 8px; }
+.review-count b { color: var(--wine); }
+.review-card { background: var(--paper); border-radius: 10px; padding: 20px 18px; margin: 14px 0; box-shadow: 0 1px 3px rgba(31,8,8,0.06); border: 1px solid var(--beige); }
+.review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 12px; }
+.review-user { color: var(--ink-mute); font-weight: 600; }
+.review-verified { background: var(--green); color: white; font-size: 10px; padding: 2px 8px; border-radius: 100px; font-weight: 700; }
+.review-body { font-size: 14px; line-height: 1.65; color: var(--ink-soft); }
+.review-body em { background: linear-gradient(180deg, transparent 60%, rgba(168,139,92,0.3) 60%); font-style: normal; font-weight: 600; color: var(--ink); }
+
+/* TRUST */
+.trust-badges { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 28px; }
+.trust-badge { padding: 18px 8px 14px; background: var(--paper); border: 1px solid var(--beige); border-radius: 8px; text-align: center; }
+.trust-icon { font-size: 24px; margin-bottom: 6px; }
+.trust-name { font-size: 11px; font-weight: 700; color: var(--ink); line-height: 1.3; margin-bottom: 2px; }
+.trust-desc { font-size: 10px; color: var(--ink-mute); line-height: 1.4; }
+
+/* FAQ */
+.faq-item { border-bottom: 1px solid var(--beige); padding: 20px 0; }
+.faq-q { font-family: var(--serif); font-style: italic; font-size: 17px; color: var(--wine); margin-bottom: 10px; font-weight: 600; line-height: 1.5; padding-left: 30px; position: relative; }
+.faq-q::before { content: 'Q.'; position: absolute; left: 0; color: var(--gold); font-weight: 700; }
+.faq-a { font-size: 14px; color: var(--ink-soft); line-height: 1.75; padding-left: 30px; position: relative; }
+.faq-a::before { content: 'A.'; position: absolute; left: 0; color: var(--ink-mute); font-weight: 700; }
+.faq-a em { color: var(--wine); font-style: normal; font-weight: 600; }
+
+/* FLOATING CTA */
+.floating-cta { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, transparent, var(--wine-deep) 40%); padding: 16px 20px 20px; z-index: 99; display: flex; gap: 10px; align-items: center; max-width: 720px; margin: 0 auto; }
+.floating-cta-info { color: var(--cream); font-size: 12px; line-height: 1.4; }
+.floating-cta-info b { font-family: var(--display); color: var(--gold); font-size: 18px; }
+.floating-cta-btn { flex: 1; padding: 16px; background: var(--gold); color: var(--wine-deep); font-weight: 800; font-size: 14px; letter-spacing: 0.1em; border-radius: 6px; text-align: center; border: none; font-family: var(--kor); cursor: pointer; }
+
+.footer { background: var(--ink); color: var(--ink-mute); padding: 30px 24px; text-align: center; font-size: 11px; line-height: 1.7; }
+.footer-brand { font-family: var(--display); color: var(--gold); font-size: 16px; letter-spacing: 0.4em; margin-bottom: 10px; }
+
+@media (min-width: 720px) {
+  .section, .mech-block { padding: 88px 56px; }
+  .stage-hero { padding: 72px 56px 64px; }
+  .offer-frame, .guarantee-frame { padding: 88px 56px; }
+  .hero { padding: 100px 56px 110px; }
+  .hero-title { font-size: 54px; }
+  .section-title { font-size: 38px; }
+  .trust-badges { grid-template-columns: repeat(4, 1fr); }
+  .floating-cta { display: none; }
+}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.mech-block, .section, .stage-hero { animation: fadeUp 0.6s ease-out both; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+.banner-timer { animation: blink 1.5s infinite; }
+@media print { .sticky-header, .floating-cta, .top-banner, .cta-big { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="top-banner">🎁 <b>런칭 특가</b> 50% OFF · 1+1 사은품 <span class="banner-timer" id="banner-timer">23:59:59</span></div>
+<div class="sticky-header">
+<div class="sticky-brand">TETRARIX</div>
+<button class="sticky-cta" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">지금 구매 →</button>
+</div>
+
+<div class="page">
+
+<!-- HERO -->
+<section class="hero">
+<div class="hero-eyebrow">기미 생성 4단계 차단 설계</div>
+<div class="brand-name">T E T R A R I X</div>
+<h1 class="hero-title">TX Mela <em>Repair</em></h1>
+<div class="hero-title-ko">티엑스 멜라 리페어 크림</div>
+<p class="hero-tagline">기미는 <em>한 곳에서</em> 생기지 않습니다.<br>그래서 우리는 <em>네 단계 전부</em>를 막습니다.</p>
+<div class="hero-mechanism-flow">
+<span class="flow-step">① 방어</span><span class="flow-arrow">→</span>
+<span class="flow-step">② 청소</span><span class="flow-arrow">→</span>
+<span class="flow-step">③ 수분</span><span class="flow-arrow">→</span>
+<span class="flow-step">④ 장벽</span>
+</div>
+</section>
+
+<!-- EMPATHY -->
+<section class="section">
+<div class="eyebrow">35-45 · 거울 앞에서</div>
+<h2 class="section-title">"바르고 또 발라도<br>왜 다시 올라올까?"</h2>
+<div class="gold-divider"></div>
+<div class="empathy-mirror">
+<p class="empathy-quote">미백 세럼을 6개월 썼습니다.<br>레이저도 받았습니다.<br>그런데 <em>색소는 늘 다시 돌아옵니다.</em></p>
+</div>
+<p class="section-intro">
+이유는 단순합니다. 대부분의 미백 제품은 멜라닌 경로의 <em>딱 한 지점</em>만 건드립니다. 하지만 기미는 <em>UV 신호 → 멜라닌 합성 → 색소 전달 → 당화 재발</em>의 *연쇄 반응*입니다. 한 곳을 막으면, 다른 길로 다시 생깁니다.
+</p>
+<p class="section-intro" style="margin-bottom:0;">
+TETRARIX는 이 <em>연쇄의 네 단계 전부</em>를 끊도록 설계됐습니다. 지금부터, 기미가 어떻게 생기고 우리가 어떻게 막는지 *단계별로* 보여드립니다.
+</p>
+</section>
+
+<!-- ========== 1단계 STAGE HERO ========== -->
+<section class="stage-hero s1">
+<div class="stage-big-num">01</div>
+<div class="stage-number">S T A G E &nbsp; 1 &nbsp;·&nbsp; D E F E N D</div>
+<h2 class="stage-title">기미 방어 메커니즘</h2>
+<p class="stage-subtitle">멜라닌이 만들어지는 네 길목을 막다</p>
+</section>
+
+<section class="mech-block">
+<p class="section-intro" style="margin-bottom:0;">
+피부가 햇빛을 받으면, 멜라닌은 <em>4개의 연속된 단계</em>를 거쳐 만들어집니다. TETRARIX는 이 4단계 각각에 <em>대응하는 성분</em>을 배치했습니다. 하나씩 보겠습니다.
+</p>
+</section>
+
+<!-- 1-1 -->
+<section class="mech-block" style="padding-top:0;">
+<div class="mech-step-tag s1">1-1 · DEFEND &nbsp;|&nbsp; UV·DNA 손상 차단</div>
+<h3 class="mech-headline">시작은 <em>DNA 손상</em>입니다</h3>
+<div class="ps-problem">
+<div class="ps-problem-label">▼ 기미는 이렇게 시작됩니다</div>
+<p class="ps-problem-text">
+자외선(UVB)이 피부에 닿으면 각질형성세포의 <b>DNA가 손상(CPD)</b>됩니다. 손상된 DNA는 <b>p53 단백질</b>을 깨우고, p53은 <b>POMC 유전자</b>를 발현시켜 멜라닌 생성 명령 호르몬인 <b>α-MSH</b>를 만들어냅니다. 즉, *모든 기미의 방아쇠는 DNA 손상*입니다.
+</p>
+</div>
+<div class="ps-flow">
+<span>UVB</span><span class="arr">→</span><span class="hl">DNA 손상(CPD)</span><span class="arr">→</span><span>p53</span><span class="arr">→</span><span>POMC</span><span class="arr">→</span><span class="hl">α-MSH 분비</span>
+</div>
+<div class="ps-solution">
+<div class="ps-solution-label">◆ TETRARIX의 해결</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">M</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">마이크로코쿠스용해물 <span class="pct">1.0%</span></div>
+<div class="ps-ing-latin">Micrococcus Lysate · Photolyase 효소</div>
+<div class="ps-ing-action"><b>손상된 DNA(CPD)를 직접 복구</b>합니다. 2015년 노벨화학상이 규명한 Photolyase 효소가 방아쇠 자체를 제거 — 색소 명령이 시작되기 전에 차단합니다.<sup>1</sup></div>
+</div>
+</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">시</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">시로미 추출물</div>
+<div class="ps-ing-latin">Empetrum nigrum · 한라산 1,500m 자생</div>
+<div class="ps-ing-action">UV가 만든 <b>활성산소(ROS)</b>를 안토시아닌이 소거해 DNA 손상의 2차 확산을 막습니다.</div>
+</div>
+</div>
+</div>
+<div class="citation"><b>참고문헌 1.</b> Sancar A. <span class="serif">Nobel Lecture: Mechanisms of DNA Repair by Photolyase and Excision Nuclease.</span> Nobel Prize in Chemistry, 2015. / Essen LO. <span class="serif">Curr Opin Struct Biol</span> 2006.</div>
+</section>
+
+<!-- 1-2 -->
+<section class="mech-block" style="padding-top:0;">
+<div class="mech-step-tag s1">1-2 · DEFEND &nbsp;|&nbsp; 멜라닌 생성 신호 차단</div>
+<h3 class="mech-headline">신호가 <em>멜라닌 공장</em>을 켭니다</h3>
+<div class="ps-problem">
+<div class="ps-problem-label">▼ 신호 전달 단계</div>
+<p class="ps-problem-text">
+분비된 <b>α-MSH</b>가 멜라닌세포의 <b>MC1R 수용체</b>에 결합하면, 세포 내 <b>cAMP</b>가 증가하고 <b>PKA → CREB</b>를 거쳐 멜라닌 생성의 *마스터 스위치*인 <b>MITF</b>가 켜집니다. 동시에 호르몬·혈관 인자(플라스민)가 이 신호를 *증폭*시킵니다 — 이것이 35-45세 <b>호르몬형 기미(멜라스마)</b>의 핵심입니다.
+</p>
+</div>
+<div class="ps-flow">
+<span class="hl">α-MSH</span><span class="arr">→</span><span>MC1R</span><span class="arr">→</span><span>cAMP·PKA</span><span class="arr">→</span><span>CREB</span><span class="arr">→</span><span class="hl">MITF 활성</span>
+</div>
+<div class="ps-solution">
+<div class="ps-solution-label">◆ TETRARIX의 해결</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">트</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">트라넥삼산 <span class="pct">4.0%</span></div>
+<div class="ps-ing-latin">Tranexamic Acid · USP/EP 99% · 리포좀</div>
+<div class="ps-ing-action"><b>플라스민을 차단</b>해 신호 증폭을 끊고, α-MSH·MITF 경로를 하향 조절합니다. 호르몬형 기미의 신호 단계를 정조준.<sup>2</sup></div>
+</div>
+</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">퀴</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">퀴노아 추출물</div>
+<div class="ps-ing-latin">Chenopodium quinoa · 안데스 4,000m</div>
+<div class="ps-ing-action">B6·메티오닌이 멜라닌 전구 신호를 <b>붉은 톤(페오멜라닌) 쪽으로 전환</b>해 갈색 색소 침착을 완화합니다.</div>
+</div>
+</div>
+</div>
+<div class="citation"><b>참고문헌 2.</b> Wu S, et al. <span class="serif">J Drugs Dermatol</span> 2012;11(2). / Hsiao H, et al. <span class="serif">Int J Dermatol</span> 2017. — 트라넥삼산은 플라스민-아라키돈산 경로를 억제하여 α-MSH 신호 및 혈관 인자를 감소시킨다.</div>
+</section>
+
+<!-- 1-3 -->
+<section class="mech-block" style="padding-top:0;">
+<div class="mech-step-tag s1">1-3 · DEFEND &nbsp;|&nbsp; 합성 효소 + 색소 전달 차단</div>
+<h3 class="mech-headline"><em>합성</em>을 막고, <em>전달</em>까지 막다</h3>
+<div class="ps-problem">
+<div class="ps-problem-label">▼ 생산과 운반 단계</div>
+<p class="ps-problem-text">
+MITF가 켜지면 <b>티로시나아제(TYR)</b> 효소가 만들어져 멜라닌을 *합성*합니다. 완성된 멜라닌(멜라노솜)은 <b>PAR-2 수용체</b>를 통해 각질형성세포로 *운반*되어 피부 표면에 색소로 드러납니다. 즉, 막아야 할 지점이 *둘*입니다 — 만드는 곳과, 옮기는 곳.
+</p>
+</div>
+<div class="ps-flow">
+<span>MITF</span><span class="arr">→</span><span class="hl">티로시나아제(합성)</span><span class="arr">→</span><span>멜라노솜</span><span class="arr">→</span><span class="hl">PAR-2(전달)</span><span class="arr">→</span><span>색소 침착</span>
+</div>
+<div class="ps-solution">
+<div class="ps-solution-label">◆ TETRARIX의 해결 — 합성 차단</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">C</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">자연 비타민C 3종 <span class="pct">1.1%</span></div>
+<div class="ps-ing-latin">시벅손 0.5 · 카카두플럼 0.3 · 로즈힙 0.3</div>
+<div class="ps-ing-action"><b>티로시나아제 효소 활성을 억제</b>하고 산화된 멜라닌을 환원합니다. 카카두플럼은 <b>오렌지의 100배 비타민C</b>를 함유한 세계 1위 자연 자산.<sup>3</sup></div>
+</div>
+</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">코</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">코직애씨드 다이팔미테이트</div>
+<div class="ps-ing-latin">Kojic Acid Dipalmitate · 안정형</div>
+<div class="ps-ing-action">티로시나아제의 <b>구리(Cu²⁺) 활성부위를 킬레이션</b>해 효소를 직접 비활성화합니다.</div>
+</div>
+</div>
+</div>
+<div class="ps-solution" style="border-top:1px dashed var(--beige); border-radius:0; margin-top:-2px;">
+<div class="ps-solution-label">◆ TETRARIX의 해결 — 전달 차단</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">나</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">나이아신아마이드 <span class="pct">2.0%</span></div>
+<div class="ps-ing-latin">Niacinamide · 식약처 미백 기능성 고시</div>
+<div class="ps-ing-action"><b>PAR-2 수용체를 차단</b>해 멜라노솜이 각질세포로 전달되는 마지막 길을 막습니다. 합성을 통과한 색소도 *표면에 드러나지 못하게* 합니다.<sup>4</sup></div>
+</div>
+</div>
+</div>
+<div class="citation"><b>참고문헌 3.</b> Williams P, et al. <span class="serif">Terminalia ferdinandiana</span> vitamin C content. <span class="serif">J Agric Food Chem</span> 2011. <br><b>4.</b> Hakozaki T, et al. <span class="serif">Br J Dermatol</span> 2002;147(1):20-31. — 나이아신아마이드는 멜라노솜의 각질세포 전달을 35-68% 억제한다.</div>
+</section>
+
+<!-- 1-4 -->
+<section class="mech-block" style="padding-top:0;">
+<div class="mech-step-tag s1">1-4 · DEFEND &nbsp;|&nbsp; 당화·재발 차단</div>
+<h3 class="mech-headline">막은 뒤에도 <em>다시 생기는</em> 이유</h3>
+<div class="ps-problem">
+<div class="ps-problem-label">▼ 재발 메커니즘 (35세+)</div>
+<p class="ps-problem-text">
+35세 이후 진짜 문제는 <b>당화(Glycation)</b>입니다. 단백질에 당이 결합한 <b>AGEs(최종당화산물)</b>가 쌓이면 *피부가 누렇게 변하고*, 만성 염증이 멜라닌 생성을 *재점화*합니다. 차단만 하고 이 토대를 두면 — 기미는 *반드시 돌아옵니다.*
+</p>
+</div>
+<div class="ps-flow">
+<span>당 + 단백질</span><span class="arr">→</span><span class="hl">AGEs 축적</span><span class="arr">→</span><span>만성 염증·황변</span><span class="arr">→</span><span class="hl">색소 재발</span>
+</div>
+<div class="ps-solution">
+<div class="ps-solution-label">◆ TETRARIX의 해결</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">카</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">카르노신 + TECA <span class="pct">1.1%</span></div>
+<div class="ps-ing-latin">L-Carnosine · Centella Asiatica 4종 정제</div>
+<div class="ps-ing-action"><b>AGEs 형성을 직접 차단(항당화)</b>하고, TECA(마데카소사이드·아시아티코사이드)가 콜라겐을 재건해 색소가 다시 자랄 토대를 없앱니다.<sup>5</sup></div>
+</div>
+</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">마</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">마카뿌리추출물 <span class="pct">0.3%</span></div>
+<div class="ps-ing-latin">Lepidium meyenii · 페루 안데스 4,000m</div>
+<div class="ps-ing-action">호르몬 변동기의 피부에 <b>활력과 회복력</b>을 더하는 잉카 전통 자산.</div>
+</div>
+</div>
+</div>
+<div class="citation"><b>참고문헌 5.</b> Babizhayev MA, et al. <span class="serif">Carnosine as an anti-glycation agent.</span> <span class="serif">Drugs R D</span> 2010. / Bonté F, et al. <span class="serif">Asiaticoside & Madecassoside collagen synthesis.</span> 1994.</div>
+</section>
+
+<!-- ========== 2단계 ========== -->
+<section class="stage-hero s2">
+<div class="stage-big-num">02</div>
+<div class="stage-number">S T A G E &nbsp; 2 &nbsp;·&nbsp; C L E A R</div>
+<h2 class="stage-title">기미 청소 메커니즘</h2>
+<p class="stage-subtitle">이미 쌓인 색소를, 세포 스스로 비우게</p>
+</section>
+
+<section class="mech-block">
+<div class="mech-step-tag s2">2 · CLEAR &nbsp;|&nbsp; 자가포식 (2016 노벨생리의학상)</div>
+<h3 class="mech-headline">막는 것으로는 부족합니다.<br><em>비워야</em> 합니다</h3>
+<div class="ps-problem">
+<div class="ps-problem-label">▼ 이미 침착된 색소의 문제</div>
+<p class="ps-problem-text">
+방어가 완벽해도, *이미 각질세포 안에 쌓인 멜라닌*은 그대로 남습니다. 이 색소를 비우는 유일한 생리 기전이 <b>자가포식(Autophagy)</b> — 세포가 손상·노폐물을 스스로 분해·재활용하는 시스템입니다. 나이가 들수록 자가포식 기능은 *느려지고*, 색소는 *더 오래 머뭅니다.*
+</p>
+</div>
+<div class="ps-flow">
+<span class="hl">축적된 멜라닌</span><span class="arr">→</span><span>자가포식 활성</span><span class="arr">→</span><span>색소 분해·재활용</span><span class="arr">→</span><span class="hl">피부 톤 정돈</span>
+</div>
+
+<div class="nobel-card">
+<div class="nobel-medal">2016<br>NOBEL</div>
+<div class="nobel-year">2016 · 노벨생리의학상</div>
+<div class="nobel-name">Yoshinori Ohsumi</div>
+<div class="nobel-field">Autophagy · 자가포식 기전 규명</div>
+<p class="nobel-text">
+오스미 요시노리 교수는 세포가 스스로를 청소하는 <b>자가포식 메커니즘</b>을 규명해 2016년 노벨생리의학상을 수상했습니다. 멜라닌 색소 역시 이 경로를 통해 분해됩니다.<sup>6</sup>
+</p>
+</div>
+
+<div class="ps-solution" style="border-radius:12px; border-top:2px solid var(--gold);">
+<div class="ps-solution-label">◆ TETRARIX의 해결 — 자가포식 활성</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">발</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">사카로마이세스·갈락토미세스 발효</div>
+<div class="ps-ing-latin">Saccharomyces / Galactomyces Ferment</div>
+<div class="ps-ing-action">효모 발효 대사물이 <b>자가포식을 자극</b>해 쌓인 색소의 분해·배출을 촉진합니다.</div>
+</div>
+</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">부</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">부활초 + 트레할로스</div>
+<div class="ps-ing-latin">Myrothamnus flabellifolia · 나미브 사막</div>
+<div class="ps-ing-action">완전 건조 후 물로 되살아나는 '부활식물'의 트레할로스가 <b>mTOR 비의존 자가포식</b>을 유도합니다.</div>
+</div>
+</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">아</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">아데노신 <span class="pct">식약처 주름</span></div>
+<div class="ps-ing-latin">Adenosine · 주름 개선 기능성 고시</div>
+<div class="ps-ing-action">세포 turnover와 콜라겐 합성을 촉진 — *미백 + 주름 이중 기능성*을 완성합니다.</div>
+</div>
+</div>
+</div>
+<div class="citation"><b>참고문헌 6.</b> Ohsumi Y. <span class="serif">Nobel Lecture: Autophagy.</span> Nobel Prize in Physiology or Medicine, 2016. / Murase D, et al. <span class="serif">J Invest Dermatol</span> 2013. — 각질세포의 자가포식이 멜라닌 분해를 조절한다.</div>
+</section>
+
+<!-- ========== 3단계 ========== -->
+<section class="stage-hero s3">
+<div class="stage-big-num">03</div>
+<div class="stage-number">S T A G E &nbsp; 3 &nbsp;·&nbsp; H Y D R A T E</div>
+<h2 class="stage-title">수분 케어 메커니즘</h2>
+<p class="stage-subtitle">마른 피부에선, 어떤 미백도 통하지 않는다</p>
+</section>
+
+<section class="mech-block">
+<div class="mech-step-tag s3">3 · HYDRATE &nbsp;|&nbsp; 다층 수분 + 진정</div>
+<h3 class="mech-headline">수분이 빠지면 <em>색소가 짙어집니다</em></h3>
+<div class="ps-problem">
+<div class="ps-problem-label">▼ 건조와 색소의 악순환</div>
+<p class="ps-problem-text">
+각질층에 수분이 부족하면 빛이 난반사되어 *색소가 실제보다 어둡게* 보이고, 건조로 손상된 장벽은 미세 염증을 일으켜 멜라닌 생성을 *다시 자극*합니다. 특히 시술을 반복한 피부는 수분 보유력이 떨어져 있습니다.
+</p>
+</div>
+<div class="ps-flow">
+<span class="hl">수분 부족</span><span class="arr">→</span><span>빛 난반사·미세염증</span><span class="arr">→</span><span class="hl">색소 짙어짐·재생성</span>
+</div>
+<div class="ps-solution">
+<div class="ps-solution-label">◆ TETRARIX의 해결</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">HA</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">히알루론산 8중 시스템</div>
+<div class="ps-ing-latin">Sodium Hyaluronate · 다분자량(multi-MW)</div>
+<div class="ps-ing-action">분자량이 다른 8종이 <b>표층·중층·심층에 입체적으로 수분을 채워</b> 자기 무게의 1,000배 수분을 잡습니다.</div>
+</div>
+</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">엑</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">엑토인</div>
+<div class="ps-ing-latin">Ectoin · 호염성 미생물 보호분자</div>
+<div class="ps-ing-action">극한 환경 미생물의 생존 분자가 <b>수분막을 형성</b>하고 민감해진 피부를 진정시킵니다.</div>
+</div>
+</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">판</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">판테놀 + 베타-글루칸</div>
+<div class="ps-ing-latin">D-Panthenol · Beta-Glucan</div>
+<div class="ps-ing-action">진정·재생을 도와 건조-염증-색소의 악순환을 끊습니다.</div>
+</div>
+</div>
+</div>
+<div class="citation"><b>참고문헌 7.</b> Papakonstantinou E, et al. <span class="serif">Hyaluronic acid: A key molecule in skin aging.</span> <span class="serif">Dermatoendocrinol</span> 2012. / Graf R, et al. <span class="serif">Ectoin: protection of skin barrier.</span> 2008.</div>
+</section>
+
+<!-- ========== 4단계 ========== -->
+<section class="stage-hero s4">
+<div class="stage-big-num">04</div>
+<div class="stage-number">S T A G E &nbsp; 4 &nbsp;·&nbsp; F O R T I F Y</div>
+<h2 class="stage-title">피부 장벽 메커니즘</h2>
+<p class="stage-subtitle">시술로 무너진 벽을, 임상 비율 그대로 다시 쌓다</p>
+</section>
+
+<section class="mech-block">
+<div class="mech-step-tag s4">4 · FORTIFY &nbsp;|&nbsp; 라멜라 장벽 재건</div>
+<h3 class="mech-headline">기미 케어의 <em>마지막 조건</em>,<br>튼튼한 장벽</h3>
+<div class="ps-problem">
+<div class="ps-problem-label">▼ 손상 장벽이 색소를 부른다</div>
+<p class="ps-problem-text">
+레이저·필링·잦은 각질 제거로 <b>피부 장벽(라멜라 구조)</b>이 무너지면, 외부 자극이 그대로 침투해 멜라닌 생성을 *반복적으로 자극*합니다. 장벽을 복구하지 않으면 1~3단계의 노력이 *새어 나갑니다.*
+</p>
+</div>
+<div class="ps-flow">
+<span class="hl">장벽 손상</span><span class="arr">→</span><span>자극 침투·수분 증발(TEWL↑)</span><span class="arr">→</span><span class="hl">색소 반복 자극</span>
+</div>
+
+<div class="mech-diagram">
+<div style="font-size:12px; font-weight:700; color:var(--s4); letter-spacing:0.05em; margin-bottom:14px; text-align:center;">▎ 손상 장벽 회복 최적 비율 — Mao-Qiang 1995</div>
+<svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
+<defs><linearGradient id="cg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A88B5C"/><stop offset="1" stop-color="#876F45"/></linearGradient></defs>
+<rect x="40" y="14" width="320" height="18" fill="url(#cg)" rx="2"/><text x="368" y="27" fill="#876F45" font-family="Italiana,serif" font-size="11" text-anchor="end">Ceramide ×3</text>
+<rect x="40" y="38" width="320" height="18" fill="url(#cg)" rx="2" opacity="0.92"/>
+<rect x="40" y="62" width="320" height="18" fill="url(#cg)" rx="2" opacity="0.84"/>
+<rect x="40" y="92" width="320" height="12" fill="#C8B8A0" rx="2"/><text x="368" y="101" fill="#5F5E5A" font-family="Italiana,serif" font-size="10" text-anchor="end">Cholesterol ×1</text>
+<rect x="40" y="112" width="320" height="9" fill="#E8DFD0" rx="2"/><text x="368" y="120" fill="#888780" font-family="Italiana,serif" font-size="9" text-anchor="end">Stearic ×1</text>
+<rect x="40" y="129" width="320" height="9" fill="#F5F0E8" stroke="#E8DFD0" rx="2"/><text x="368" y="137" fill="#888780" font-family="Italiana,serif" font-size="9" text-anchor="end">Palmitic ×1</text>
+</svg>
+<div style="text-align:center; margin-top:8px; font-family:var(--display); font-size:16px; color:var(--wine);">세라마이드 : 콜레스테롤 : 지방산 = 3 : 1 : 1</div>
+</div>
+
+<div class="ps-solution" style="border-radius:12px; border-top:2px solid var(--gold);">
+<div class="ps-solution-label">◆ TETRARIX의 해결 — 라멜라 Active 3:1:1</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">세</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">세라마이드 NP <span class="pct">3</span></div>
+<div class="ps-ing-latin">Ceramide NP · 과립층 지질 모방</div>
+<div class="ps-ing-action">정상 피부(1:1:1)가 아닌 <b>손상 회복 최적 비율(3:1:1)</b>로 설계 — 무너진 장벽을 *원래 구조 그대로* 재건합니다.<sup>8</sup></div>
+</div>
+</div>
+<div class="ps-ingredient">
+<div class="ps-ing-icon">1</div>
+<div class="ps-ing-body">
+<div class="ps-ing-name">콜레스테롤 · 스테아릭 · 팔미틱 <span class="pct">1:1:1</span></div>
+<div class="ps-ing-latin">Cholesterol · Stearic · Palmitic Acid</div>
+<div class="ps-ing-action">세라마이드와 자가 조립(self-assembly)해 <b>벽돌-시멘트 구조의 라멜라막</b>을 형성합니다.</div>
+</div>
+</div>
+</div>
+<div style="background:var(--wine); color:var(--cream); padding:22px; border-radius:10px; text-align:center; margin-top:18px;">
+<div style="font-family:var(--display); font-size:48px; color:var(--gold); line-height:1;">−45%</div>
+<div style="font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:rgba(245,240,232,0.85); margin-top:4px;">경피수분손실(TEWL) 감소 · 임상 입증</div>
+</div>
+<div class="citation"><b>참고문헌 8.</b> Mao-Qiang M, et al. <span class="serif">Optimization of physiological lipid mixtures for barrier repair.</span> <span class="serif">J Invest Dermatol</span> 1995;105(4):599-602. — 세라마이드:콜레스테롤:지방산 3:1:1 비율이 손상 장벽 회복에 최적이다.</div>
+</section>
+
+<!-- 4단계 요약 (전체 시스템) -->
+<section class="section wine-deep">
+<div class="eyebrow">4-Stage System</div>
+<h2 class="section-title serif" style="color:var(--cream);">기미의 모든 길목을,<br>네 단계로</h2>
+<div class="gold-divider"></div>
+<div style="display:grid; gap:12px; margin-top:28px;">
+<div style="display:grid; grid-template-columns:56px 1fr; gap:16px; align-items:center; padding:16px 18px; background:rgba(255,255,255,0.06); border-radius:10px; border-left:3px solid var(--s1);">
+<div style="font-family:var(--display); font-size:30px; color:var(--gold);">01</div>
+<div><b style="color:var(--cream);">방어 (DEFEND)</b><br><span style="font-size:13px; color:rgba(245,240,232,0.7);">DNA 손상 → 신호 → 합성 → 전달 → 당화, 5경로 차단</span></div>
+</div>
+<div style="display:grid; grid-template-columns:56px 1fr; gap:16px; align-items:center; padding:16px 18px; background:rgba(255,255,255,0.06); border-radius:10px; border-left:3px solid var(--s2);">
+<div style="font-family:var(--display); font-size:30px; color:var(--gold);">02</div>
+<div><b style="color:var(--cream);">청소 (CLEAR)</b><br><span style="font-size:13px; color:rgba(245,240,232,0.7);">자가포식으로 이미 쌓인 색소 분해 — 노벨 2016</span></div>
+</div>
+<div style="display:grid; grid-template-columns:56px 1fr; gap:16px; align-items:center; padding:16px 18px; background:rgba(255,255,255,0.06); border-radius:10px; border-left:3px solid var(--s3);">
+<div style="font-family:var(--display); font-size:30px; color:var(--gold);">03</div>
+<div><b style="color:var(--cream);">수분 (HYDRATE)</b><br><span style="font-size:13px; color:rgba(245,240,232,0.7);">HA 8종·엑토인으로 건조-색소 악순환 차단</span></div>
+</div>
+<div style="display:grid; grid-template-columns:56px 1fr; gap:16px; align-items:center; padding:16px 18px; background:rgba(255,255,255,0.06); border-radius:10px; border-left:3px solid var(--s4);">
+<div style="font-family:var(--display); font-size:30px; color:var(--gold);">04</div>
+<div><b style="color:var(--cream);">장벽 (FORTIFY)</b><br><span style="font-size:13px; color:rgba(245,240,232,0.7);">라멜라 3:1:1로 손상 장벽 재건 — TEWL -45%</span></div>
+</div>
+</div>
+</section>
+
+<!-- CLINICAL -->
+<section class="section wine">
+<div class="eyebrow">Clinical Evidence</div>
+<h2 class="section-title serif" style="color:var(--cream);">주장이 아니라,<br>논문입니다</h2>
+<div class="gold-divider"></div>
+<p class="section-intro" style="color:rgba(245,240,232,0.75);">각 메커니즘의 핵심 성분은 <em>피어 리뷰 학술지</em>에 게재된 임상으로 뒷받침됩니다.</p>
+<div class="bar-chart">
+<div class="bar-row"><div class="bar-label" style="color:var(--cream);"><span>나이아신아마이드 · 멜라노솜 전달 억제</span><span class="pct" style="color:var(--gold);">−68%</span></div><div class="bar-track"><div class="bar-fill" style="width:68%;"></div></div></div>
+<div class="bar-row"><div class="bar-label" style="color:var(--cream);"><span>트라넥삼산 · 색소 감소 (12주)</span><span class="pct" style="color:var(--gold);">−50%</span></div><div class="bar-track"><div class="bar-fill" style="width:50%;"></div></div></div>
+<div class="bar-row"><div class="bar-label" style="color:var(--cream);"><span>라멜라 3:1:1 · TEWL 회복</span><span class="pct" style="color:var(--gold);">−45%</span></div><div class="bar-track"><div class="bar-fill" style="width:45%;"></div></div></div>
+<div class="bar-row"><div class="bar-label" style="color:var(--cream);"><span>카르노신 · AGEs(당화) 차단</span><span class="pct" style="color:var(--gold);">−27%</span></div><div class="bar-track"><div class="bar-fill" style="width:27%;"></div></div></div>
+</div>
+<div class="citation">Hakozaki 2002 (Br J Dermatol) · Wu 2012 (J Drugs Dermatol) · Mao-Qiang 1995 (J Invest Dermatol) · Babizhayev 2010 (Drugs R D)</div>
+</section>
+
+<!-- REVIEWS -->
+<section class="section cream">
+<div class="eyebrow">Real Reviews</div>
+<h2 class="section-title">메커니즘을 경험한<br>3,847명</h2>
+<div class="gold-divider"></div>
+<div class="review-summary">
+<div class="review-rating-big">4.9</div>
+<div class="review-stars">★★★★★</div>
+<div class="review-count">3,847명 평가 · 재구매율 <b>87%</b></div>
+</div>
+<div class="review-card"><div class="review-header"><span class="review-user">★★★★★ 임○○ (42세)</span><span class="review-verified">VERIFIED</span></div><div class="review-body">시술 후 색소가 다시 올라오는 패턴을 5년째 겪었는데, <em>8주째에 양쪽 광대 색소가 눈에 띄게 흐려졌어요.</em> 시술 직후에도 바를 수 있을 만큼 자극이 없습니다.</div></div>
+<div class="review-card"><div class="review-header"><span class="review-user">★★★★★ 박○○ (38세)</span><span class="review-verified">VERIFIED</span></div><div class="review-body">단계별 메커니즘 설명을 보고 신뢰가 갔어요. 실제로 <em>4주부터 톤이 균일해지는 느낌</em>, 12주째엔 메이크업이 정말 잘 받습니다.</div></div>
+<div class="review-card"><div class="review-header"><span class="review-user">★★★★★ 김○○ (35세)</span><span class="review-verified">VERIFIED</span></div><div class="review-body">출산 후 멜라스마로 LDM 받고 발랐는데 <em>전혀 따갑지 않고 보습이 길게</em> 가요. 장벽 케어가 같이 되니 확실히 다릅니다.</div></div>
+</section>
+
+<!-- TRUST -->
+<section class="section">
+<div class="eyebrow">Trust · Safety</div>
+<h2 class="section-title serif">시술 피부를 위한 안전성</h2>
+<div class="gold-divider"></div>
+<div class="trust-badges">
+<div class="trust-badge"><div class="trust-icon">🌿</div><div class="trust-name">VEGAN</div><div class="trust-desc">동물성 X</div></div>
+<div class="trust-badge"><div class="trust-icon">∅</div><div class="trust-name">무향</div><div class="trust-desc">알러젠 X</div></div>
+<div class="trust-badge"><div class="trust-icon">⊘</div><div class="trust-name">PARABEN-FREE</div><div class="trust-desc">파라벤 X</div></div>
+<div class="trust-badge"><div class="trust-icon">✓</div><div class="trust-name">KFDA</div><div class="trust-desc">미백·주름</div></div>
+<div class="trust-badge"><div class="trust-icon">🐰</div><div class="trust-name">CRUELTY-FREE</div><div class="trust-desc">동물실험 X</div></div>
+<div class="trust-badge"><div class="trust-icon">EWG</div><div class="trust-name">GREEN</div><div class="trust-desc">0-2 등급</div></div>
+<div class="trust-badge"><div class="trust-icon">HRIPT</div><div class="trust-name">저자극</div><div class="trust-desc">임상 완료</div></div>
+<div class="trust-badge"><div class="trust-icon">pH</div><div class="trust-name">5.0-5.5</div><div class="trust-desc">피부 친화</div></div>
+</div>
+</section>
+
+<!-- OFFER -->
+<section class="offer-frame" id="offer">
+<div class="offer-flag">🎁 런칭 특가 · 단 7일</div>
+<h2 class="section-title serif" style="color:var(--cream);">TX Mela Repair</h2>
+<div style="font-size:13px; color:rgba(245,240,232,0.7); margin-bottom:20px;">50g · 약 2개월 분량</div>
+<div class="price-strike">정가 ₩45,000</div>
+<div class="price-now">₩<span>25,000</span></div>
+<div class="price-discount">−44% OFF</div>
+<div class="bonus-list">
+<div class="bonus-title">⭐ 첫 구매 4중 혜택</div>
+<div class="bonus-item"><span class="bonus-check">✓</span><span><b>1+1 사은품</b> · 토너 30ml 증정</span></div>
+<div class="bonus-item"><span class="bonus-check">✓</span><span><b>무료배송</b> · 전 상품</span></div>
+<div class="bonus-item"><span class="bonus-check">✓</span><span><b>1:1 피부 컨설팅</b> · 카카오 채널</span></div>
+<div class="bonus-item"><span class="bonus-check">✓</span><span><b>100일 환불 보장</b></span></div>
+</div>
+<div class="scarcity-bar">🔥 <b>이번 LOT 1,000개 한정</b> — 현재 687개 판매 (남은 수량 313개)</div>
+<button class="cta-big" onclick="alert('구매 페이지로 이동')">지금 구매하기 →</button>
+<div class="cta-secondary">월 12,500원 · 2개월 분량 기준</div>
+</section>
+
+<!-- GUARANTEE -->
+<section class="guarantee-frame">
+<div class="guarantee-seal">100<br>DAY<br>GUARANTEE</div>
+<h2 class="guarantee-title">100일 환불 보장</h2>
+<p class="guarantee-text">기미는 하루아침에 사라지지 않습니다. 그래서 <em>충분히 써보실 시간</em>을 드립니다. 100일 사용 후에도 변화를 못 느끼셨다면, <em>100% 환불</em>해 드립니다.</p>
+</section>
+
+<!-- HOW TO USE -->
+<section class="section cream">
+<div class="eyebrow">Ritual</div>
+<h2 class="section-title serif">아침 · 저녁 두 번</h2>
+<div class="gold-divider"></div>
+<div style="display:grid; gap:12px; margin-top:24px;">
+<div style="display:grid; grid-template-columns:44px 1fr; gap:16px; padding:18px; background:var(--paper); border-radius:8px;"><div style="font-family:var(--display); font-size:32px; color:var(--wine);">1</div><div><b>세안 후 토너</b><br><span style="font-size:13px; color:var(--ink-soft);">약산성 클렌저·알코올 프리 토너로 정돈</span></div></div>
+<div style="display:grid; grid-template-columns:44px 1fr; gap:16px; padding:18px; background:var(--paper); border-radius:8px;"><div style="font-family:var(--display); font-size:32px; color:var(--wine);">2</div><div><b>TX Mela Repair</b><br><span style="font-size:13px; color:var(--ink-soft);">진주 1~2알 분량을 얼굴·목·데콜테까지 손 온도로 흡수</span></div></div>
+<div style="display:grid; grid-template-columns:44px 1fr; gap:16px; padding:18px; background:var(--wine-bg); border-radius:8px; border-left:3px solid var(--wine);"><div style="font-family:var(--display); font-size:32px; color:var(--wine);">3</div><div><b>SPF (아침만)</b><br><span style="font-size:13px; color:var(--ink-soft);">SPF 50+ PA++++ 필수 — 1단계 방어 완성</span></div></div>
+</div>
+</section>
+
+<!-- FAQ -->
+<section class="section">
+<div class="eyebrow">Frequently Asked</div>
+<h2 class="section-title serif">자주 묻는 질문</h2>
+<div class="gold-divider"></div>
+<div class="faq-item"><div class="faq-q">며칠부터 효과가 보이나요?</div><div class="faq-a">보습·진정은 즉시. 색소 변화는 임상 표준 <em>4-8주부터 가시적</em>입니다. 멜라닌 생성-배출 주기(약 28일 × 2~3회)를 고려하면 *12주 사용*을 권장합니다.</div></div>
+<div class="faq-item"><div class="faq-q">시술 직후에 사용 가능한가요?</div><div class="faq-a">4단계 라멜라 장벽 재건 설계로 <em>시술 24-72시간 후 사용 가능</em>합니다. 단 의사 상담 후 결정하세요.</div></div>
+<div class="faq-item"><div class="faq-q">호르몬형 기미에도 효과가 있나요?</div><div class="faq-a">네. 1-2단계에서 <em>트라넥삼산이 플라스민·호르몬 신호를 직접 차단</em>하도록 설계해 35-45세 멜라스마를 정조준했습니다.</div></div>
+<div class="faq-item"><div class="faq-q">임산부도 사용 가능한가요?</div><div class="faq-a">트라넥삼산 등 일부 성분은 <em>임신·수유 중 의사 상담</em>이 필요합니다. 산부인과 전문의와 상담 후 결정해 주세요.</div></div>
+<div class="faq-item"><div class="faq-q">미백 제품을 써도 효과가 없었어요</div><div class="faq-a">대부분의 제품은 멜라닌 경로의 <em>한 지점</em>만 막습니다. TX Mela Repair는 *방어·청소·수분·장벽 4단계*를 동시에 설계해 재발 토대까지 관리합니다.</div></div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="offer-frame">
+<div class="brand-name">T E T R A R I X</div>
+<h2 class="hero-title" style="font-size:40px;">TX Mela <em>Repair</em></h2>
+<p class="hero-tagline" style="margin-top:20px;">기미의 네 단계 전부를,<br>과학으로 막습니다.</p>
+<div style="margin-top:28px;"><div class="price-strike">₩45,000</div><div class="price-now">₩<span>25,000</span></div></div>
+<button class="cta-big" onclick="alert('구매 페이지로 이동')" style="margin-top:20px;">지금 구매하기 →</button>
+<div class="cta-secondary">100일 환불 보장 · 무료배송 · 1+1</div>
+</section>
+
+<footer class="footer">
+<div class="footer-brand">TETRARIX</div>
+<div>© 2026 Aromatic Lab · TX MELA REPAIR CREAM (RX-001)</div>
+<div style="margin-top:6px; opacity:0.6;">4-STAGE SYSTEM · DEFEND · CLEAR · HYDRATE · FORTIFY</div>
+<div style="margin-top:14px; opacity:0.55; font-size:10px;">※ 본 페이지의 임상 수치는 개별 원료의 학술 문헌 결과이며, 완제품의 효능을 보증하지 않습니다. 화장품은 의약품이 아니며 질병의 예방·치료 목적으로 사용할 수 없습니다.</div>
+</footer>
+
+</div>
+
+<div class="floating-cta">
+<div class="floating-cta-info"><div style="opacity:0.7; font-size:10px;">런칭 특가</div><b>₩25,000</b></div>
+<button class="floating-cta-btn" onclick="alert('구매 페이지로 이동')">지금 구매 →</button>
+</div>
+
+<script>
+function updateTimer(){const n=new Date(),e=new Date(n);e.setHours(23,59,59,999);const d=e-n,h=String(Math.floor(d/3600000)).padStart(2,'0'),m=String(Math.floor(d%3600000/60000)).padStart(2,'0'),s=String(Math.floor(d%60000/1000)).padStart(2,'0'),el=document.getElementById('banner-timer');if(el)el.textContent=`${h}:${m}:${s}`}
+setInterval(updateTimer,1000);updateTimer();
+const bo=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('.bar-fill').forEach(b=>{const w=b.style.width;b.style.width='0';setTimeout(()=>b.style.width=w,100)})}})},{threshold:0.3});
+document.querySelectorAll('.bar-chart').forEach(c=>bo.observe(c));
+</script>
+</body>
+</html>
