@@ -1717,7 +1717,7 @@ html, body{
         <div style="margin-bottom:12px;padding:10px 12px;background:var(--bg);border-radius:8px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
             <span style="font-size:11px;color:var(--mu)">판매가 (단품)</span>
-            <input type="number" id="roas-price2" placeholder="40000" oninput="calcROAS2()"
+            <input type="number" id="roas-price2" placeholder="40000" oninput="saveRoasInput('roas-price2');calcROAS2()"
               style="width:120px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:13px;font-weight:600;text-align:right;outline:none;background:var(--sur)">
           </div>
         </div>
@@ -1728,33 +1728,33 @@ html, body{
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
             <div style="display:flex;justify-content:space-between;align-items:center">
               <span style="font-size:10px;color:var(--mu)" title="PG/카드 판매 결제수수료 (보통 2.9~3.5%)">💳 판매결제수수료 (%)</span>
-              <input type="number" id="roas-payfee" step="0.1" placeholder="3.3" oninput="calcROAS2()" 
+              <input type="number" id="roas-payfee" step="0.1" placeholder="3.3" oninput="saveRoasInput('roas-payfee');calcROAS2()" 
                 value="3.3"
                 style="width:60px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center">
               <span style="font-size:10px;color:var(--mu)" title="메타/구글 등 광고채널 수수료 (애드 플랫폼 수수료)">📊 광고채널수수료 (%)</span>
-              <input type="number" id="roas-etcfee" step="0.1" placeholder="0" oninput="calcROAS2()" 
+              <input type="number" id="roas-etcfee" step="0.1" placeholder="0" oninput="saveRoasInput('roas-etcfee');calcROAS2()" 
                 style="width:60px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center">
               <span style="font-size:10px;color:var(--mu)" title="택배상자 단가">📦 택배상자 (원)</span>
-              <input type="number" id="roas-box" placeholder="500" oninput="calcROAS2()" 
+              <input type="number" id="roas-box" placeholder="500" oninput="saveRoasInput('roas-box');calcROAS2()" 
                 style="width:70px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center">
               <span style="font-size:10px;color:var(--mu)" title="합포장 인건비/물품비">🎁 합포장비 (원)</span>
-              <input type="number" id="roas-wrapfee" placeholder="0" oninput="calcROAS2()" 
+              <input type="number" id="roas-wrapfee" placeholder="0" oninput="saveRoasInput('roas-wrapfee');calcROAS2()" 
                 style="width:70px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center">
               <span style="font-size:10px;color:var(--mu)" title="뽁뽁이, 완충재, 스티커, 사은품 등">📋 포장부자재 (원)</span>
-              <input type="number" id="roas-extramaterial" placeholder="200" oninput="calcROAS2()" 
+              <input type="number" id="roas-extramaterial" placeholder="200" oninput="saveRoasInput('roas-extramaterial');calcROAS2()" 
                 style="width:70px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center">
               <span style="font-size:10px;color:var(--mu)" title="무료배송 시 부담하는 배송비">🚚 무료배송비 (원)</span>
-              <input type="number" id="roas-shipfee" placeholder="3000" oninput="calcROAS2()" 
+              <input type="number" id="roas-shipfee" placeholder="3000" oninput="saveRoasInput('roas-shipfee');calcROAS2()" 
                 style="width:70px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:11px;text-align:right;outline:none;background:var(--sur)">
             </div>
           </div>
@@ -1794,12 +1794,12 @@ html, body{
           <div style="font-size:12px;font-weight:700;color:var(--tx);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bd)">📦 단품 + 무료배송</div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <span style="font-size:11px;color:var(--mu)">판매가 (원)</span>
-            <input type="number" id="rs1-price" placeholder="40000" oninput="calcRoasSet()" 
+            <input type="number" id="rs1-price" placeholder="40000" oninput="saveRoasInput('rs1-price');calcRoasSet()" 
               style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <span style="font-size:11px;color:var(--mu)">무료배송비 (원)</span>
-            <input type="number" id="rs1-ship" placeholder="3000" oninput="calcRoasSet()" value="3000"
+            <input type="number" id="rs1-ship" placeholder="3000" oninput="saveRoasInput('rs1-ship');calcRoasSet()" value="3000"
               style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
           </div>
           <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">단품 가격 + 무료배송비를 우리가 부담</div>
@@ -1810,12 +1810,12 @@ html, body{
           <div style="font-size:12px;font-weight:700;color:#1A3FAA;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #B5C9E8">🎁 2개 세트</div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <span style="font-size:11px;color:var(--mu)">세트 판매가 (원)</span>
-            <input type="number" id="rs2-price" placeholder="76000" oninput="calcRoasSet()" 
+            <input type="number" id="rs2-price" placeholder="76000" oninput="saveRoasInput('rs2-price');calcRoasSet()" 
               style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <span style="font-size:11px;color:var(--mu)">무료배송비 (원)</span>
-            <input type="number" id="rs2-ship" placeholder="3000" oninput="calcRoasSet()" value="3000"
+            <input type="number" id="rs2-ship" placeholder="3000" oninput="saveRoasInput('rs2-ship');calcRoasSet()" value="3000"
               style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
           </div>
           <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">제품 2개 + 1박스 + 1배송비</div>
@@ -1826,12 +1826,12 @@ html, body{
           <div style="font-size:12px;font-weight:700;color:#1A6B4A;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #A5D6A7">🎁 3개 세트</div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <span style="font-size:11px;color:var(--mu)">세트 판매가 (원)</span>
-            <input type="number" id="rs3-price" placeholder="108000" oninput="calcRoasSet()" 
+            <input type="number" id="rs3-price" placeholder="108000" oninput="saveRoasInput('rs3-price');calcRoasSet()" 
               style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <span style="font-size:11px;color:var(--mu)">무료배송비 (원)</span>
-            <input type="number" id="rs3-ship" placeholder="3000" oninput="calcRoasSet()" value="3000"
+            <input type="number" id="rs3-ship" placeholder="3000" oninput="saveRoasInput('rs3-ship');calcRoasSet()" value="3000"
               style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
           </div>
           <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">제품 3개 + 1박스 + 1배송비</div>
@@ -3051,6 +3051,7 @@ function sv(label){
    designRefs:_g(typeof designRefs!=='undefined'?designRefs:null,[]),
    cogsData:_g(typeof cogsData!=='undefined'?cogsData:null,[]),
    roasData:_g(typeof roasData!=='undefined'?roasData:null,[]),
+   roasInputs:_g(typeof roasInputs!=='undefined'?roasInputs:null,{}),
    prodExpenseData:_g(typeof prodExpenseData!=='undefined'?prodExpenseData:null,[]),
    prodExpData2:_g(typeof prodExpData2!=='undefined'?prodExpData2:null,[]),
    adExpenseData:_g(typeof adExpenseData!=='undefined'?adExpenseData:null,[]),
@@ -5821,7 +5822,7 @@ function calcROAS(){
  const cost=parseFloat(document.getElementById('roas-cost')?.value)||4800;
  const adCost=parseFloat(document.getElementById('roas-adcost')?.value)||8000;
  const margin=price-cost-adCost;
- const marginRate=Math.round((margin/price)*100);
+ const marginRate=price?Math.round((margin/price)*10000)/100:0;
  const costRate=Math.round((cost/price)*100);
  const adRate=Math.round((adCost/price)*100);
  const breakEvenROAS=adCost>0?Math.round(price/margin*100):0;
@@ -6052,6 +6053,7 @@ function editRevenue(ci,yr,cur){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // ROAS 2 — 항목별 계산
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+var roasInputs={};  // ★ ROAS/세트 탭 단순 입력값 저장 (price2, payfee, box, rs1-price 등)
 var roasData=[
  {id:'r1',name:'원가',amount:4800,pct:0,type:'fixed'},
  {id:'r2',name:'사이트 결제수수료',amount:0,pct:3.5,type:'pct'},
@@ -6238,8 +6240,8 @@ function calcROAS2(){
  // 추가비용 전역 저장 (END ROAS 세트 계산에서 재사용)
  window._roasExtraBreakdown = {payfeePct, etcfeePct, boxCost, wrapCost, extraMaterial, shipCost};
  var margin=price-totalCost;
- var marginRate=price?Math.round(margin/price*100):0;
- var costRate=price?Math.round(totalCost/price*100):0;
+ var marginRate=price?Math.round(margin/price*10000)/100:0;
+ var costRate=price?Math.round(totalCost/price*10000)/100:0;
  var endROAS=(margin>0&&price>0)?Math.round(price/margin*100):0;
  var wrap=document.getElementById('roas-result2');
  if(wrap){
@@ -6269,8 +6271,8 @@ function calcROAS2(){
  var vatAmount = Math.round(price * 0.1);
  var totalCostVAT = totalCost + vatAmount;
  var marginVAT = price - totalCostVAT;
- var marginRateVAT = price?Math.round(marginVAT/price*100):0;
- var costRateVAT = price?Math.round(totalCostVAT/price*100):0;
+ var marginRateVAT = price?Math.round(marginVAT/price*10000)/100:0;
+ var costRateVAT = price?Math.round(totalCostVAT/price*10000)/100:0;
  var endROAS_VAT = (marginVAT>0&&price>0)?Math.round(price/marginVAT*100):0;
 
  var wrapVAT = document.getElementById('roas-vat-detail');
@@ -6550,7 +6552,7 @@ function updateCogsTotal(){
  const total=cogsData.reduce((s,r)=>s+((r.unitPrice||r.amount)||0),0);
  const vat=Math.round(total*0.1);
  const grandTotal=total+vat;
- const rate=targetPrice?Math.round(grandTotal/targetPrice*100):0;
+ const rate=targetPrice?Math.round(grandTotal/targetPrice*10000)/100:0;
  const N=n=>(n||0).toLocaleString('ko-KR');
 
  // ━━━ 합계 행: 생산수량/초도투자금/잔여잔고 합산 ━━━
@@ -7368,6 +7370,25 @@ function saveIdea(){sv();buildIdea();buildIdeaIngredients();showToast('아이디
 // ============================================================
 // COSTS (t5)
 // ============================================================
+// ━━ ROAS/세트 탭 입력값 저장·복원 (roasInputs) ━━
+var ROAS_INPUT_IDS = ['roas-price2','roas-payfee','roas-etcfee','roas-box','roas-wrapfee','roas-extramaterial','roas-shipfee',
+  'rs1-price','rs1-ship','rs2-price','rs2-ship','rs3-price','rs3-ship',
+  'rs4-price','rs4-ship','rs5-price','rs5-ship','rs6-price','rs6-ship'];
+function saveRoasInput(id){
+  if(typeof roasInputs==='undefined'||!roasInputs) roasInputs={};
+  var el=document.getElementById(id);
+  if(el) roasInputs[id]=el.value;
+  if(typeof sv==='function') sv('ROAS 입력');
+}
+function restoreRoasInputs(){
+  if(typeof roasInputs==='undefined'||!roasInputs) return;
+  ROAS_INPUT_IDS.forEach(function(id){
+    if(roasInputs[id]!==undefined && roasInputs[id]!==''){
+      var el=document.getElementById(id);
+      if(el && document.activeElement!==el) el.value=roasInputs[id];
+    }
+  });
+}
 function showCostTab(tab, btn){
  const panels=['cost','adbudget','expense','adspend','monthly','prod','roas','roasset','allexp','adexp','prodexp','totalbudget','inventory','cashflow','scenario','sensitivity','integrated'];
  panels.forEach(p=>{const el=document.getElementById(p+'-tab-panel');if(el)el.style.display='none';});
@@ -7388,6 +7409,8 @@ function showCostTab(tab, btn){
   const roasPrice=document.getElementById('roas-price2');
   if(cogsPrice&&roasPrice&&!roasPrice.value)roasPrice.value=cogsPrice;
   renderRoasRows();
+  restoreRoasInputs();  // ★ 저장된 입력값 복원
+  if(typeof calcROAS2==='function') calcROAS2();
  }
  if(tab==='allexp'){renderAllExpenses();}
  if(tab==='adexp'){renderAdExpRows();}
@@ -7400,7 +7423,7 @@ function showCostTab(tab, btn){
  if(tab==='sensitivity')renderROASSensitivity();
  if(tab==='integrated')renderIntegratedFinance();
  if(tab==='adbudget')renderAdBudget();
- if(tab==='roasset')renderRoasSet();
+ if(tab==='roasset'){renderRoasSet();restoreRoasInputs();if(typeof calcRoasSet==='function')calcRoasSet();}
 }
 function showIdeaSubTab(which,btn){
  const panelZ=document.getElementById('idea4z-panel');
@@ -9918,6 +9941,7 @@ function load(){
    adPlans=d.adPlans||[...adPlans];
    orgData=d.org||JSON.parse(JSON.stringify(orgData));cogsData=d.cogsData||(isEmpty?[]:[...DEF_COGS_ROWS]);
       if(d.roasData&&d.roasData.length)roasData=d.roasData;
+      roasInputs=d.roasInputs||{};  // ★ ROAS/세트 입력값 복원
       if(d.prodExpenseData)prodExpenseData=d.prodExpenseData;
       if(d.prodExpData2)prodExpData2=d.prodExpData2;
       if(d.adExpenseData)adExpenseData=d.adExpenseData;
