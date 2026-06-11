@@ -3161,7 +3161,9 @@ function showTab(id,btn){
  const renders={
   t2:()=>{populateAnalysis();},
   t3:()=>{buildReviews();},
+  t4:()=>{buildIdea();if(typeof renderProductLineup==='function')renderProductLineup();},
   t6:()=>{renderPersonas();},
+  t8:()=>{buildMktPlan();},
   t9:()=>{buildProgress();renderDeadlineSummary();},
   t10:()=>{buildDevForms();},
   t11:()=>{buildWIG();},
@@ -6969,7 +6971,7 @@ function buildMap(){
  map.querySelectorAll('.brand-dot').forEach(e=>e.remove());
  const leg=document.getElementById('map-legend');if(leg)leg.innerHTML='';
  const myBrandDot={id:'epi',brand:(hubSettings&&hubSettings.brandName||'우리 브랜드')+' (목표)',mapX:72,mapY:68,isTarget:true};
- const items=[...allData.filter((d,i,a)=>a.findIndex(x=>x.brand===d.brand)===i),...mapCustomItems,epitect];
+ const items=[...allData.filter((d,i,a)=>a.findIndex(x=>x.brand===d.brand)===i),...mapCustomItems,myBrandDot];
  items.forEach((d,i)=>{
   const x=mapPos[d.id+'x']??d.mapX??50,y=mapPos[d.id+'y']??d.mapY??50;
   const el=document.createElement('div');el.className='brand-dot'+(d.isTarget?' mybrand-dot':'');el.id='dot'+d.id;
