@@ -10527,23 +10527,149 @@ function setMonthlyItem(y,mi,ii,key,val){
 // ============================================================
 // DEADLINE CALCULATOR (t14)
 // ============================================================
+// ━━ 데드라인 카테고리 메타 시스템 (동적 탭) ━━
+var DL_DEFAULT_META = [
+  {key:'marketing', label:'마케팅·런칭', emoji:'📢'},
+  {key:'product',   label:'제품·생산',   emoji:'🏭'},
+  {key:'packaging', label:'용기·상자',   emoji:'📦'},
+  {key:'sales',     label:'판매 세팅',   emoji:'🛒'},
+  {key:'capital',   label:'자금',        emoji:'💰'}
+];
+
+function getDLCategoryMeta(){
+  if(typeof deadlineData==='undefined'||!deadlineData) deadlineData={targetDate:'',categories:{}};
+  if(!Array.isArray(deadlineData.categoryMeta) || deadlineData.categoryMeta.length===0){
+    deadlineData.categoryMeta = JSON.parse(JSON.stringify(DL_DEFAULT_META));
+  }
+  // categories에 있는데 meta에 없는 키 자동 보강
+  if(deadlineData.categories){
+    Object.keys(deadlineData.categories).forEach(function(k){
+      if(!deadlineData.categoryMeta.some(function(m){return m.key===k;})){
+        deadlineData.categoryMeta.push({key:k, label:k, emoji:'📌'});
+      }
+    });
+  }
+  return deadlineData.categoryMeta;
+}
+
+var _dlCurrentCat_BOS = 'all';  // 'all' 또는 카테고리 key
+
+function renderDLTabs_BOS(){
+  var tabsEl = document.getElementById('dl-tabs-bos');
+  if(!tabsEl) return;
+  var meta = getDLCategoryMeta();
+  var h = '';
+  // 전체 탭
+  h += '<button class="stab' + (_dlCurrentCat_BOS==='all'?' act':'') + '" onclick="showDLCat(\'all\',this)">📋 전체</button>';
+  // 카테고리 탭들
+  meta.forEach(function(m){
+    var active = _dlCurrentCat_BOS===m.key;
+    h += '<span style="display:inline-flex;align-items:center">'
+      + '<button class="stab' + (active?' act':'') + '" onclick="showDLCat(\'' + m.key + '\',this)">' + (m.emoji||'') + ' ' + m.label + '</button>';
+    if(active){
+      h += '<button onclick="editDLCategory_BOS(\'' + m.key + '\')" title="탭 수정" style="background:none;border:none;cursor:pointer;font-size:10px;color:var(--mu);padding:2px 3px">⚙</button>';
+    }
+    h += '</span>';
+  });
+  // 탭 추가 버튼
+  h += '<button onclick="addDLCategory_BOS()" title="탭 추가" style="background:none;border:1px dashed var(--bd);border-radius:5px;cursor:pointer;font-size:11px;color:var(--mu);padding:4px 9px;margin-left:4px">＋ 탭</button>';
+  tabsEl.innerHTML = h;
+}
+
+function renderDLContainers_BOS(){
+  var cont = document.getElementById('dl-cat-container-bos');
+  if(!cont) return;
+  var meta = getDLCategoryMeta();
+  // 필요한 컨테이너 생성 (없는 것만)
+  var h = '';
+  meta.forEach(function(m){
+    h += '<div id="dl-cat-' + m.key + '" class="dl-cat" style="display:none"></div>';
+  });
+  cont.innerHTML = h;
+}
+
+window.showDLCat = function(cat, btn){
+  _dlCurrentCat_BOS = cat;
+  renderDLTabs_BOS();
+  renderDLContainers_BOS();
+  renderDeadlines();
+};
+
+window.addDLCategory_BOS = function(){
+  var label = prompt('새 탭 이름을 입력하세요 (예: 협찬·인플루언서)');
+  if(!label || !label.trim()) return;
+  label = label.trim();
+  var emoji = prompt('이모지 1개 (선택, 비워도 됨)', '📌') || '📌';
+  var meta = getDLCategoryMeta();
+  // 고유 key 생성
+  var key = 'cat_' + Date.now();
+  meta.push({key:key, label:label, emoji:emoji.trim()});
+  if(!deadlineData.categories) deadlineData.categories={};
+  deadlineData.categories[key] = [];
+  _dlCurrentCat_BOS = key;
+  if(typeof sv==='function') sv('데드라인 탭 추가');
+  renderDLTabs_BOS();
+  renderDLContainers_BOS();
+  renderDeadlines();
+};
+
+window.editDLCategory_BOS = function(key){
+  var meta = getDLCategoryMeta();
+  var m = meta.find(function(x){ return x.key===key; });
+  if(!m) return;
+  var action = prompt('"' + m.label + '" 탭\n\n새 이름 입력 (수정) / 비우고 확인 시 삭제\n취소하려면 ESC', m.label);
+  if(action === null) return;  // 취소
+  if(action.trim() === ''){
+    // 삭제
+    var cnt = (deadlineData.categories[key]||[]).length;
+    if(!confirm('"' + m.label + '" 탭을 삭제하시겠습니까?' + (cnt? '\n이 탭의 마일스톤 ' + cnt + '개도 함께 삭제됩니다.' : ''))) return;
+    deadlineData.categoryMeta = meta.filter(function(x){ return x.key!==key; });
+    delete deadlineData.categories[key];
+    _dlCurrentCat_BOS = 'all';
+  } else {
+    m.label = action.trim();
+    var em = prompt('이모지 (선택)', m.emoji||'📌');
+    if(em !== null) m.emoji = em.trim()||'📌';
+  }
+  if(typeof sv==='function') sv('데드라인 탭 수정');
+  renderDLTabs_BOS();
+  renderDLContainers_BOS();
+  renderDeadlines();
+};
+
 function renderDeadlines(){
  if(typeof deadlineData==='undefined'||!deadlineData)deadlineData={targetDate:'2026-06-19',categories:{}};
  if(!deadlineData.categories||typeof deadlineData.categories!=='object')deadlineData.categories={};
- ['marketing','product','packaging','sales','capital'].forEach(function(k){if(!Array.isArray(deadlineData.categories[k]))deadlineData.categories[k]=[];});
+ // 동적 탭바 + 컨테이너 먼저 생성 (전체보기/추가/삭제 반영)
+ if(typeof renderDLTabs_BOS==='function') renderDLTabs_BOS();
+ if(typeof renderDLContainers_BOS==='function') renderDLContainers_BOS();
+ // 동적 카테고리 메타 기반 (탭 추가/삭제 반영)
+ var _meta = (typeof getDLCategoryMeta==='function') ? getDLCategoryMeta() : [{key:'marketing',label:'마케팅·런칭',emoji:'📢'},{key:'product',label:'제품·생산',emoji:'🏭'},{key:'packaging',label:'용기·상자',emoji:'📦'},{key:'sales',label:'판매 세팅',emoji:'🛒'},{key:'capital',label:'자금',emoji:'💰'}];
+ _meta.forEach(function(m){if(!Array.isArray(deadlineData.categories[m.key]))deadlineData.categories[m.key]=[];});
  const target=deadlineData.targetDate||'';
- const catNames={marketing:'📢 마케팅·런칭',product:'🏭 제품·생산',packaging:'📦 용기·상자',sales:'🛒 판매 세팅',capital:'💰 자금'};
+ const catNames={};
+ _meta.forEach(function(m){ catNames[m.key]=(m.emoji||'')+' '+m.label; });
  const cats=deadlineData.categories;
+ var _cur = (typeof _dlCurrentCat_BOS!=='undefined') ? _dlCurrentCat_BOS : 'all';
  Object.keys(catNames).forEach(catKey=>{
   const el=document.getElementById('dl-cat-'+catKey);
   if(!el)return;
+  // 현재 탭이 'all'이 아니고 이 카테고리가 아니면 숨김 (전체 보기 지원)
+  if(_cur!=='all' && _cur!==catKey){ el.style.display='none'; return; }
+  el.style.display='';
   const items=(cats[catKey]||[]);
   if(!items.length){
-   el.innerHTML='<div style="padding:30px;text-align:center;color:var(--hi)">항목이 없습니다. 아래 버튼으로 추가하세요.</div>'
-    +'<div style="text-align:center"><button class="btn" onclick="addDLItem(\''+catKey+'\')">+ 항목 추가</button></div>';
+   var emptyTitle = (_cur==='all') ? '<div style="font-size:13px;font-weight:700;margin:6px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--bd)">'+catNames[catKey]+'</div>' : '';
+   el.innerHTML=emptyTitle+'<div style="padding:24px;text-align:center;color:var(--hi)">항목이 없습니다. 아래 버튼으로 추가하세요.</div>'
+    +'<div style="text-align:center;margin-bottom:10px"><button class="btn" onclick="addDLItem(\''+catKey+'\')">+ 항목 추가</button></div>';
    return;
   }
-  let html2='<div style="margin-bottom:8px;font-size:11px;color:var(--mu)">';
+  let html2='';
+  // 전체 보기일 때 카테고리 제목 표시
+  if(_cur==='all'){
+   html2+='<div style="font-size:13px;font-weight:700;margin:6px 0 8px;padding-bottom:5px;border-bottom:2px solid '+(_meta.find(function(mm){return mm.key===catKey;})?'var(--bd)':'var(--bd)')+'">'+catNames[catKey]+'</div>';
+  }
+  html2+='<div style="margin-bottom:8px;font-size:11px;color:var(--mu)">';
   html2+=target?('런칭일 <strong>'+target+'</strong> 기준 자동 산출 · 수정 가능'):'⚠ 상단에서 런칭 목표일을 먼저 설정하세요';
   html2+='</div>';
   html2+='<table style="width:100%;border-collapse:collapse;font-size:12px">';
@@ -11980,20 +12106,12 @@ function forceIsolationReset(){
     </div>
   </div>
   <div style="padding:10px 18px 0">
-    <div style="display:flex;gap:4px;border-bottom:1px solid var(--bd);margin-bottom:12px;flex-wrap:wrap">
-      <button class="stab act" onclick="showDLCat('marketing',this)">📢 마케팅·런칭</button>
-      <button class="stab" onclick="showDLCat('product',this)">🏭 제품·생산</button>
-      <button class="stab" onclick="showDLCat('packaging',this)">📦 용기·상자</button>
-      <button class="stab" onclick="showDLCat('sales',this)">🛒 판매 세팅</button>
-      <button class="stab" onclick="showDLCat('capital',this)">💰 자금</button>
+    <div id="dl-tabs-bos" style="display:flex;gap:4px;border-bottom:1px solid var(--bd);margin-bottom:12px;flex-wrap:wrap;align-items:center">
+      <!-- 동적 생성: 전체 + 카테고리 탭들 + 탭 추가 버튼 -->
     </div>
   </div>
   <div style="padding:0 18px 18px">
-    <div id="dl-cat-marketing" class="dl-cat"></div>
-    <div id="dl-cat-product" class="dl-cat" style="display:none"></div>
-    <div id="dl-cat-packaging" class="dl-cat" style="display:none"></div>
-    <div id="dl-cat-sales" class="dl-cat" style="display:none"></div>
-    <div id="dl-cat-capital" class="dl-cat" style="display:none"></div>
+    <div id="dl-cat-container-bos"></div>
     
     <!-- 데드라인 캘린더 -->
     <div class="card" style="padding:18px;margin-top:18px">
@@ -13311,17 +13429,21 @@ function forceIsolationReset(){
       + '</div>';
   }
   
-  window.addCalendarItem_BOS = function(){
+  window.addCalendarItem_BOS = function(presetPrereqId){
     calEditingItemId_BOS = null;
     document.getElementById('bos-cal-modal-title').textContent = '📌 항목 추가';
     document.getElementById('bos-cal-item-id').value = '';
     document.getElementById('bos-cal-item-title').value = '';
-    if(typeof fillCalCategoryOptions_BOS==='function') fillCalCategoryOptions_BOS('');
-    if(typeof fillPrereqOptions_BOS==='function') fillPrereqOptions_BOS('', null);
+    var _preItems = (typeof calData_BOS!=='undefined' && calData_BOS.items) ? calData_BOS.items : [];
+    var _preObj = presetPrereqId ? _preItems.find(function(i){return i.id===presetPrereqId;}) : null;
+    if(typeof fillCalCategoryOptions_BOS==='function') fillCalCategoryOptions_BOS(_preObj ? (_preObj.category||'') : '');
+    if(typeof window.fillPrereqOptions_BOS==='function') window.fillPrereqOptions_BOS(presetPrereqId || '', null);
     var _catEl = document.getElementById('bos-cal-item-category');
-    if(_catEl) _catEl.value = '';
+    if(_catEl) _catEl.value = _preObj ? (_preObj.category||'') : '';
     var todayStr = new Date().toISOString().slice(0,10);
     document.getElementById('bos-cal-item-start').value = todayStr;
+    // 선행이 미리 지정된 경우 시작일 자동 (onPrereqChange가 채움)
+    if(presetPrereqId && typeof window.onPrereqChange_BOS==='function'){ window.onPrereqChange_BOS(presetPrereqId); }
     document.getElementById('bos-cal-item-end').value = '';
     document.getElementById('bos-cal-item-note').value = '';
     document.getElementById('bos-cal-item-leadtime-value').value = '';
@@ -13347,7 +13469,19 @@ function forceIsolationReset(){
     document.getElementById('bos-cal-item-id').value = itemId;
     document.getElementById('bos-cal-item-title').value = item.title || '';
     if(typeof fillCalCategoryOptions_BOS==='function') fillCalCategoryOptions_BOS(item.category || '');
-    if(typeof fillPrereqOptions_BOS==='function') fillPrereqOptions_BOS(item.prereqId || '', item.id);
+    if(typeof window.fillPrereqOptions_BOS==='function') window.fillPrereqOptions_BOS(item.prereqId || '', item.id);
+    // 수동 고정 상태 복원
+    var _startEl = document.getElementById('bos-cal-item-start');
+    if(_startEl){
+      _startEl.dataset.manualEdited = item.prereqManual ? '1' : '';
+      if(item.prereqId && item.prereqManual){
+        var _at = document.getElementById('bos-cal-start-auto');
+        var _ht = document.getElementById('bos-cal-prereq-hint');
+        if(_at){ _at.style.display=''; _at.textContent='(직접 수정함 · 자동 이동 안 함)'; _at.style.color='#E65100'; }
+        _startEl.style.background = '#FFF8E8';
+        if(_ht){ _ht.style.display=''; _ht.style.color='#E65100'; _ht.innerHTML='✏️ 시작일을 직접 지정한 항목입니다. 선행이 밀려도 자동 이동하지 않습니다.'; }
+      }
+    }
     var _catEl2 = document.getElementById('bos-cal-item-category');
     if(_catEl2) _catEl2.value = item.category || '';
     document.getElementById('bos-cal-item-start').value = item.startDate || '';
@@ -13393,7 +13527,8 @@ function forceIsolationReset(){
       note: document.getElementById('bos-cal-item-note').value.trim(),
       leadtimeValue: parseInt(document.getElementById('bos-cal-item-leadtime-value')?.value) || 0,
       leadtimeUnit: document.getElementById('bos-cal-item-leadtime-unit')?.value || 'week',
-      prereqId: (document.getElementById('bos-cal-item-prereq')?.value || '')
+      prereqId: (document.getElementById('bos-cal-item-prereq')?.value || ''),
+      prereqManual: (document.getElementById('bos-cal-item-start')?.dataset.manualEdited === '1')
     };
     
     if(calEditingItemId_BOS){
@@ -18595,13 +18730,7 @@ body.cal-highlighting .cal-item-card-bos:hover{
     document.querySelectorAll('.cal-item-card-bos').forEach(function(c){
       var match = c.getAttribute('data-item-id') === itemId;
       c.classList.toggle('cal-card-highlighted', match);
-      // 강조된 카드로 스크롤(보이지 않을 때만)
-      if(match){
-        var rect = c.getBoundingClientRect();
-        if(rect.top < 0 || rect.bottom > window.innerHeight){
-          c.scrollIntoView({behavior:'smooth', block:'nearest'});
-        }
-      }
+      // (배지 호버 시 자동 스크롤 제거 — 캘린더 아래로 내렸을 때 페이지가 위로 튀는 문제 방지)
     });
   };
   
@@ -21202,6 +21331,10 @@ setTimeout(function(){
         _orig.apply(this, arguments);
         try {
           if(typeof renderCalendarItems_BOS === 'function') renderCalendarItems_BOS();
+          // ★ 월별 그리드(점)도 갱신 — 삭제 시 점이 남는 버그 수정
+          if(typeof renderCalendarGrid_BOS === 'function') renderCalendarGrid_BOS();
+          // ★ 데드라인 자체 캘린더도 갱신
+          if(typeof renderDeadlineMiniCal_BOS === 'function') renderDeadlineMiniCal_BOS();
         } catch(e){}
       };
       window.renderDeadlines._calWrapped = true;
@@ -21297,13 +21430,8 @@ tr.row-cal-highlight td{ background:transparent !important; }
         if(!firstRow) firstRow = row;
       }
     });
-    // 강조된 행이 화면 밖이면 스크롤
-    if(firstRow){
-      var rect = firstRow.getBoundingClientRect();
-      if(rect.top < 60 || rect.bottom > window.innerHeight){
-        firstRow.scrollIntoView({behavior:'smooth', block:'center'});
-      }
-    }
+    // (셀 호버 시 자동 스크롤 제거 — 캘린더 아래로 내렸을 때 페이지가 위로 튀는 문제 방지)
+    // 강조만 적용하고 스크롤은 하지 않음
   };
   
   window.clearRowHighlightFromCell_BOS = function(){
@@ -21446,6 +21574,10 @@ tr.row-cal-highlight td{ background:transparent !important; }
     var hint = document.getElementById('bos-cal-prereq-hint');
     var autoTag = document.getElementById('bos-cal-start-auto');
     var startEl = document.getElementById('bos-cal-item-start');
+    // 선행을 (재)선택하면 수동 고정 해제 → 다시 자동
+    if(startEl && !skipFill){ startEl.dataset.manualEdited = ''; }
+    if(autoTag){ autoTag.style.color = '#1565C0'; autoTag.textContent = '(선행 따라 자동)'; }
+    if(hint){ hint.style.color = '#1565C0'; }
     if(!prereqId){
       if(hint) hint.style.display = 'none';
       if(autoTag) autoTag.style.display = 'none';
@@ -21475,39 +21607,24 @@ tr.row-cal-highlight td{ background:transparent !important; }
     var autoTag = document.getElementById('bos-cal-start-auto');
     var hint = document.getElementById('bos-cal-prereq-hint');
     var startEl = document.getElementById('bos-cal-item-start');
-    // 이 함수는 사용자가 날짜를 직접 바꿀 때만 호출됨 (자동설정은 .value 직접 대입이라 onchange 안 탐)
+    // 시작일을 직접 수정하면: 선행 연결은 유지하되 '수동 고정' 표시 (자동 재계산 제외)
     if(sel && sel.value){
-      sel.value = '';
-      if(autoTag) autoTag.style.display = 'none';
-      if(hint) hint.style.display = 'none';
-      if(startEl) startEl.style.background = '';
+      if(autoTag){ autoTag.style.display = ''; autoTag.textContent = '(직접 수정함 · 자동 이동 안 함)'; autoTag.style.color = '#E65100'; }
+      if(startEl){ startEl.style.background = '#FFF8E8'; startEl.dataset.manualEdited = '1'; }
+      if(hint){ hint.style.display = ''; hint.style.color = '#E65100';
+        hint.innerHTML = '✏️ 시작일을 직접 지정했습니다. 선행이 밀려도 이 날짜는 자동 이동하지 않습니다. (선행 연결을 끊으려면 위에서 \'없음\' 선택)'; }
     }
   };
   
   // 후속 일정 바로 추가 (이 항목을 선행으로)
   window.addFollowupItem_BOS = function(prereqId){
-    var items = (typeof calData_BOS !== 'undefined' && calData_BOS.items) ? calData_BOS.items : [];
-    var prereq = items.find(function(i){ return i.id === prereqId; });
-    if(!prereq) return;
-    var end = getItemEnd_BOS(prereq);
-    var autoStart = end ? nextBusinessDay(end) : (prereq.startDate || '');
-    var newItem = {
-      id: 'cal_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
-      title: '',
-      category: prereq.category || '',
-      startDate: autoStart,
-      endDate: '',
-      color: prereq.color || '#1976D2',
-      note: '',
-      leadtimeValue: 0,
-      leadtimeUnit: 'week',
-      prereqId: prereqId
-    };
-    calData_BOS.items.push(newItem);
-    if(typeof saveCalData_BOS === 'function') saveCalData_BOS();
-    if(typeof renderCalendarItems_BOS === 'function') renderCalendarItems_BOS();
-    // 바로 편집 모달 열기
-    if(typeof editCalendarItem_BOS === 'function') editCalendarItem_BOS(newItem.id);
+    // 빈 항목을 저장하지 않고, 추가 모달을 '선행 미리선택' 상태로 연다
+    // (모달에서 제목 입력 + 선행 변경 가능, 취소하면 아무것도 저장 안 됨)
+    if(typeof window.addCalendarItem_BOS === 'function'){
+      window.addCalendarItem_BOS(prereqId);
+    } else {
+      console.warn('[Followup] addCalendarItem_BOS 없음');
+    }
   };
   
   // 선행 의존 항목들 시작일 자동 재계산 (렌더 전 호출)
@@ -21522,6 +21639,7 @@ tr.row-cal-highlight td{ background:transparent !important; }
       changed = false; guard++;
       items.forEach(function(it){
         if(!it.prereqId) return;
+        if(it.prereqManual) return;  // 시작일 직접 수정한 항목은 자동 이동 제외
         var prereq = byId[it.prereqId];
         if(!prereq){ return; }
         var end = getItemEnd_BOS(prereq);
