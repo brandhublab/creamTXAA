@@ -10666,23 +10666,24 @@ function renderDeadlines(){
   }
   let html2='';
   // 전체 보기일 때 카테고리 제목 표시
+  // 접힘 상태
+  window._dlCollapsed_BOS = window._dlCollapsed_BOS || {};
+  var _collapsed = !!window._dlCollapsed_BOS[catKey];
   if(_cur==='all'){
-   html2+='<div style="font-size:13px;font-weight:700;margin:6px 0 8px;padding-bottom:5px;border-bottom:2px solid '+(_meta.find(function(mm){return mm.key===catKey;})?'var(--bd)':'var(--bd)')+'">'+catNames[catKey]+'</div>';
+   var _doneCnt = items.filter(function(x){return x.done;}).length;
+   html2+='<div onclick="toggleDLCollapse_BOS(\''+catKey+'\')" style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;margin:6px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--bd);cursor:pointer;user-select:none">'
+    +'<span style="transition:transform .15s;display:inline-block;'+(_collapsed?'':'transform:rotate(90deg)')+'">▶</span>'
+    +'<span>'+catNames[catKey]+'</span>'
+    +'<span style="font-size:10px;color:var(--mu);font-weight:400">'+_doneCnt+'/'+items.length+' 완료</span>'
+    +'</div>';
+   if(_collapsed){ el.innerHTML=html2; el.style.display=''; return; }
   }
   html2+='<div style="margin-bottom:8px;font-size:11px;color:var(--mu)">';
   html2+=target?('런칭일 <strong>'+target+'</strong> 기준 자동 산출 · 수정 가능'):'⚠ 상단에서 런칭 목표일을 먼저 설정하세요';
   html2+='</div>';
-  html2+='<table style="width:100%;border-collapse:collapse;font-size:12px">';
-  html2+='<thead><tr style="background:var(--bg);border-bottom:2px solid var(--bd)">';
-  html2+='<th style="padding:6px 8px;text-align:left;width:36px"></th>';
-  html2+='<th style="padding:6px 8px;text-align:left">항목</th>';
-  html2+='<th style="padding:6px 8px;text-align:center;width:70px" title="런칭일 기준 시작 오프셋 (음수=이전, 0=당일)">D±N</th>';
-  html2+='<th style="padding:6px 8px;text-align:center;width:110px">시작일</th>';
-  html2+='<th style="padding:6px 8px;text-align:center;width:110px">완료일</th>';
-  html2+='<th style="padding:6px 8px;text-align:center;width:70px">소요일</th>';
-  html2+='<th style="padding:6px 8px;text-align:left">메모</th>';
-  html2+='<th style="width:28px"></th>';
-  html2+='</tr></thead><tbody>';
+  // ━━ 카드 그리드 ━━
+  var today2=new Date();today2.setHours(0,0,0,0);
+  html2+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px">';
   items.forEach((item,i)=>{
    let startDate='',endDate='';
    if(target){
@@ -10694,20 +10695,42 @@ function renderDeadlines(){
     startDate=item.customStart||'';
     endDate=item.customEnd||'';
    }
-   const done=item.done?'✓':'';
-   html2+='<tr style="border-bottom:.5px solid var(--bd);background:'+(item.done?'rgba(76,175,80,.06)':'transparent')+'">';
-   html2+='<td style="padding:4px 8px;text-align:center"><input type="checkbox" '+(item.done?'checked':'')+' onchange="deadlineData.categories.'+catKey+'['+i+'].done=this.checked;renderDeadlines();sv()" style="width:16px;height:16px;cursor:pointer"></td>';
-   html2+='<td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:4px;height:18px;background:'+(item.color||'#888')+';border-radius:2px;flex-shrink:0"></span><input value="'+(item.name||'').replace(/"/g,'&quot;')+'" onchange="deadlineData.categories.'+catKey+'['+i+'].name=this.value;sv()" style="width:100%;border:none;background:transparent;font-size:12px;outline:none;'+(item.done?'text-decoration:line-through;color:var(--mu)':'')+'"></div></td>';
-   html2+='<td style="padding:5px 8px;text-align:center"><input type="number" value="'+(item.offsetDays||0)+'" onchange="deadlineData.categories.'+catKey+'['+i+'].offsetDays=parseInt(this.value)||0;delete deadlineData.categories.'+catKey+'['+i+'].customStart;delete deadlineData.categories.'+catKey+'['+i+'].customEnd;renderDeadlines();sv()" style="width:55px;border:none;border-bottom:1px dashed var(--bd);background:transparent;font-family:var(--mn);font-size:11px;outline:none;text-align:center"></td>';
-   html2+='<td style="padding:5px 8px;text-align:center"><input type="date" value="'+startDate+'" onchange="deadlineData.categories.'+catKey+'['+i+'].customStart=this.value;sv()" style="border:none;background:transparent;font-family:var(--mn);font-size:11px;outline:none;text-align:center"></td>';
-   html2+='<td style="padding:5px 8px;text-align:center"><input type="date" value="'+endDate+'" onchange="deadlineData.categories.'+catKey+'['+i+'].customEnd=this.value;if(this.value)deadlineData.categories.'+catKey+'['+i+'].done=true;else deadlineData.categories.'+catKey+'['+i+'].done=false;renderDeadlines();sv()" style="border:none;background:transparent;font-family:var(--mn);font-size:11px;outline:none;text-align:center"></td>';
-   html2+='<td style="padding:5px 8px;text-align:center"><input type="number" value="'+(item.durationDays||0)+'" min="0" onchange="deadlineData.categories.'+catKey+'['+i+'].durationDays=parseInt(this.value)||0;delete deadlineData.categories.'+catKey+'['+i+'].customEnd;renderDeadlines();sv()" style="width:55px;border:none;border-bottom:1px dashed var(--bd);background:transparent;font-family:var(--mn);font-size:11px;outline:none;text-align:center">일</td>';
-   html2+='<td style="padding:5px 8px"><input value="'+(item.note||'').replace(/"/g,'&quot;')+'" onchange="deadlineData.categories.'+catKey+'['+i+'].note=this.value;sv()" style="width:100%;border:none;background:transparent;font-size:11px;color:var(--mu);outline:none"></td>';
-   html2+='<td style="padding:5px 4px"><button onclick="delDLItem(\''+catKey+'\','+i+')" style="background:none;border:none;color:var(--hi);cursor:pointer;font-size:11px">✕</button></td>';
-   html2+='</tr>';
+   // D-day 계산
+   var ddayTxt='';
+   if(startDate){
+    var sd=new Date(startDate+'T00:00:00');
+    var diff=Math.round((sd-today2)/86400000);
+    if(!item.done){
+     if(diff===0) ddayTxt='<span style="color:#C0392B;font-weight:700">D-DAY</span>';
+     else if(diff>0) ddayTxt='<span style="color:#1A6B4A;font-weight:600">D-'+diff+'</span>';
+     else ddayTxt='<span style="color:#999;font-weight:600">D+'+Math.abs(diff)+'</span>';
+    }
+   }
+   var dlid='dl_'+(item.id||(catKey+'_'+i));
+   html2+='<div class="dl-card-bos" data-dl-id="'+dlid+'" onmouseenter="highlightDLInCal_BOS(\''+dlid+'\')" onmouseleave="clearDLCalHighlight_BOS()" style="border:1px solid var(--bd);border-left:3px solid '+(item.color||'#888')+';border-radius:8px;padding:10px 12px;background:'+(item.done?'rgba(76,175,80,.06)':'#fff')+';transition:all .12s">';
+   // 헤더: 체크박스 + 이름 + D-day
+   html2+='<div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:8px">';
+   html2+='<input type="checkbox" '+(item.done?'checked':'')+' onchange="deadlineData.categories.'+catKey+'['+i+'].done=this.checked;renderDeadlines();sv()" style="width:15px;height:15px;cursor:pointer;margin-top:2px;flex-shrink:0">';
+   html2+='<input value="'+(item.name||'').replace(/"/g,'&quot;')+'" onchange="deadlineData.categories.'+catKey+'['+i+'].name=this.value;sv()" style="flex:1;min-width:0;border:none;background:transparent;font-size:12.5px;font-weight:600;outline:none;'+(item.done?'text-decoration:line-through;color:var(--mu)':'')+'">';
+   html2+='<button onclick="delDLItem(\''+catKey+'\','+i+')" style="background:none;border:none;color:var(--hi);cursor:pointer;font-size:12px;flex-shrink:0;padding:0 2px">✕</button>';
+   html2+='</div>';
+   // 날짜 행
+   html2+='<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px;font-size:10.5px">';
+   html2+='<span style="color:var(--mu)">📅 '+(startDate||'미정')+'</span>'+ddayTxt;
+   html2+='</div>';
+   // 상세 (시작/완료/D±N/소요) - 2x2 그리드
+   html2+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:10px;margin-bottom:6px">';
+   html2+='<label style="color:var(--mu)">시작 <input type="date" value="'+startDate+'" onchange="deadlineData.categories.'+catKey+'['+i+'].customStart=this.value;renderDeadlines();sv()" style="width:100%;border:1px solid var(--bd);border-radius:4px;padding:2px 4px;font-size:9.5px;font-family:var(--mn);outline:none"></label>';
+   html2+='<label style="color:var(--mu)">완료 <input type="date" value="'+endDate+'" onchange="deadlineData.categories.'+catKey+'['+i+'].customEnd=this.value;if(this.value)deadlineData.categories.'+catKey+'['+i+'].done=true;renderDeadlines();sv()" style="width:100%;border:1px solid var(--bd);border-radius:4px;padding:2px 4px;font-size:9.5px;font-family:var(--mn);outline:none"></label>';
+   html2+='<label style="color:var(--mu)" title="런칭일 기준 오프셋">D±N <input type="number" value="'+(item.offsetDays||0)+'" onchange="deadlineData.categories.'+catKey+'['+i+'].offsetDays=parseInt(this.value)||0;delete deadlineData.categories.'+catKey+'['+i+'].customStart;delete deadlineData.categories.'+catKey+'['+i+'].customEnd;renderDeadlines();sv()" style="width:100%;border:1px solid var(--bd);border-radius:4px;padding:2px 4px;font-size:9.5px;font-family:var(--mn);outline:none;text-align:center"></label>';
+   html2+='<label style="color:var(--mu)">소요(일) <input type="number" value="'+(item.durationDays||0)+'" min="0" onchange="deadlineData.categories.'+catKey+'['+i+'].durationDays=parseInt(this.value)||0;delete deadlineData.categories.'+catKey+'['+i+'].customEnd;renderDeadlines();sv()" style="width:100%;border:1px solid var(--bd);border-radius:4px;padding:2px 4px;font-size:9.5px;font-family:var(--mn);outline:none;text-align:center"></label>';
+   html2+='</div>';
+   // 메모
+   html2+='<input value="'+(item.note||'').replace(/"/g,'&quot;')+'" placeholder="메모..." onchange="deadlineData.categories.'+catKey+'['+i+'].note=this.value;sv()" style="width:100%;border:none;border-top:1px dashed var(--bd);background:transparent;font-size:10.5px;color:var(--mu);outline:none;padding-top:6px;margin-top:2px">';
+   html2+='</div>';
   });
-  html2+='</tbody></table>';
-  html2+='<div style="margin-top:10px;text-align:right"><button class="btn" onclick="addDLItem(\''+catKey+'\')">+ 항목 추가</button></div>';
+  html2+='</div>';
+  html2+='<div style="margin-top:12px;text-align:right"><button class="btn" onclick="addDLItem(\''+catKey+'\')">+ 항목 추가</button></div>';
   el.innerHTML=html2;
  });
 }
@@ -12440,6 +12463,7 @@ function forceIsolationReset(){
     <div style="display:flex;gap:4px;flex-wrap:wrap">
       <button class="stab active" id="t20-sub-calendar-btn" onclick="showCalendarSubTab('calendar')">📅 타임라인</button>
       <button class="stab" id="t20-sub-sample-btn" onclick="showCalendarSubTab('sample')">🧪 샘플</button>
+      <button class="stab" id="t20-sub-clinical-btn" onclick="showCalendarSubTab('clinical')">🔬 임상시험</button>
       <button class="stab" id="t20-sub-outsource-btn" onclick="showCalendarSubTab('outsource')">🤝 아웃소싱</button>
     </div>
   </div>
@@ -12558,6 +12582,20 @@ function forceIsolationReset(){
         </div>
         <div id="sample-minical-bos"></div>
       </div>
+    </div>
+  </div>
+  
+  <!-- ━━━ 서브탭: 🔬 임상시험 (견적 검토) ━━━ -->
+  <div id="t20-sub-clinical" style="display:none">
+    <div class="card" style="padding:20px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:14px;font-weight:700">🔬 임상시험 견적 검토</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:3px">여러 기관 견적을 비교하고 선정 — 항목·소요기간·금액·결과 표기방식까지 한눈에</div>
+        </div>
+        <button class="btn pri" onclick="addClinicalEntry_BOS()" style="font-size:12px">+ 기관 추가</button>
+      </div>
+      <div id="clinical-table-wrap-bos" style="overflow-x:auto;margin-top:12px"></div>
     </div>
   </div>
   
@@ -17930,7 +17968,6 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
   var OUTSOURCE_CATS = [
     {key:'전체',       emoji:'📋', color:'#7F8C8D'},
     {key:'제품생산',    emoji:'🏭', color:'#F1C40F'},
-    {key:'임상시험',    emoji:'🔬', color:'#0097A7'},
     {key:'1차용기',     emoji:'🧴', color:'#E67E22'},
     {key:'2차상자',     emoji:'📦', color:'#9ACD32'},
     {key:'패키지디자인', emoji:'🎁', color:'#27AE60'},
@@ -18029,7 +18066,7 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
   // 서브탭 전환
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   window.showCalendarSubTab = function(name){
-    var subs = ['calendar', 'sample', 'outsource'];
+    var subs = ['calendar', 'sample', 'clinical', 'outsource'];
     subs.forEach(function(s){
       var btn = document.getElementById('t20-sub-' + s + '-btn');
       var pane = document.getElementById('t20-sub-' + s);
@@ -18037,6 +18074,7 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
       if(pane) pane.style.display = (s === name) ? '' : 'none';
     });
     if(name === 'sample') renderSampleTable_BOS();
+    if(name === 'clinical') renderClinicalTable_BOS();
     if(name === 'outsource') renderOutsourceTable_BOS();
   };
   
@@ -21351,6 +21389,8 @@ setTimeout(function(){
 .minical-cell-bos.sid-active{ background:#FFF3CD !important; outline:2.5px solid #FF9800; outline-offset:-2px; border-radius:4px; transition:all .15s; z-index:3; position:relative; box-shadow:0 0 0 3px rgba(255,152,0,.25); animation:sidPulse 1s ease-in-out infinite; }
 .minical-cell-bos.sid-active .minical-day-bos{ font-weight:800; color:#E65100; }
 .minical-cell-bos.sid-active .minical-dot-bos{ transform:scale(1.6); }
+.dl-card-bos:hover{ box-shadow:0 2px 8px rgba(0,0,0,.08); transform:translateY(-1px); }
+.dl-card-bos.dl-card-hl{ background:#FFF8E1 !important; outline:2px solid #FFB300; outline-offset:-1px; box-shadow:0 0 0 3px rgba(255,179,0,.2); }
 @keyframes sidPulse{ 0%,100%{ box-shadow:0 0 0 3px rgba(255,152,0,.25); } 50%{ box-shadow:0 0 0 5px rgba(255,152,0,.45); } }
 </style>
 <script id="sample-cal-hover-script">
@@ -21416,9 +21456,15 @@ tr.row-cal-highlight td{ background:transparent !important; }
     _lastHoverSids = sids;
     var idList = sids.split(',').filter(function(x){ return x; });
     if(idList.length === 0) return;
-    // 어느 미니캘린더인지 판별 (sample / outsource)
+    // 어느 미니캘린더인지 판별 (sample / outsource / deadline)
     var inSample = !!cell.closest('#sample-minical-bos');
     var inOutsource = !!cell.closest('#outsource-minical-bos');
+    var inDeadline = !!cell.closest('#deadline-minical-bos');
+    // 데드라인 캘린더 → 데드라인 카드 강조 (별도 처리)
+    if(inDeadline){
+      if(typeof highlightDLCardsFromCell_BOS === 'function') highlightDLCardsFromCell_BOS(cell);
+      return;
+    }
     var attr = inSample ? 'data-sample-id' : (inOutsource ? 'data-outsource-id' : null);
     if(!attr) return;
     clearRowHighlightFromCell_BOS();
@@ -21439,6 +21485,7 @@ tr.row-cal-highlight td{ background:transparent !important; }
     document.querySelectorAll('tr.row-cal-highlight').forEach(function(r){
       r.classList.remove('row-cal-highlight');
     });
+    if(typeof clearDLCardHighlight_BOS === 'function') clearDLCardHighlight_BOS();
   };
   
   console.log('[CalToRow] 캘린더 셀 → 행 역방향 강조 준비됨');
@@ -21484,6 +21531,55 @@ tr.row-cal-highlight td{ background:transparent !important; }
     if(typeof renderMiniCal === 'function'){
       renderMiniCal('deadline-minical-bos', events, 'deadline');
     }
+  };
+  
+  window.toggleDLCollapse_BOS = function(catKey){
+    window._dlCollapsed_BOS = window._dlCollapsed_BOS || {};
+    window._dlCollapsed_BOS[catKey] = !window._dlCollapsed_BOS[catKey];
+    if(typeof renderDeadlines === 'function') renderDeadlines();
+  };
+  
+  // ━━ 데드라인 카드 ↔ 캘린더 양방향 강조 ━━
+  window.highlightDLInCal_BOS = function(dlid){
+    var cal = document.getElementById('deadline-minical-bos');
+    if(!cal) return;
+    var cells = cal.querySelectorAll('.minical-cell-bos');
+    var firstActive = null;
+    cells.forEach(function(cell){
+      cell.classList.remove('sid-active','sid-dimmed');
+      var sids = cell.getAttribute('data-sids');
+      if(sids){
+        if(sids.split(',').indexOf(dlid) >= 0){ cell.classList.add('sid-active'); if(!firstActive) firstActive=cell; }
+        else cell.classList.add('sid-dimmed');
+      } else if(cell.classList.contains('has-ev')){ cell.classList.add('sid-dimmed'); }
+    });
+    if(firstActive){
+      var r = firstActive.getBoundingClientRect();
+      if(r.top<0||r.top>window.innerHeight-80) firstActive.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  };
+  window.clearDLCalHighlight_BOS = function(){
+    var cal = document.getElementById('deadline-minical-bos');
+    if(!cal) return;
+    cal.querySelectorAll('.minical-cell-bos').forEach(function(c){ c.classList.remove('sid-active','sid-dimmed'); });
+  };
+  window.highlightDLCardsFromCell_BOS = function(cell){
+    if(!cell) return;
+    var sids = cell.getAttribute('data-sids');
+    if(!sids) return;
+    clearDLCardHighlight_BOS();
+    var first=null;
+    sids.split(',').filter(function(x){return x;}).forEach(function(id){
+      var card = document.querySelector('.dl-card-bos[data-dl-id="'+id+'"]');
+      if(card){ card.classList.add('dl-card-hl'); if(!first) first=card; }
+    });
+    if(first){
+      var r=first.getBoundingClientRect();
+      if(r.top<60||r.bottom>window.innerHeight) first.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  };
+  window.clearDLCardHighlight_BOS = function(){
+    document.querySelectorAll('.dl-card-bos.dl-card-hl').forEach(function(c){ c.classList.remove('dl-card-hl'); });
   };
   
   window.toggleTimelineInDeadlineCal_BOS = function(checked){
@@ -21675,6 +21771,201 @@ tr.row-cal-highlight td{ background:transparent !important; }
   
   window._getItemEnd_BOS = getItemEnd_BOS;
   console.log('[CalDeps] 선행/후속 의존 관계 준비됨');
+})();
+</script>
+
+<!-- ━━━ 임상시험 견적 검토 ━━━ -->
+<script id="clinical-script">
+(function(){
+  var LS_CLINICAL = 'bos_clinical_data_v1';
+  
+  window.loadClinicalData_BOS = function(){
+    try { return JSON.parse(localStorage.getItem(LS_CLINICAL)||'[]'); } catch(e){ return []; }
+  };
+  window.saveClinicalData_BOS = function(arr){
+    try { localStorage.setItem(LS_CLINICAL, JSON.stringify(arr)); } catch(e){}
+  };
+  
+  window.addClinicalEntry_BOS = function(){
+    var arr = loadClinicalData_BOS();
+    arr.push({
+      id: 'clin_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
+      vendor: '', link: '',              // 업체명 + 링크(이동)
+      contact: '',                       // 담당자
+      validLink: '',                     // 유효성 검사 항목(링크)
+      brands: '',                        // 진행한 브랜드
+      items: [{ name:'' }],              // 견적 항목 (항목수 → 1개당 비용 계산)
+      cost: '',                          // 견적 금액
+      period: '',                        // 임상 기간
+      sampleVol: '', sampleCount: '',    // 필요 시료수 (용량, 시료수)
+      picked: false, note: ''
+    });
+    saveClinicalData_BOS(arr);
+    renderClinicalTable_BOS();
+  };
+  
+  window.delClinicalEntry_BOS = function(id){
+    if(!confirm('이 기관 견적을 삭제할까요?')) return;
+    var arr = loadClinicalData_BOS().filter(function(x){ return x.id !== id; });
+    saveClinicalData_BOS(arr);
+    renderClinicalTable_BOS();
+  };
+  
+  window.updateClinical_BOS = function(id, field, val){
+    var arr = loadClinicalData_BOS();
+    var e = arr.find(function(x){ return x.id===id; });
+    if(!e) return;
+    e[field] = val;
+    saveClinicalData_BOS(arr);
+    // 소요기간은 재렌더 필요(자동계산 표시)
+    if(field==='cost' || field==='picked') renderClinicalTable_BOS();
+  };
+  
+  window.togglePickClinical_BOS = function(id){
+    var arr = loadClinicalData_BOS();
+    var e = arr.find(function(x){ return x.id===id; });
+    if(!e) return;
+    e.picked = !e.picked;
+    saveClinicalData_BOS(arr);
+    renderClinicalTable_BOS();
+  };
+  
+  // 세부 항목(모달 종류·금액) 추가/삭제/수정
+  window.addClinicalItem_BOS = function(id){
+    var arr = loadClinicalData_BOS();
+    var e = arr.find(function(x){ return x.id===id; });
+    if(!e) return;
+    if(!Array.isArray(e.items)) e.items=[];
+    e.items.push({ name:'' });
+    saveClinicalData_BOS(arr);
+    renderClinicalTable_BOS();
+  };
+  window.delClinicalItem_BOS = function(id, idx){
+    var arr = loadClinicalData_BOS();
+    var e = arr.find(function(x){ return x.id===id; });
+    if(!e || !e.items) return;
+    e.items.splice(idx,1);
+    if(e.items.length===0) e.items.push({name:''});
+    saveClinicalData_BOS(arr);
+    renderClinicalTable_BOS();
+  };
+  window.updateClinicalItem_BOS = function(id, idx, field, val){
+    var arr = loadClinicalData_BOS();
+    var e = arr.find(function(x){ return x.id===id; });
+    if(!e || !e.items || !e.items[idx]) return;
+    e.items[idx][field] = val;
+    saveClinicalData_BOS(arr);
+  };
+  
+  function esc(s){ return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+  function num(s){ var n=parseInt((s||'').toString().replace(/[^0-9]/g,'')); return isNaN(n)?0:n; }
+  function fmtWon(n){ return n ? n.toLocaleString('ko-KR')+'원' : ''; }
+  
+  // 의뢰→도착 소요기간 계산
+  function calcDays(req, arr){
+    if(!req || !arr) return '';
+    var d1=new Date(req+'T00:00:00'), d2=new Date(arr+'T00:00:00');
+    if(isNaN(d1)||isNaN(d2)) return '';
+    var diff=Math.round((d2-d1)/86400000);
+    return diff>=0 ? (diff+'일') : '';
+  }
+  
+  window.renderClinicalTable_BOS = function(){
+    var wrap = document.getElementById('clinical-table-wrap-bos');
+    if(!wrap) return;
+    var arr = loadClinicalData_BOS();
+    
+    if(arr.length===0){
+      wrap.innerHTML = '<div style="padding:40px;text-align:center;color:var(--mu);font-size:13px">아직 등록된 임상시험 기관이 없습니다.<br><button class="btn pri" onclick="addClinicalEntry_BOS()" style="margin-top:12px">+ 첫 기관 추가</button></div>';
+      return;
+    }
+    
+    var h = '<table style="width:100%;border-collapse:collapse;font-size:11.5px;min-width:1180px">';
+    h += '<thead><tr style="background:var(--bg);border-bottom:2px solid var(--bd)">';
+    var cols = ['','업체명 · 링크','담당자','유효성 검사 항목','진행한 브랜드','견적 항목','견적 금액','1개당 비용','임상 기간','필요 시료수','메모',''];
+    var widths = ['32px','130px','80px','120px','110px','170px','110px','95px','95px','120px','110px','28px'];
+    cols.forEach(function(c,i){
+      h += '<th style="padding:7px 8px;text-align:left;width:'+widths[i]+';font-weight:600;color:var(--mu)">'+c+'</th>';
+    });
+    h += '</tr></thead><tbody>';
+    
+    arr.forEach(function(e){
+      var picked = e.picked;
+      h += '<tr style="border-bottom:.5px solid var(--bd);background:'+(picked?'rgba(0,151,167,.07)':'transparent')+'">';
+      // 선정 체크
+      h += '<td style="padding:6px 8px;text-align:center;vertical-align:top"><input type="checkbox" '+(picked?'checked':'')+' onchange="togglePickClinical_BOS(\''+e.id+'\')" title="선정" style="width:16px;height:16px;cursor:pointer"></td>';
+      // 업체명 + 링크(이동)
+      var linkBtn = e.link ? '<a href="'+esc(e.link)+'" target="_blank" style="font-size:10px;color:#1976D2;text-decoration:none">🔗 이동</a>' : '';
+      h += '<td style="padding:6px 8px;vertical-align:top">';
+      h += '<input value="'+esc(e.vendor)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'vendor\',this.value)" placeholder="업체명" style="width:100%;border:none;border-bottom:1px solid var(--bd);background:transparent;font-size:11.5px;font-weight:600;outline:none;padding:2px 0'+(picked?';color:#00838F':'')+'">';
+      h += '<div style="display:flex;align-items:center;gap:4px;margin-top:2px">';
+      h += '<input value="'+esc(e.link)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'link\',this.value)" placeholder="https://" style="flex:1;min-width:0;border:none;border-bottom:1px dashed var(--bd);background:transparent;font-size:9.5px;outline:none;padding:1px 0">'+linkBtn;
+      h += '</div></td>';
+      // 담당자
+      h += '<td style="padding:6px 8px;vertical-align:top"><input value="'+esc(e.contact)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'contact\',this.value)" placeholder="이름/연락처" style="width:100%;border:none;border-bottom:1px solid var(--bd);background:transparent;font-size:11px;outline:none;padding:2px 0"></td>';
+      // 유효성 검사 항목 (링크)
+      var validBtn = e.validLink ? '<a href="'+esc(e.validLink)+'" target="_blank" style="font-size:10px;color:#1976D2;text-decoration:none">🔗 보기</a>' : '';
+      h += '<td style="padding:6px 8px;vertical-align:top">'+validBtn+'<input value="'+esc(e.validLink)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'validLink\',this.value)" placeholder="검사항목 링크" style="width:100%;border:none;border-bottom:1px solid var(--bd);background:transparent;font-size:9.5px;outline:none;padding:2px 0;margin-top:2px"></td>';
+      // 진행한 브랜드
+      h += '<td style="padding:6px 8px;vertical-align:top"><textarea onchange="updateClinical_BOS(\''+e.id+'\',\'brands\',this.value)" placeholder="진행 브랜드" style="width:100%;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:3px 4px;min-height:40px;resize:vertical;font-family:inherit">'+esc(e.brands)+'</textarea></td>';
+      // 견적 항목 (여러 줄, 항목명만) → 항목수 카운트
+      var itemCount = (e.items||[]).filter(function(it){return (it.name||'').trim();}).length;
+      h += '<td style="padding:6px 8px;vertical-align:top">';
+      (e.items||[]).forEach(function(it,idx){
+        h += '<div style="display:flex;gap:3px;align-items:center;margin-bottom:3px">';
+        h += '<input value="'+esc(it.name)+'" onchange="updateClinicalItem_BOS(\''+e.id+'\','+idx+',\'name\',this.value)" placeholder="항목(예: 미백 4주)" style="flex:1;min-width:0;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:2px 4px">';
+        h += '<button onclick="delClinicalItem_BOS(\''+e.id+'\','+idx+')" style="background:none;border:none;color:var(--hi);cursor:pointer;font-size:11px;padding:0 2px">✕</button>';
+        h += '</div>';
+      });
+      h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px">';
+      h += '<button onclick="addClinicalItem_BOS(\''+e.id+'\')" style="font-size:10px;background:#EAF3EE;border:1px solid #16A085;color:#16A085;border-radius:4px;padding:2px 8px;cursor:pointer">+ 항목</button>';
+      if(itemCount) h += '<span style="font-size:9.5px;color:var(--mu)">총 '+itemCount+'개</span>';
+      h += '</div></td>';
+      // 견적 금액
+      var costN = num(e.cost);
+      h += '<td style="padding:6px 8px;vertical-align:top">';
+      h += '<input value="'+esc(e.cost)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'cost\',this.value)" placeholder="금액" style="width:100%;border:none;border-bottom:1px solid var(--bd);background:transparent;font-size:11.5px;font-weight:600;outline:none;padding:2px 0;text-align:right">';
+      if(costN) h += '<div style="font-size:9px;color:var(--mu);text-align:right;margin-top:2px">VAT+ '+fmtWon(Math.round(costN*1.1))+'</div>';
+      h += '</td>';
+      // 1개당 비용 (견적 ÷ 항목수, 자동)
+      h += '<td style="padding:6px 8px;vertical-align:top;text-align:right">';
+      if(costN && itemCount){
+        var per = Math.round(costN/itemCount);
+        h += '<div style="font-size:11.5px;font-weight:700;color:#00838F">'+fmtWon(per)+'</div>';
+        h += '<div style="font-size:9px;color:var(--mu);margin-top:2px">'+fmtWon(costN)+' ÷ '+itemCount+'개</div>';
+      } else {
+        h += '<div style="font-size:10px;color:var(--mu)">—</div>';
+      }
+      h += '</td>';
+      // 임상 기간
+      h += '<td style="padding:6px 8px;vertical-align:top"><input value="'+esc(e.period)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'period\',this.value)" placeholder="예: 4주" style="width:100%;border:none;border-bottom:1px solid var(--bd);background:transparent;font-size:11px;outline:none;padding:2px 0"></td>';
+      // 필요 시료수 (용량, 시료수)
+      h += '<td style="padding:6px 8px;vertical-align:top">';
+      h += '<div style="display:flex;align-items:center;gap:3px;margin-bottom:3px"><span style="font-size:9px;color:var(--mu);width:26px">용량</span><input value="'+esc(e.sampleVol)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'sampleVol\',this.value)" placeholder="예: 50ml" style="flex:1;min-width:0;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:2px 4px"></div>';
+      h += '<div style="display:flex;align-items:center;gap:3px"><span style="font-size:9px;color:var(--mu);width:26px">개수</span><input value="'+esc(e.sampleCount)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'sampleCount\',this.value)" placeholder="예: 30개" style="flex:1;min-width:0;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:2px 4px"></div>';
+      h += '</td>';
+      // 메모
+      h += '<td style="padding:6px 8px;vertical-align:top"><textarea onchange="updateClinical_BOS(\''+e.id+'\',\'note\',this.value)" placeholder="비고" style="width:100%;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:3px 4px;min-height:40px;resize:vertical;font-family:inherit">'+esc(e.note)+'</textarea></td>';
+      // 삭제
+      h += '<td style="padding:6px 4px;vertical-align:top"><button onclick="delClinicalEntry_BOS(\''+e.id+'\')" style="background:none;border:none;color:var(--hi);cursor:pointer;font-size:12px">✕</button></td>';
+      h += '</tr>';
+    });
+    h += '</tbody></table>';
+    
+    // 선정 요약
+    var picked = arr.filter(function(x){return x.picked;});
+    if(picked.length){
+      var totalN = picked.reduce(function(s,x){return s+num(x.cost);},0);
+      h += '<div style="margin-top:12px;padding:10px 14px;background:rgba(0,151,167,.08);border-radius:8px;font-size:12px">';
+      h += '✅ 선정: <b>'+picked.map(function(x){return esc(x.vendor)||'(업체명 미입력)';}).join(', ')+'</b>';
+      if(totalN) h += ' · 견적 합계 <b>'+fmtWon(totalN)+'</b> / VAT포함 '+fmtWon(Math.round(totalN*1.1));
+      h += '</div>';
+    }
+    
+    wrap.innerHTML = h;
+  };;
+  
+  console.log('[Clinical] 임상시험 견적 검토 준비됨');
 })();
 </script>
 </body>
