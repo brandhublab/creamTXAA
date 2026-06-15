@@ -21798,6 +21798,7 @@ tr.row-cal-highlight td{ background:transparent !important; }
       cost: '',                          // 견적 금액
       period: '',                        // 임상 기간
       sampleVol: '', sampleCount: '',    // 필요 시료수 (용량, 시료수)
+      results: [{ metric:'', value:'' }],// 임상 결과: 지표명 + 수치(%)
       picked: false, note: ''
     });
     saveClinicalData_BOS(arr);
@@ -21857,6 +21858,56 @@ tr.row-cal-highlight td{ background:transparent !important; }
     saveClinicalData_BOS(arr);
   };
   
+  // 임상 결과 항목 (지표명 + 수치)
+  window.addClinicalResult_BOS = function(id){
+    var arr = loadClinicalData_BOS();
+    var e = arr.find(function(x){ return x.id===id; });
+    if(!e) return;
+    if(!Array.isArray(e.results)) e.results=[];
+    e.results.push({ metric:'', value:'' });
+    saveClinicalData_BOS(arr);
+    renderClinicalTable_BOS();
+  };
+  window.delClinicalResult_BOS = function(id, idx){
+    var arr = loadClinicalData_BOS();
+    var e = arr.find(function(x){ return x.id===id; });
+    if(!e || !e.results) return;
+    e.results.splice(idx,1);
+    if(e.results.length===0) e.results.push({metric:'',value:''});
+    saveClinicalData_BOS(arr);
+    renderClinicalTable_BOS();
+  };
+  window.updateClinicalResult_BOS = function(id, idx, field, val){
+    var arr = loadClinicalData_BOS();
+    var e = arr.find(function(x){ return x.id===id; });
+    if(!e || !e.results || !e.results[idx]) return;
+    e.results[idx][field] = val;
+    saveClinicalData_BOS(arr);
+    if(field==='value') renderClinicalTable_BOS();  // 색/부호 즉시 갱신
+  };
+  
+  // 수치 → 자릿수·부호 판별 (색/라벨)
+  window.resultStyle_BOS = function(val){
+    var raw = (val||'').toString().trim();
+    if(raw==='') return null;
+    var n = parseFloat(raw.replace(/[^0-9.\-]/g,''));
+    if(isNaN(n)) return { color:'#7F8C8D', bg:'#ECF0F1', label:'', sign:'', text:raw };
+    var abs = Math.abs(n);
+    var color, bg, label;
+    if(n < 0){
+      color='#C0392B'; bg='#FDEDEC'; label='악화';
+    } else if(n === 0){
+      color='#7F8C8D'; bg='#ECF0F1'; label='변화없음';
+    } else {
+      // 양수: 자릿수로 구분
+      if(abs < 10){ color='#52B788'; bg='#E9F7EF'; label='개선·한자릿수'; }
+      else if(abs < 100){ color='#1E8449'; bg='#D5F0DD'; label='개선·두자릿수'; }
+      else { color='#0B5345'; bg='#A9DFBF'; label='개선·세자릿수'; }
+    }
+    var sign = n > 0 ? '+' : '';
+    return { color:color, bg:bg, label:label, sign:sign, num:n, text: sign + n + '%' };
+  };
+  
   function esc(s){ return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
   function num(s){ var n=parseInt((s||'').toString().replace(/[^0-9]/g,'')); return isNaN(n)?0:n; }
   function fmtWon(n){ return n ? n.toLocaleString('ko-KR')+'원' : ''; }
@@ -21880,10 +21931,10 @@ tr.row-cal-highlight td{ background:transparent !important; }
       return;
     }
     
-    var h = '<table style="width:100%;border-collapse:collapse;font-size:11.5px;min-width:1180px">';
+    var h = '<table style="width:100%;border-collapse:collapse;font-size:11.5px;min-width:1360px">';
     h += '<thead><tr style="background:var(--bg);border-bottom:2px solid var(--bd)">';
-    var cols = ['','업체명 · 링크','담당자','유효성 검사 항목','진행한 브랜드','견적 항목','견적 금액','1개당 비용','임상 기간','필요 시료수','메모',''];
-    var widths = ['32px','130px','80px','120px','110px','170px','110px','95px','95px','120px','110px','28px'];
+    var cols = ['','업체명 · 링크','담당자','유효성 검사 항목','진행한 브랜드','견적 항목','견적 금액','1개당 비용','임상 기간','필요 시료수','임상 결과 표기','메모',''];
+    var widths = ['32px','130px','80px','115px','105px','160px','105px','90px','85px','115px','175px','100px','28px'];
     cols.forEach(function(c,i){
       h += '<th style="padding:7px 8px;text-align:left;width:'+widths[i]+';font-weight:600;color:var(--mu)">'+c+'</th>';
     });
@@ -21943,6 +21994,22 @@ tr.row-cal-highlight td{ background:transparent !important; }
       h += '<td style="padding:6px 8px;vertical-align:top">';
       h += '<div style="display:flex;align-items:center;gap:3px;margin-bottom:3px"><span style="font-size:9px;color:var(--mu);width:26px">용량</span><input value="'+esc(e.sampleVol)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'sampleVol\',this.value)" placeholder="예: 50ml" style="flex:1;min-width:0;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:2px 4px"></div>';
       h += '<div style="display:flex;align-items:center;gap:3px"><span style="font-size:9px;color:var(--mu);width:26px">개수</span><input value="'+esc(e.sampleCount)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'sampleCount\',this.value)" placeholder="예: 30개" style="flex:1;min-width:0;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:2px 4px"></div>';
+      h += '</td>';
+      // 임상 결과 표기 (지표명 + 수치 → 자릿수/부호 자동 색)
+      h += '<td style="padding:6px 8px;vertical-align:top">';
+      (e.results||[]).forEach(function(r,idx){
+        var st = resultStyle_BOS(r.value);
+        h += '<div style="display:flex;gap:3px;align-items:center;margin-bottom:3px">';
+        h += '<input value="'+esc(r.metric)+'" onchange="updateClinicalResult_BOS(\''+e.id+'\','+idx+',\'metric\',this.value)" placeholder="지표(예: 미백)" style="flex:1;min-width:0;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:2px 4px">';
+        h += '<input value="'+esc(r.value)+'" onchange="updateClinicalResult_BOS(\''+e.id+'\','+idx+',\'value\',this.value)" placeholder="%" style="width:42px;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:2px 3px;text-align:right">';
+        h += '<button onclick="delClinicalResult_BOS(\''+e.id+'\','+idx+')" style="background:none;border:none;color:var(--hi);cursor:pointer;font-size:11px;padding:0 1px">✕</button>';
+        h += '</div>';
+        // 자동 표기 배지
+        if(st && st.label){
+          h += '<div style="margin:0 0 5px 2px"><span style="display:inline-block;background:'+st.bg+';color:'+st.color+';font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:9px">'+(r.metric?esc(r.metric)+' ':'')+st.text+'</span> <span style="font-size:8.5px;color:var(--mu)">'+st.label+'</span></div>';
+        }
+      });
+      h += '<button onclick="addClinicalResult_BOS(\''+e.id+'\')" style="font-size:10px;background:#E9F7EF;border:1px solid #52B788;color:#1E8449;border-radius:4px;padding:2px 8px;cursor:pointer;margin-top:1px">+ 결과</button>';
       h += '</td>';
       // 메모
       h += '<td style="padding:6px 8px;vertical-align:top"><textarea onchange="updateClinical_BOS(\''+e.id+'\',\'note\',this.value)" placeholder="비고" style="width:100%;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:3px 4px;min-height:40px;resize:vertical;font-family:inherit">'+esc(e.note)+'</textarea></td>';
