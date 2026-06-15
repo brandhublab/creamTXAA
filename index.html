@@ -2527,37 +2527,32 @@ let designRefs=[
  {id:'dsr6',name:'Dr.MELAXIN',url:'https://melaxin.com',note:'클리닉 화이트 더마'},
 ];
 let deadlineData={
- targetDate:'2026-06-19',
+ targetDate:'2026-08-25',
  categories:{
-  prod:[
-   {id:'prod-cttest',name:'CT TEST',offsetDays:-63,durationDays:7,color:'#C0392B',fixed:true,note:'부자재 발주 2주 전',done:false},
-   {id:'prod-review',name:'문안 검수',offsetDays:-63,durationDays:7,color:'#7A4AA8',fixed:true,note:'부자재 발주 2주 전',done:false},
-   {id:'prod-package',name:'패키지 디자인 확정',offsetDays:-56,durationDays:7,color:'#6A1B9A',fixed:true,note:'문안 검수 1주 뒤',done:false},
-   {id:'prod-material',name:'부자재 발주',offsetDays:-49,durationDays:21,color:'#8D6E63',fixed:true,note:'생산발주 3주 전',done:false},
-   {id:'prod-order',name:'생산 발주',offsetDays:-28,durationDays:28,color:'#16A085',fixed:true,note:'런칭 4주 전',done:false},
-   {id:'prod-sample',name:'최종 처방 샘플 확정',offsetDays:-56,durationDays:28,color:'#8B4513',fixed:true,note:'생산발주 4주 전부터',done:false},
-   {id:'prod-vendor',name:'샘플링 전 업체 조사 및 선정',offsetDays:-70,durationDays:7,color:'#A0522D',fixed:true,note:'최종 처방 확정 전',done:false},
-   {id:'prod-clin-quote',name:'임상시험 견적 확정',offsetDays:-35,durationDays:7,color:'#2E7D32',fixed:true,note:'D-day 5주 전',done:false},
-   {id:'prod-clin-test',name:'임상시험 진행',offsetDays:-28,durationDays:21,color:'#1B5E20',fixed:true,note:'D-day 4주 전부터 3주간',done:false}
+  product:[
+   {id:'ms-sample-fix',name:'🧪 최종 샘플·사양 확정',offsetDays:-55,durationDays:1,color:'#E67E22',fixed:true,note:'업체 선정 + 사양 픽스 — 이게 늦으면 전부 밀림',done:false},
+   {id:'ms-prod-order',name:'🏭 생산(양산) 발주 들어가야 하는 시기',offsetDays:-33,durationDays:1,color:'#16A085',fixed:true,note:'용기·상자·부자재 입고 완료 후 양산 시작',done:false},
+   {id:'ms-prod-done',name:'📦 완제품 입고 완료',offsetDays:-7,durationDays:1,color:'#00897B',fixed:true,note:'판매 시작 1주 전 — 재고 확보',done:false},
+   {id:'ms-clinical',name:'🔬 임상 결과 확보',offsetDays:-14,durationDays:1,color:'#0097A7',fixed:true,note:'상세페이지 임상 수치 삽입용',done:false}
   ],
-  photo:[
-   {id:'photo-concept',name:'촬영 컨셉 기획',offsetDays:-21,durationDays:5,color:'#FF6F00',note:'자유 수정 가능',done:false},
-   {id:'photo-shoot',name:'제품 촬영 (스튜디오)',offsetDays:-14,durationDays:3,color:'#E65100',note:'자유 수정 가능',done:false},
-   {id:'photo-retouch',name:'사진 리터칭',offsetDays:-11,durationDays:5,color:'#FF8F00',note:'자유 수정 가능',done:false},
-   {id:'photo-detail',name:'상세페이지 디자인',offsetDays:-7,durationDays:7,color:'#FFA000',note:'자유 수정 가능',done:false}
+  packaging:[
+   {id:'ms-bottle',name:'🧴 용기 디자인 확정 → 발주',offsetDays:-60,durationDays:1,color:'#E65100',fixed:true,note:'발주 후 입고까지 3주 — 양산 전 입고 필수',done:false},
+   {id:'ms-box-design',name:'🎁 단상자 디자인 나와줘야 하는 시기',offsetDays:-66,durationDays:1,color:'#6A1B9A',fixed:true,note:'디자인 3주 + 발주 3주 = 6주 소요. 가장 먼저 시작',done:false},
+   {id:'ms-box-order',name:'📦 단상자 발주',offsetDays:-45,durationDays:1,color:'#8E24AA',fixed:true,note:'디자인 확정 직후 발주',done:false}
   ],
-  web:[
-   {id:'web-domain',name:'도메인 · 호스팅 세팅',offsetDays:-14,durationDays:2,color:'#1565C0',note:'출시 2주 전 시작',done:false},
-   {id:'web-theme',name:'쇼핑몰 테마 설치 · 디자인',offsetDays:-12,durationDays:4,color:'#0D47A1',note:'유동 수정',done:false},
-   {id:'web-pg',name:'PG · 간편결제 연결',offsetDays:-8,durationDays:3,color:'#1976D2',note:'유동 수정',done:false},
-   {id:'web-review',name:'알파리뷰 · 픽셀 설치',offsetDays:-5,durationDays:2,color:'#2196F3',note:'유동 수정',done:false},
-   {id:'web-test',name:'전체 테스트 · 오픈 준비',offsetDays:-3,durationDays:3,color:'#42A5F5',note:'유동 수정',done:false}
+  sales:[
+   {id:'ms-detail',name:'📄 상세페이지 완성',offsetDays:-10,durationDays:1,color:'#FFA000',fixed:true,note:'기획→디자인 2주. 판매 시작 전 완료',done:false},
+   {id:'ms-pg',name:'💳 PG사·간편결제 세팅 완료',offsetDays:-7,durationDays:1,color:'#1976D2',fixed:true,note:'PG 심사에 시간 걸림 — 미리 신청',done:false},
+   {id:'ms-shop',name:'🛒 판매 채널·쇼핑몰 세팅 완료',offsetDays:-5,durationDays:1,color:'#1565C0',fixed:true,note:'도메인·테마·픽셀·리뷰앱',done:false}
   ],
-  ad:[
-   {id:'ad-plan',name:'광고 소재 기획',offsetDays:-28,durationDays:7,color:'#7B1FA2',note:'D-day 4주 전 시작',done:false},
-   {id:'ad-produce',name:'광고 소재 제작 (영상/이미지)',offsetDays:-21,durationDays:14,color:'#9C27B0',note:'유동 수정',done:false},
-   {id:'ad-run',name:'초도 광고 영상 5개 집행',offsetDays:-7,durationDays:14,color:'#AB47BC',note:'D-day 1주 전 ~ D+7일, 5개',done:false},
-   {id:'ad-review',name:'광고 성과 분석',offsetDays:7,durationDays:7,color:'#BA68C8',note:'D+7일까지',done:false}
+  marketing:[
+   {id:'ms-video',name:'🎬 마케팅 영상 나와줘야 하는 시기',offsetDays:-21,durationDays:1,color:'#9C27B0',fixed:true,note:'외주 제작 2~3주 — 가장 오래 걸림. 미리 발주',done:false},
+   {id:'ms-ad-ready',name:'📢 광고 소재·세팅 완료',offsetDays:-3,durationDays:1,color:'#AB47BC',fixed:true,note:'영상+이미지+카피+픽셀 점검',done:false},
+   {id:'ms-launch',name:'🚀 판매 시작 (D-DAY)',offsetDays:0,durationDays:1,color:'#C0392B',fixed:true,note:'런칭일',done:false},
+   {id:'ms-roas',name:'📈 ROAS 끌어올려야 하는 시기',offsetDays:14,durationDays:1,color:'#7B1FA2',fixed:true,note:'런칭 2주 후 — 초기 데이터로 소재·타겟 최적화, 효율 개선',done:false}
+  ],
+  capital:[
+   {id:'ms-capital',name:'💰 자금 소진 마지노선',offsetDays:51,durationDays:1,color:'#B71C1C',fixed:true,note:'이 전에 매출 회수 궤도 진입 필수',done:false}
   ]
  }
 },adPlans=[{id:'ap1',name:'기획안 1',videoUrl:'',appeal:'',product:'',script:'',hook:'',cta:'',format:'영상 (15초)',status:'기획중'}],orgData={leader:{name:'대표 (사용자)',role:'CEO / 1인 대표',memo:'전략·광고·운영 총괄'},teams:[
@@ -3184,7 +3179,7 @@ function showTab(id,btn){
   t17b:()=>{buildMood();},
   t18:()=>{renderClinicalItems();renderClinicalInstitutions();},
   t19:()=>{renderPersuasion();},
-  t14:()=>{const dt=document.getElementById('dl-target-date');if(dt)dt.value=deadlineData.targetDate||'';renderDeadlines();},
+  t14:()=>{const dt=document.getElementById('dl-target-date');if(dt)dt.value=deadlineData.targetDate||'';renderDeadlines();if(typeof renderDeadlineMiniCal_BOS==='function')renderDeadlineMiniCal_BOS();},
   t15:()=>{renderAdPlans();},
   t16:()=>{renderOrg();},
  };
@@ -8340,7 +8335,7 @@ function buildDeadlineProgress(){
  }
  ['prod','photo','web','ad'].forEach(function(k){if(!Array.isArray(deadlineData.categories[k]))deadlineData.categories[k]=[];});
  const target=deadlineData.targetDate||'';
- const catLabels={prod:'🏭 생산',photo:'📸 촬영 & 상세페이지',web:'🛒 자사몰 세팅',ad:'📢 광고 소재 제작'};
+ const catLabels={marketing:'📢 마케팅·런칭',product:'🏭 제품·생산',packaging:'📦 용기·상자',sales:'🛒 판매 세팅',capital:'💰 자금'};
  const catColors={prod:'#C0392B',photo:'#E65100',web:'#1565C0',ad:'#7B1FA2'};
  // 전체 통계
  let totalDone=0,totalTasks=0;
@@ -9948,15 +9943,16 @@ function load(){
    (function(){
     // 데드라인 마이그레이션: 옛 구조(items)면 기본 categories 복원
     const loaded=d.deadlines;
-    if(loaded&&loaded.categories&&typeof loaded.categories==='object'){
+    var NEW_DL_CATS=['marketing','product','packaging','sales','capital'];
+    var hasNewCats=loaded&&loaded.categories&&NEW_DL_CATS.some(function(k){return Array.isArray(loaded.categories[k])&&loaded.categories[k].length;});
+    if(hasNewCats){
      deadlineData=loaded;
-     // 누락된 카테고리 키 보장
-     ['prod','photo','web','ad'].forEach(function(k){
-      if(!Array.isArray(deadlineData.categories[k]))deadlineData.categories[k]=[];
-     });
+     NEW_DL_CATS.forEach(function(k){if(!Array.isArray(deadlineData.categories[k]))deadlineData.categories[k]=[];});
     } else {
-     // 옛 포맷이거나 null → 현재 기본값 유지 (이미 선언된 deadlineData 그대로)
+     // 구 카테고리(prod/photo/web/ad) 또는 빈 데이터 → 새 마일스톤 기본값 유지
+     // 단, 사용자가 설정한 런칭일은 보존
      if(loaded&&loaded.targetDate)deadlineData.targetDate=loaded.targetDate;
+     NEW_DL_CATS.forEach(function(k){if(!Array.isArray(deadlineData.categories[k]))deadlineData.categories[k]=[];});
     }
    })();
    adPlans=d.adPlans||[...adPlans];
@@ -9990,15 +9986,16 @@ function load(){
    (function(){
     // 데드라인 마이그레이션: 옛 구조(items)면 기본 categories 복원
     const loaded=d.deadlines;
-    if(loaded&&loaded.categories&&typeof loaded.categories==='object'){
+    var NEW_DL_CATS=['marketing','product','packaging','sales','capital'];
+    var hasNewCats=loaded&&loaded.categories&&NEW_DL_CATS.some(function(k){return Array.isArray(loaded.categories[k])&&loaded.categories[k].length;});
+    if(hasNewCats){
      deadlineData=loaded;
-     // 누락된 카테고리 키 보장
-     ['prod','photo','web','ad'].forEach(function(k){
-      if(!Array.isArray(deadlineData.categories[k]))deadlineData.categories[k]=[];
-     });
+     NEW_DL_CATS.forEach(function(k){if(!Array.isArray(deadlineData.categories[k]))deadlineData.categories[k]=[];});
     } else {
-     // 옛 포맷이거나 null → 현재 기본값 유지 (이미 선언된 deadlineData 그대로)
+     // 구 카테고리(prod/photo/web/ad) 또는 빈 데이터 → 새 마일스톤 기본값 유지
+     // 단, 사용자가 설정한 런칭일은 보존
      if(loaded&&loaded.targetDate)deadlineData.targetDate=loaded.targetDate;
+     NEW_DL_CATS.forEach(function(k){if(!Array.isArray(deadlineData.categories[k]))deadlineData.categories[k]=[];});
     }
    })();
    adPlans=d.adPlans||[...adPlans];
@@ -10533,9 +10530,9 @@ function setMonthlyItem(y,mi,ii,key,val){
 function renderDeadlines(){
  if(typeof deadlineData==='undefined'||!deadlineData)deadlineData={targetDate:'2026-06-19',categories:{}};
  if(!deadlineData.categories||typeof deadlineData.categories!=='object')deadlineData.categories={};
- ['prod','photo','web','ad'].forEach(function(k){if(!Array.isArray(deadlineData.categories[k]))deadlineData.categories[k]=[];});
+ ['marketing','product','packaging','sales','capital'].forEach(function(k){if(!Array.isArray(deadlineData.categories[k]))deadlineData.categories[k]=[];});
  const target=deadlineData.targetDate||'';
- const catNames={prod:'🏭 생산',photo:'📸 촬영 & 상세페이지',web:'🛒 자사몰 세팅',ad:'📢 광고 소재 제작'};
+ const catNames={marketing:'📢 마케팅·런칭',product:'🏭 제품·생산',packaging:'📦 용기·상자',sales:'🛒 판매 세팅',capital:'💰 자금'};
  const cats=deadlineData.categories;
  Object.keys(catNames).forEach(catKey=>{
   const el=document.getElementById('dl-cat-'+catKey);
@@ -11984,17 +11981,38 @@ function forceIsolationReset(){
   </div>
   <div style="padding:10px 18px 0">
     <div style="display:flex;gap:4px;border-bottom:1px solid var(--bd);margin-bottom:12px;flex-wrap:wrap">
-      <button class="stab act" onclick="showDLCat('prod',this)">🏭 생산</button>
-      <button class="stab" onclick="showDLCat('photo',this)">📸 촬영 & 상세페이지</button>
-      <button class="stab" onclick="showDLCat('web',this)">🛒 자사몰 세팅</button>
-      <button class="stab" onclick="showDLCat('ad',this)">📢 광고 소재 제작</button>
+      <button class="stab act" onclick="showDLCat('marketing',this)">📢 마케팅·런칭</button>
+      <button class="stab" onclick="showDLCat('product',this)">🏭 제품·생산</button>
+      <button class="stab" onclick="showDLCat('packaging',this)">📦 용기·상자</button>
+      <button class="stab" onclick="showDLCat('sales',this)">🛒 판매 세팅</button>
+      <button class="stab" onclick="showDLCat('capital',this)">💰 자금</button>
     </div>
   </div>
   <div style="padding:0 18px 18px">
-    <div id="dl-cat-prod" class="dl-cat"></div>
-    <div id="dl-cat-photo" class="dl-cat" style="display:none"></div>
-    <div id="dl-cat-web" class="dl-cat" style="display:none"></div>
-    <div id="dl-cat-ad" class="dl-cat" style="display:none"></div>
+    <div id="dl-cat-marketing" class="dl-cat"></div>
+    <div id="dl-cat-product" class="dl-cat" style="display:none"></div>
+    <div id="dl-cat-packaging" class="dl-cat" style="display:none"></div>
+    <div id="dl-cat-sales" class="dl-cat" style="display:none"></div>
+    <div id="dl-cat-capital" class="dl-cat" style="display:none"></div>
+    
+    <!-- 데드라인 캘린더 -->
+    <div class="card" style="padding:18px;margin-top:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:6px">
+        <div>
+          <div style="font-size:13px;font-weight:700">📅 데드라인 캘린더</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">마일스톤(결승선)을 달력에서 한눈에</div>
+        </div>
+        <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;user-select:none;font-size:11px;color:var(--mu)">
+          <input type="checkbox" id="dlcal-show-timeline-bos" onchange="toggleTimelineInDeadlineCal_BOS(this.checked)" style="cursor:pointer">
+          <span>📆 타임라인도 함께 보기</span>
+        </label>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:10.5px;color:var(--mu);flex-wrap:wrap;margin-bottom:8px">
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#C0392B;vertical-align:middle"></span> 데드라인 마일스톤</span>
+        <span id="dlcal-timeline-legend-bos" style="display:none"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1976D2;vertical-align:middle"></span> 타임라인 일정</span>
+      </div>
+      <div id="deadline-minical-bos"></div>
+    </div>
   </div>
 </div>
 <div id="t15" class="tab-pane">
@@ -12349,7 +12367,13 @@ function forceIsolationReset(){
       <div class="cal-view-tabs-bos" id="cal-year-nav-bos">
         <!-- JS가 동적 생성: (올해-2) ~ 저장된 최대 연도 + 그룹 뷰 + 연도 추가 버튼 -->
       </div>
-      <div style="font-size:11px;color:var(--mu)">🔵 오늘 / 🔘 항목별 색상</div>
+      <div style="display:flex;align-items:center;gap:12px;font-size:11px;color:var(--mu)">
+        <span>🔵 오늘 / 🔘 항목별 색상</span>
+        <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;user-select:none">
+          <input type="checkbox" id="cal-show-deadline-bos" onchange="toggleDeadlineInCal_BOS(this.checked)" style="cursor:pointer">
+          <span>⑨ 데드라인도 함께 보기</span>
+        </label>
+      </div>
     </div>
 
     <div class="cal-grid-bos" id="bos-cal-grid" style="margin-top:14px"></div>
@@ -13164,9 +13188,9 @@ function forceIsolationReset(){
       var dayOfWeek = date.getDay();
       
       var allCalItems = (calData_BOS.items||[]).slice();
-      // ★ 데드라인(⑨) 항목도 타임라인에 표시 (읽기 전용)
+      // ★ 데드라인(⑨)은 기본적으로 캘린더에서 분리. 토글 ON일 때만 표시
       try {
-        if(typeof getDeadlineCalItems_BOS === 'function'){
+        if(window._showDeadlineInCal_BOS && typeof getDeadlineCalItems_BOS === 'function'){
           allCalItems = allCalItems.concat(getDeadlineCalItems_BOS());
         }
       } catch(e){}
@@ -19554,9 +19578,23 @@ body.cal-highlighting .cal-item-card-bos:hover{
         }
       }
       if(s.arrivalDate) events.push({date: s.arrivalDate, color:'#27AE60', label:'[도착 완료] ' + name, sid:s.id});
-      // ━━ 공정 일정 (문안검수 / CT Test / 부자재·양산) ━━
+      // ━━ 샘플의뢰 차수별 (1차/2차/3차…) ━━
+      if(typeof getSampleRequests_BOS === 'function'){
+        var reqs = getSampleRequests_BOS(s);
+        reqs.forEach(function(r, ri){
+          var lbl = (ri+1) + '차 ';
+          if(r.reqDate) events.push({date: r.reqDate, color:'#E67E22', label:'[' + lbl + '샘플의뢰] ' + name, sid:s.id});
+          // 예상 도착 = 의뢰일 + 소요
+          var endIso = (typeof calcPhaseEnd_BOS==='function') ? calcPhaseEnd_BOS(r.reqDate, r.dur, r.unit) : '';
+          if(endIso && !r.arrival) events.push({date: endIso, color:'#1976D2', label:'[' + lbl + '예상 도착] ' + name, sid:s.id});
+          // 실제 도착
+          if(r.arrival) events.push({date: r.arrival, color:'#27AE60', label:'[' + lbl + '실제 도착] ' + name, sid:s.id});
+        });
+      }
+      // ━━ 공정 일정 (샘플의뢰 제외 — 차수로 별도 처리) ━━
       if(typeof SAMPLE_PHASES_BOS !== 'undefined'){
         SAMPLE_PHASES_BOS.forEach(function(ph){
+          if(ph.key === 'request') return;  // 차수별로 위에서 처리
           var st = s[ph.startKey];
           if(!st) return;
           events.push({date: st, color: ph.startColor || ph.color, label:'[' + ph.startLabel + '] ' + name, sid:s.id});
@@ -19829,10 +19867,125 @@ body.cal-highlighting .cal-item-card-bos:hover{
   }
   
   // ━━ 펼침 패널 빌더 (행 렌더에서 호출) ━━
+  // ━━ 샘플의뢰 차수별 렌더 (1차/2차/3차…) ━━
+  function getSampleRequests_BOS(s){
+    if(!s.sampleRequests || !Array.isArray(s.sampleRequests) || s.sampleRequests.length === 0){
+      s.sampleRequests = [{
+        reqDate: s.sreqStart || '',
+        dur: s.sreqDur || '',
+        unit: s.sreqUnit || 'd',
+        arrival: s.sreqArrival || ''
+      }];
+    }
+    return s.sampleRequests;
+  }
+  
+  function buildSampleRequestRounds_BOS(s, ph){
+    var rounds = getSampleRequests_BOS(s);
+    var roundsHtml = rounds.map(function(r, idx){
+      var unitVal = r.unit || 'd';
+      var endIso = calcPhaseEnd_BOS(r.reqDate, r.dur, r.unit);
+      var endTxt = endIso ? ('예상 ' + endIso) : '<span style="color:var(--mu)">의뢰일·소요 입력</span>';
+      var diffTxt = '';
+      if(r.arrival && endIso){
+        var diff = Math.round((new Date(r.arrival+'T00:00:00') - new Date(endIso+'T00:00:00'))/86400000);
+        if(diff === 0) diffTxt = '<span style="color:#1A6B4A;font-weight:600">🎯 예정대로</span>';
+        else if(diff > 0) diffTxt = '<span style="color:#C0392B;font-weight:600">⏰ ' + diff + '일 늦음</span>';
+        else diffTxt = '<span style="color:#1565C0;font-weight:600">⚡ ' + Math.abs(diff) + '일 빠름</span>';
+      }
+      var delBtn = rounds.length > 1
+        ? '<button onclick="delSampleRequest_BOS(\'' + s.id + '\',' + idx + ')" title="이 차수 삭제" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:11px;padding:0 2px;margin-left:auto">✕</button>'
+        : '';
+      return '<div style="border:1px dashed ' + ph.color + ';border-radius:5px;padding:7px 9px;background:#FFFCF9;margin-bottom:6px">'
+        + '<div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">'
+          + '<span style="font-size:10px;font-weight:700;color:' + ph.color + ';background:#FFF3E8;padding:1px 7px;border-radius:8px">' + (idx+1) + '차 의뢰</span>'
+          + delBtn
+        + '</div>'
+        + '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">'
+          + '<div style="display:flex;flex-direction:column;gap:2px">'
+            + '<span style="font-size:9px;color:var(--mu);font-weight:600">의뢰일</span>'
+            + '<input type="date" value="' + esc(r.reqDate) + '" onchange="updateSampleRequest_BOS(\'' + s.id + '\',' + idx + ',\'reqDate\',this.value)" style="padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff">'
+          + '</div>'
+          + '<div style="display:flex;flex-direction:column;gap:2px">'
+            + '<span style="font-size:9px;color:var(--mu);font-weight:600">예상 소요</span>'
+            + '<div style="display:flex;align-items:center;gap:3px">'
+              + '<input type="number" value="' + esc(r.dur) + '" min="0" placeholder="0" oninput="updateSampleRequest_BOS(\'' + s.id + '\',' + idx + ',\'dur\',this.value)" style="width:48px;padding:4px;border:1px solid var(--bd);border-radius:4px;font-size:11px;text-align:center">'
+              + '<select onchange="updateSampleRequest_BOS(\'' + s.id + '\',' + idx + ',\'unit\',this.value)" style="padding:4px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff;cursor:pointer">'
+                + '<option value="d"' + (unitVal==='d'?' selected':'') + '>일</option>'
+                + '<option value="w"' + (unitVal==='w'?' selected':'') + '>주</option>'
+              + '</select>'
+            + '</div>'
+          + '</div>'
+          + '<span style="font-size:10.5px;color:' + ph.color + ';font-weight:700;font-family:\'Roboto Mono\',monospace;align-self:flex-end;padding-bottom:5px;white-space:nowrap">' + endTxt + '</span>'
+        + '</div>'
+        + '<div style="display:flex;align-items:center;gap:8px;margin-top:6px;padding-top:6px;border-top:1px dashed #EEE">'
+          + '<div style="display:flex;flex-direction:column;gap:2px">'
+            + '<span style="font-size:9px;color:#1A6B4A;font-weight:600">✅ 실제 도착일</span>'
+            + '<input type="date" value="' + esc(r.arrival) + '" onchange="updateSampleRequest_BOS(\'' + s.id + '\',' + idx + ',\'arrival\',this.value)" style="padding:4px 6px;border:1px solid #B8DCC8;border-radius:4px;font-size:11px;background:#F4FBF7">'
+          + '</div>'
+          + (diffTxt ? '<span style="font-size:10.5px;align-self:flex-end;padding-bottom:5px">' + diffTxt + '</span>' : '')
+        + '</div>'
+      + '</div>';
+    }).join('');
+    
+    return '<div style="border:1px solid var(--bd);border-left:3px solid ' + ph.color + ';border-radius:6px;padding:9px 11px;background:#fff">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">'
+        + '<span style="font-size:11px;font-weight:700;color:' + ph.color + '">' + ph.icon + ' 샘플의뢰 (차수별)</span>'
+        + '<button onclick="addSampleRequest_BOS(\'' + s.id + '\')" style="background:#FFF3E8;border:1px solid ' + ph.color + ';color:' + ph.color + ';border-radius:4px;font-size:10px;cursor:pointer;padding:3px 8px;font-weight:600">＋ 차수 추가</button>'
+      + '</div>'
+      + roundsHtml
+    + '</div>';
+  }
+  
+  window.addSampleRequest_BOS = function(id){
+    var data = JSON.parse(localStorage.getItem('bos_sample_data_v1')||'[]');
+    var s = data.find(function(x){ return x.id === id; });
+    if(!s) return;
+    if(!s.sampleRequests) getSampleRequests_BOS(s);
+    s.sampleRequests.push({reqDate:'', dur:'', unit:'d', arrival:''});
+    localStorage.setItem('bos_sample_data_v1', JSON.stringify(data));
+    if(typeof updateSaveTime==='function') updateSaveTime();
+    renderSampleTable_BOS();
+    if(typeof renderSampleMiniCal_BOS==='function') renderSampleMiniCal_BOS();
+  };
+  
+  window.delSampleRequest_BOS = function(id, idx){
+    var data = JSON.parse(localStorage.getItem('bos_sample_data_v1')||'[]');
+    var s = data.find(function(x){ return x.id === id; });
+    if(!s || !s.sampleRequests) return;
+    if(s.sampleRequests.length <= 1) return;
+    if(!confirm((idx+1) + '차 의뢰를 삭제하시겠습니까?')) return;
+    s.sampleRequests.splice(idx, 1);
+    localStorage.setItem('bos_sample_data_v1', JSON.stringify(data));
+    if(typeof updateSaveTime==='function') updateSaveTime();
+    renderSampleTable_BOS();
+    if(typeof renderSampleMiniCal_BOS==='function') renderSampleMiniCal_BOS();
+  };
+  
+  window.updateSampleRequest_BOS = function(id, idx, key, val){
+    var data = JSON.parse(localStorage.getItem('bos_sample_data_v1')||'[]');
+    var s = data.find(function(x){ return x.id === id; });
+    if(!s) return;
+    getSampleRequests_BOS(s);
+    if(!s.sampleRequests[idx]) return;
+    s.sampleRequests[idx][key] = val;
+    if(idx === 0){
+      if(key==='reqDate') s.sreqStart = val;
+      if(key==='dur') s.sreqDur = val;
+      if(key==='unit') s.sreqUnit = val;
+      if(key==='arrival') s.sreqArrival = val;
+    }
+    localStorage.setItem('bos_sample_data_v1', JSON.stringify(data));
+    if(typeof updateSaveTime==='function') updateSaveTime();
+    if(typeof renderSampleMiniCal_BOS==='function') renderSampleMiniCal_BOS();
+    renderSampleTable_BOS();
+  };
+  
   window.buildSampleDetailRow_BOS = function(s){
     var open = !!window._sampleExpanded_BOS[s.id];
     
     var blocks = SAMPLE_PHASES_BOS.map(function(ph){
+      if(ph.key === 'request'){ return buildSampleRequestRounds_BOS(s, ph); }
       var unitVal = s[ph.unitKey] || 'd';
       var endTxt = endDisplayHtml(s, ph);
       var endIso = calcPhaseEnd_BOS(s[ph.startKey], s[ph.durKey], s[ph.unitKey]);
@@ -20967,6 +21120,11 @@ setTimeout(function(){
 <script id="deadline-cal-script">
 (function(){
   // 데드라인 항목을 타임라인 캘린더 항목 형식으로 변환
+  window.toggleDeadlineInCal_BOS = function(checked){
+    window._showDeadlineInCal_BOS = !!checked;
+    if(typeof renderCalendarGrid_BOS === 'function') renderCalendarGrid_BOS();
+  };
+  
   window.getDeadlineCalItems_BOS = function(){
     if(typeof deadlineData === 'undefined' || !deadlineData || !deadlineData.targetDate || !deadlineData.categories){
       return [];
@@ -20975,7 +21133,7 @@ setTimeout(function(){
     if(isNaN(target.getTime())) return [];
     
     var items = [];
-    var catLabels = {prod:'생산', photo:'촬영/상세', web:'웹', mkt:'마케팅', launch:'런칭'};
+    var catLabels = {marketing:'마케팅', product:'제품', packaging:'포장', sales:'판매', capital:'자금'};
     
     Object.keys(deadlineData.categories).forEach(function(catKey){
       var arr = deadlineData.categories[catKey] || [];
@@ -21025,9 +21183,11 @@ setTimeout(function(){
 
 <!-- ━━━ 샘플/아웃소싱 행 → 미니캘린더 강조 ━━━ -->
 <style>
-.minical-cell-bos.sid-dimmed{ opacity:.25; transition:opacity .15s; }
-.minical-cell-bos.sid-active{ background:#FFF8E1 !important; outline:2px solid #FFB300; outline-offset:-2px; border-radius:4px; transition:all .15s; z-index:2; position:relative; }
-.minical-cell-bos.sid-active .minical-day-bos{ font-weight:700; color:#E65100; }
+.minical-cell-bos.sid-dimmed{ opacity:.2; transition:opacity .15s; }
+.minical-cell-bos.sid-active{ background:#FFF3CD !important; outline:2.5px solid #FF9800; outline-offset:-2px; border-radius:4px; transition:all .15s; z-index:3; position:relative; box-shadow:0 0 0 3px rgba(255,152,0,.25); animation:sidPulse 1s ease-in-out infinite; }
+.minical-cell-bos.sid-active .minical-day-bos{ font-weight:800; color:#E65100; }
+.minical-cell-bos.sid-active .minical-dot-bos{ transform:scale(1.6); }
+@keyframes sidPulse{ 0%,100%{ box-shadow:0 0 0 3px rgba(255,152,0,.25); } 50%{ box-shadow:0 0 0 5px rgba(255,152,0,.45); } }
 </style>
 <script id="sample-cal-hover-script">
 (function(){
@@ -21035,6 +21195,7 @@ setTimeout(function(){
     var container = document.getElementById(containerId);
     if(!container) return;
     var cells = container.querySelectorAll('.minical-cell-bos');
+    var firstActive = null;
     cells.forEach(function(cell){
       cell.classList.remove('sid-active', 'sid-dimmed');
       var sids = cell.getAttribute('data-sids');
@@ -21042,6 +21203,7 @@ setTimeout(function(){
         var list = sids.split(',');
         if(list.indexOf(sampleId) >= 0){
           cell.classList.add('sid-active');
+          if(!firstActive) firstActive = cell;
         } else {
           cell.classList.add('sid-dimmed');
         }
@@ -21049,6 +21211,13 @@ setTimeout(function(){
         cell.classList.add('sid-dimmed');
       }
     });
+    // ★ 강조된 첫 셀이 화면 밖이면 캘린더 영역을 보이도록 스크롤
+    if(firstActive){
+      var rect = firstActive.getBoundingClientRect();
+      if(rect.top < 0 || rect.bottom > window.innerHeight || rect.top > window.innerHeight - 80){
+        firstActive.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+    }
   }
   function clearHighlight(containerId){
     var container = document.getElementById(containerId);
@@ -21114,6 +21283,73 @@ tr.row-cal-highlight td{ background:transparent !important; }
   };
   
   console.log('[CalToRow] 캘린더 셀 → 행 역방향 강조 준비됨');
+})();
+</script>
+
+<!-- ━━━ 데드라인 캘린더 ━━━ -->
+<script id="deadline-minical-script">
+(function(){
+  window._showTimelineInDeadlineCal_BOS = false;
+  
+  window.renderDeadlineMiniCal_BOS = function(){
+    var container = document.getElementById('deadline-minical-bos');
+    if(!container) return;
+    var events = [];
+    
+    // 데드라인 마일스톤 이벤트
+    if(typeof getDeadlineCalItems_BOS === 'function'){
+      try {
+        getDeadlineCalItems_BOS().forEach(function(it){
+          if(it.startDate){
+            events.push({date: it.startDate, color: it.color || '#C0392B', label: (it.title||'').replace(/^⑨\s*/,''), sid: it.id});
+          }
+        });
+      } catch(e){}
+    }
+    
+    // 타임라인 함께 보기 (토글 ON)
+    if(window._showTimelineInDeadlineCal_BOS){
+      try {
+        var calData = JSON.parse(localStorage.getItem('bos_calendar_v1')||'{}');
+        (calData.items||[]).forEach(function(item){
+          if(item.startDate){
+            events.push({date: item.startDate, color:'#1976D2', label:'📆 ' + (item.title||''), sid:'tl_'+(item.id||'')});
+          }
+          if(item.endDate && item.endDate !== item.startDate){
+            events.push({date: item.endDate, color:'#42A5F5', label:'📆 ' + (item.title||'') + ' (종료)', sid:'tl_'+(item.id||'')});
+          }
+        });
+      } catch(e){}
+    }
+    
+    if(typeof renderMiniCal === 'function'){
+      renderMiniCal('deadline-minical-bos', events, 'deadline');
+    }
+  };
+  
+  window.toggleTimelineInDeadlineCal_BOS = function(checked){
+    window._showTimelineInDeadlineCal_BOS = !!checked;
+    var legend = document.getElementById('dlcal-timeline-legend-bos');
+    if(legend) legend.style.display = checked ? '' : 'none';
+    renderDeadlineMiniCal_BOS();
+  };
+  
+  // 데드라인 탭 진입 / 렌더 시 캘린더도 갱신
+  // (이전 _calWrapped 래핑이 setTimeout 800ms 후 적용되므로, 그 뒤에 래핑)
+  setTimeout(function(){
+    if(typeof window.renderDeadlines === 'function' && !window.renderDeadlines._calMiniWrapped){
+      var _orig = window.renderDeadlines;
+      var wrapped = function(){
+        _orig.apply(this, arguments);
+        try { renderDeadlineMiniCal_BOS(); } catch(e){}
+      };
+      wrapped._calMiniWrapped = true;
+      if(_orig._calWrapped) wrapped._calWrapped = true;
+      window.renderDeadlines = wrapped;
+    }
+  }, 1100);
+  
+  console.log('[DeadlineMiniCal] 데드라인 캘린더 준비됨');
 })();
 </script>
 </body>
