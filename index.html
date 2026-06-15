@@ -52,6 +52,13 @@ body{font-family:var(--sa);background:var(--bg);color:var(--tx);font-size:14px;l
 /* === COMMON === */
 .hbar{background:var(--sur);border-bottom:1px solid var(--bd);padding:8px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px}
 .btn{font-family:var(--sa);font-size:11px;font-weight:500;padding:5px 11px;border-radius:5px;border:1px solid var(--bdd);cursor:pointer;background:var(--bg);color:var(--tx);transition:background .15s}
+/* ━━ 버튼형 탭 선택 강조 (가중목 분기, 데드라인 카테고리 등) ━━ */
+.btn.act, .btn.active{
+  background:#1A6B4A !important;
+  color:#fff !important;
+  border-color:#1A6B4A !important;
+  font-weight:700;
+}
 .btn:hover{background:var(--bd)}.btn.pri{background:var(--acc);color:#FFF;border-color:var(--acc)}.btn.pri:hover{background:#333}
 .btn.grn{background:var(--green);color:#FFF;border-color:var(--green)}.btn.red{background:var(--red);color:#FFF;border-color:var(--red)}
 .section{background:var(--sur);border:.5px solid var(--bd);border-radius:9px;margin:12px 18px;overflow:hidden}
@@ -108,6 +115,15 @@ tr:hover td{background:#F7F6F2}
 .stab:hover{color:var(--tx)}.stab-del{display:inline-block;margin-left:6px;padding:0 4px;font-size:11px;color:rgba(0,0,0,.4);cursor:pointer;border-radius:3px;line-height:1}
 .stab-del:hover{color:#C0392B;background:rgba(192,57,43,.1)}
 .stab.act{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* ━━ 서브탭 선택 강조 통합 (act + active 모두 동일하게) ━━ */
+.stab.act, .stab.active{
+  color:#1A6B4A !important;
+  border-bottom:2px solid #1A6B4A !important;
+  font-weight:700;
+  background:rgba(26,107,74,.08);
+  border-radius:6px 6px 0 0;
+}
 .stab-name-edit{background:transparent;border:none;color:inherit;font-family:var(--sa);font-size:11px;font-weight:500;cursor:text;outline:none;max-width:80px}
 .subtab-pane{display:none}.subtab-pane.act{display:block}
 
@@ -1302,7 +1318,7 @@ html, body{
         <div style="font-size:9px;color:var(--mu);margin-top:2px">원</div>
       </div>
       <div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:10px;text-align:center">
-        <div style="font-size:10px;color:#8B5E00;margin-bottom:3px">사용 예산 (VAT포함)</div>
+        <div style="font-size:10px;color:#8B5E00;margin-bottom:3px">실지출 합계 (완료분)</div>
         <div style="font-size:15px;font-weight:600;font-family:var(--mn);color:var(--red)" id="cost-sum-used">0원</div>
       </div>
       <div style="background:#E8F5E9;border:1px solid #A5D6A7;border-radius:8px;padding:10px;text-align:center">
@@ -1316,13 +1332,13 @@ html, body{
       <div style="background:#E3F2FD;border:1px solid #90CAF9;border-radius:8px;padding:10px;text-align:center">
         <div style="font-size:10px;color:#1565C0;margin-bottom:3px">초도 필요 투자금 합계</div>
         <div style="font-size:13px;font-weight:600;font-family:var(--mn);color:#1565C0" id="cost-sum-invest">—</div>
-        <div style="font-size:9px;color:#42A5F5;margin-top:2px">준비비용 + 생산 초도투자</div>
+        <div style="font-size:9px;color:#42A5F5;margin-top:2px">준비비용 예상액 합 (계획)</div>
       </div>
     </div>
     <div class="section">
       <div class="sec-head"><h3>📋 준비 비용 항목</h3><span style="font-size:10px;color:var(--mu)">금액 클릭 후 직접 입력 · 항목명도 수정 가능</span></div>
       <table class="cost-table" id="cost-tbl">
-        <thead><tr><th>항목명 (수정 가능)</th><th>원가 (VAT 제외)</th><th>부가세 (10%)</th><th>VAT 포함</th><th>비율</th><th>메모</th><th style="width:32px"></th></tr></thead>
+        <thead><tr><th>항목명 (수정 가능)</th><th>예상 금액 (VAT 제외)</th><th>부가세 (10%)</th><th>예상 VAT 포함</th><th>비율</th><th style="width:130px">💸 실지출 (완료분)</th><th>메모</th><th style="width:32px"></th></tr></thead>
         <tbody id="cost-body"></tbody>
         <tfoot><tr class="tot-row"><td>합계</td><td id="ct-ex">0원</td><td id="ct-vat">0원</td><td id="ct-inc">0원</td><td>100%</td><td></td><td></td></tr></tfoot>
       </table>
@@ -2192,13 +2208,6 @@ html, body{
       <button class="btn pri" onclick="saveWIG()">저장</button>
     </div>
   </div>
-  <div style="padding:6px 18px;display:flex;gap:7px;border-bottom:1px solid var(--bd);background:var(--bg)">
-    <button class="btn act" id="wig-tab-annual" onclick="switchWIGPeriod('annual',this)">연간</button>
-    <button class="btn" id="wig-tab-q1" onclick="switchWIGPeriod('q1',this)">1분기</button>
-    <button class="btn" id="wig-tab-q2" onclick="switchWIGPeriod('q2',this)">2분기</button>
-    <button class="btn" id="wig-tab-q3" onclick="switchWIGPeriod('q3',this)">3분기</button>
-    <button class="btn" id="wig-tab-q4" onclick="switchWIGPeriod('q4',this)">4분기</button>
-  </div>
   <div id="wig-wrap" style="padding:12px 18px"></div>
 </div>
 
@@ -2496,8 +2505,8 @@ let adSpendData=[],adSpendBudget=0,monthlyAdsData={},currentMonthlyYear=null;
 let revSummaryData={auto:'',insight:'',avoid:'',copy:''};
 let detailStructure=[
  {id:'ds1',title:'후킹 섹션',desc:'기미가 보이기 시작한다면, 이미 늦었다. — 문제 직면 + 강렬한 비포애프터 이미지',principle:'손실 회피 + 첫 인상'},
- {id:'ds2',title:'브랜드 스토리',desc:'조선 왕실이 선택한 황칠나무 → 현대 피부 갑옷으로 — K-헤리티지 후킹',principle:'호감 + 스토리텔링'},
- {id:'ds3',title:'핵심 성분 3단계',desc:'트라베논(멜라닌 억제) + 황칠(항산화 방어) + 에어로젤 피막(성분 고정) = 기미 방어선 3겹 구조',principle:'권위 + 원리 이해'},
+ {id:'ds2',title:'브랜드 스토리',desc:'브랜드의 핵심 스토리를 한 줄로 — 원료 유래, 창업 계기, 차별화된 철학 등으로 후킹',principle:'호감 + 스토리텔링'},
+ {id:'ds3',title:'핵심 성분 3단계',desc:'핵심 성분 A(작용) + 성분 B(작용) + 성분 C(작용) = 우리 제품만의 메커니즘 구조',principle:'권위 + 원리 이해'},
  {id:'ds4',title:'임상 결과',desc:'기미 개선 ~% (인체적용시험 완료) — 수치와 그래프',principle:'사회적 증거 + 권위'},
  {id:'ds5',title:'제형 차별화',desc:'에어로젤 나노 피막 — 바를 때 공기처럼 가볍지만, 성분은 피부에 밀착 고정 — 비주얼 시연',principle:'차별화 + 작동 원리'},
  {id:'ds6',title:'실제 후기',desc:'실제 구매자 비포애프터 + 텍스트 리뷰 모음',principle:'사회적 증거'},
@@ -2521,12 +2530,15 @@ let deadlineData={
  targetDate:'2026-06-19',
  categories:{
   prod:[
-   {id:'prod-order',name:'생산발주+입고',offsetDays:-50,durationDays:50,color:'#C0392B',fixed:true,note:'출시 50일 전 필수 완료',done:false},
-   {id:'prod-sample',name:'최종 처방 샘플 확정',offsetDays:-78,durationDays:28,color:'#8B4513',fixed:true,note:'생산발주 4주 전부터 4주간',done:false},
-   {id:'prod-vendor',name:'샘플링 전 업체 조사 및 선정',offsetDays:-81,durationDays:3,color:'#A0522D',fixed:true,note:'최종 처방 확정 3일 전',done:false},
-   {id:'prod-clin-quote',name:'임상시험 견적 확정',offsetDays:-28,durationDays:7,color:'#2E7D32',fixed:true,note:'D-day 4주 전, 1주간',done:false},
-   {id:'prod-clin-test',name:'임상시험 진행',offsetDays:-21,durationDays:21,color:'#1B5E20',fixed:true,note:'D-day 3주 전부터 3주간',done:false},
-   {id:'prod-package',name:'패키지 디자인 확정',offsetDays:-57,durationDays:7,color:'#6A1B9A',fixed:true,note:'생산발주 1주 전 완료',done:false}
+   {id:'prod-cttest',name:'CT TEST',offsetDays:-63,durationDays:7,color:'#C0392B',fixed:true,note:'부자재 발주 2주 전',done:false},
+   {id:'prod-review',name:'문안 검수',offsetDays:-63,durationDays:7,color:'#7A4AA8',fixed:true,note:'부자재 발주 2주 전',done:false},
+   {id:'prod-package',name:'패키지 디자인 확정',offsetDays:-56,durationDays:7,color:'#6A1B9A',fixed:true,note:'문안 검수 1주 뒤',done:false},
+   {id:'prod-material',name:'부자재 발주',offsetDays:-49,durationDays:21,color:'#8D6E63',fixed:true,note:'생산발주 3주 전',done:false},
+   {id:'prod-order',name:'생산 발주',offsetDays:-28,durationDays:28,color:'#16A085',fixed:true,note:'런칭 4주 전',done:false},
+   {id:'prod-sample',name:'최종 처방 샘플 확정',offsetDays:-56,durationDays:28,color:'#8B4513',fixed:true,note:'생산발주 4주 전부터',done:false},
+   {id:'prod-vendor',name:'샘플링 전 업체 조사 및 선정',offsetDays:-70,durationDays:7,color:'#A0522D',fixed:true,note:'최종 처방 확정 전',done:false},
+   {id:'prod-clin-quote',name:'임상시험 견적 확정',offsetDays:-35,durationDays:7,color:'#2E7D32',fixed:true,note:'D-day 5주 전',done:false},
+   {id:'prod-clin-test',name:'임상시험 진행',offsetDays:-28,durationDays:21,color:'#1B5E20',fixed:true,note:'D-day 4주 전부터 3주간',done:false}
   ],
   photo:[
    {id:'photo-concept',name:'촬영 컨셉 기획',offsetDays:-21,durationDays:5,color:'#FF6F00',note:'자유 수정 가능',done:false},
@@ -2548,7 +2560,7 @@ let deadlineData={
    {id:'ad-review',name:'광고 성과 분석',offsetDays:7,durationDays:7,color:'#BA68C8',note:'D+7일까지',done:false}
   ]
  }
-},adPlans=[{id:'ap1',name:'기획안 1',videoUrl:'',appeal:'출산 후 기미 손실 회피',product:'신규진행 제품',script:'기미가 보이기 시작한다면, 이미 늦었다.\n출산 후 갑자기 생긴 기미, 레이저 대신 매일 이걸 바르세요.\n트라넥삼산 5% 임상 완료. 황칠 항산화 방어층으로 기미를 막습니다.',hook:'기미가 보이기 시작한다면, 이미 늦었다.',cta:'지금 바로 시작하세요',format:'영상 (15초)',status:'기획중'}],orgData={leader:{name:'대표 (사용자)',role:'CEO / 1인 대표',memo:'전략·광고·운영 총괄'},teams:[
+},adPlans=[{id:'ap1',name:'기획안 1',videoUrl:'',appeal:'',product:'',script:'',hook:'',cta:'',format:'영상 (15초)',status:'기획중'}],orgData={leader:{name:'대표 (사용자)',role:'CEO / 1인 대표',memo:'전략·광고·운영 총괄'},teams:[
  {id:'ot1',name:'제품팀',color:'#1A6B4A',members:[{name:'(담당자 미정)',role:'제품 기획·ODM 관리'}]},
  {id:'ot2',name:'광고/컨텐츠팀',color:'#2196F3',members:[{name:'(담당자 미정)',role:'Meta·Google 광고 집행'}]},
  {id:'ot3',name:'디자인팀',color:'#9C27B0',members:[{name:'(담당자 미정)',role:'패키지·상세페이지·SNS 디자인'}]},
@@ -7512,6 +7524,7 @@ function renderCosts(){
   <td style="font-family:var(--mn);color:var(--mu)" id="cv-${i}">${N(Math.round((item.ex||0)*0.1))}원</td>
   <td style="font-family:var(--mn);font-weight:500" id="ci-${i}">${N(Math.round((item.ex||0)*1.1))}원</td>
   <td style="color:var(--mu);font-size:11px" id="cp-${i}">0%</td>
+  <td style="text-align:center">${(()=>{ const pays=(item.payments||[]); const sum=pays.reduce((s,p)=>s+(parseInt(p.amount)||0),0); return '<div style=\"display:flex;flex-direction:column;align-items:center;gap:2px\"><span style=\"font-family:var(--mn);font-size:11px;font-weight:600;color:'+(sum>0?'#1565C0':'var(--mu)')+'\">'+N(sum)+'원</span><button onclick=\"openCostPayments_BOS('+i+')\" style=\"background:#E3F2FD;border:1px solid #90CAF9;border-radius:4px;padding:2px 7px;font-size:10px;cursor:pointer;color:#1565C0\">💸 '+(pays.length?pays.length+'건':'기록')+'</button></div>'; })()}</td>
   <td><input value="${item.memo||''}" onchange="costData[${i}].memo=this.value" style="width:100%;border:none;background:transparent;font-size:11px;color:var(--mu);padding:2px 4px;outline:none"></td>
   <td><button class="ib dl" onclick="removeCostRow(${i})">✕</button></td>
  </tr>`).join('');
@@ -8574,10 +8587,10 @@ function buildWIG(){
  const period=w.periods.find(p=>p.id===pid)||w.periods[0];
  if(!period){wrap.innerHTML='<div style="padding:30px;text-align:center;color:var(--hi)">기간을 추가하세요.</div>';return}
  wrap.innerHTML=`
- <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
-  <div style="font-size:11px;color:var(--mu)">기간 선택:</div>
-  ${w.periods.map(p=>`<button class="btn${pid===p.id?' pri':''}" onclick="switchWIGPeriod('${p.id}')">${p.label}</button>`).join('')}
-  <button class="btn" onclick="addWIGPeriod()">+ 기간 추가</button>
+ <div style="display:flex;gap:6px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
+  <div style="font-size:11px;color:var(--mu);font-weight:600">📅 기간:</div>
+  ${w.periods.map(p=>`<span style="display:inline-flex;align-items:center;gap:2px;background:${pid===p.id?'#1A6B4A':'#fff'};border:1px solid ${pid===p.id?'#1A6B4A':'var(--bd)'};border-radius:6px;overflow:hidden"><button style="background:none;border:none;padding:6px 10px;font-size:11px;cursor:pointer;color:${pid===p.id?'#fff':'var(--tx)'};font-weight:${pid===p.id?'700':'500'};font-family:inherit" onclick="switchWIGPeriod('${p.id}')">${p.label}</button><button style="background:none;border:none;padding:4px 5px;cursor:pointer;color:${pid===p.id?'rgba(255,255,255,.7)':'var(--mu)'};font-size:10px" onclick="openWIGPeriodModal_BOS('${p.id}')" title="기간 수정/삭제">⚙</button></span>`).join('')}
+  <button class="btn" onclick="openWIGPeriodModal_BOS()" style="border-style:dashed">＋ 기간 추가</button>
  </div>
  ${(period.wigs||[]).map((wig,wi)=>`
  <div class="section" style="margin:0 0 16px">
@@ -8670,6 +8683,8 @@ function buildScoreBoard(wig){
 
 function switchWIGPeriod(pid){if(!wigData)return;wigData.currentPeriodId=pid;sv();buildWIG();}
 function addWIGPeriod(){
+ // prompt → 정식 모달로 대체
+ if(typeof openWIGPeriodModal_BOS==='function'){openWIGPeriodModal_BOS();return;}
  const label=prompt('기간 이름:', '2026년 Q1');if(!label)return;
  const id='p'+Date.now();
  if(!wigData.periods)wigData.periods=[];
@@ -8934,20 +8949,20 @@ function showP19Tab(tab, btn){
 
 // ━━━ 설명글 써보기 데이터 ━━━
 const DEF_WRITEUP_GAPS = [
- {cat:'노벨상·권위 원리', ref:'2016 노벨 생리의학상 (오토파지)', ours:'', status:'미확보', action:'트라넥삼산·장벽재생 관련 권위 논문 연결'},
- {cat:'독자 특허 성분', ref:'멜라제로 V2™ / 디멜락실™', ours:'트라베란™ (우선후보)', status:'진행중', action:'ODM과 공동 특허 출원 협의'},
- {cat:'R&D 투입 비용', ref:'8억 5천만원 (엑소멜라틴 예시)', ours:'', status:'미확보', action:'실제 기획·개발 투입 금액 스토리화'},
- {cat:'침투 기술', ref:'시카 엑소좀 163nm (모공의 1/215)', ours:'', status:'미확보', action:'리포좀·나노캡슐화 기술명 확보'},
- {cat:'임상 수치', ref:'속기미 139.04% 개선, 자극지수 0.00', ours:'겉기미 20.78% / 속기미 18.03% 목표', status:'계획중', action:'P&K 또는 휴먼피부임상 계약'},
- {cat:'원산지·헤리티지', ref:'스위스 에델바이스 + 빙하수', ours:'한국 쌀겨수 + 황칠 + 녹두', status:'진행중', action:'장인의 손 서사 강화'},
- {cat:'공통 베이스 (2층 구조)', ref:'경쟁사 대부분 단일 기능', ours:'쌀겨수 토양 = 안티에이징 +α', status:'계획중', action:'모든 상세페이지 하단 공통 섹션 고정'},
- {cat:'기대 관리 타임라인', ref:'베러디션·로투에 낮은순 50%+가 "한달 써도 효과 없다" 호소', ours:'', status:'계획중', action:'"8주부터 체감, 12주 꾸준 사용" 상세페이지 명시'},
- {cat:'완판·재구매 스토리', ref:'6차 완판 + 재구매율 1위', ours:'', status:'런칭후', action:'런칭 후 3개월 데이터 확보'},
- {cat:'환불 보장', ref:'엑소멜라틴 100% / 베러디션 15일', ours:'', status:'미확보', action:'60일 만족 보장 검토 (차별화)'},
- {cat:'이중 기능성', ref:'미백 + 주름개선', ours:'기미(간판) + 안티에이징(+α)', status:'계획중', action:'이중 기능성 식약처 승인 확인'},
- {cat:'진성 후기 전략', ref:'베러디션 포토리뷰=도움돼요0, 로투에 체험단 파일명 동일', ours:'', status:'계획중', action:'마이크로 인플루언서 30~50명 2개월 후 영상'},
- {cat:'용기 UX', ref:'베러디션·로투에 펌프 불량 다수', ours:'', status:'미확보', action:'펌프·튜브 런칭 전 확정, 로트 QC'},
- {cat:'비건/인증', ref:'없음', ours:'', status:'미확보', action:'수출용 비건 인증 검토'}
+ {cat:'노벨상·권위 원리', ref:'권위 있는 수상/논문과 연결되는 작용 원리', ours:'', status:'미확보', action:'핵심 성분의 권위 논문·수상 근거 연결'},
+ {cat:'독자 특허 성분', ref:'경쟁사의 독자/특허 성분명', ours:'', status:'미확보', action:'독자 성분명 또는 공동 특허 출원 검토'},
+ {cat:'R&D 투입 비용', ref:'000원 (R&D 투입비용)', ours:'', status:'미확보', action:'실제 기획·개발 투입 금액을 스토리화'},
+ {cat:'침투 기술', ref:'리포좀 공법 etc (전달·침투 기술명)', ours:'', status:'미확보', action:'리포좀·나노캡슐화 등 기술명 확보'},
+ {cat:'임상 수치', ref:'000 (개선율 % / 자극지수)', ours:'', status:'미확보', action:'공인 시험기관 임상 계약'},
+ {cat:'원산지·헤리티지', ref:'원료 원산지 프리미엄', ours:'', status:'미확보', action:'원료 원산지·유래 스토리 강화'},
+ {cat:'공통 베이스 (2층 구조)', ref:'단일 기능 vs 베이스+α 차별화', ours:'', status:'미확보', action:'상세페이지 하단 공통 가치 섹션 고정'},
+ {cat:'기대 관리 타임라인', ref:'효과 체감 시점에 대한 기대 관리', ours:'', status:'미확보', action:'"N주부터 체감, M주 꾸준 사용" 명시'},
+ {cat:'완판·재구매 스토리', ref:'00완판 + 재구매율 1위(자사 제품 기준)', ours:'', status:'미확보', action:'런칭 후 판매·재구매 데이터 확보'},
+ {cat:'환불 보장', ref:'경쟁사 환불 보장 기간/조건', ours:'', status:'미확보', action:'만족 보장 정책 검토 (차별화)'},
+ {cat:'이중 기능성', ref:'미백 + 주름개선 등 복수 기능성', ours:'', status:'미확보', action:'이중 기능성 식약처 승인 확인'},
+ {cat:'진성 후기 전략', ref:'진정성 있는 실사용 후기 확보 방식', ours:'', status:'미확보', action:'마이크로 인플루언서 실사용 후기 확보'},
+ {cat:'용기 UX', ref:'경쟁사 용기 불만 포인트(펌프 불량 등)', ours:'', status:'미확보', action:'용기·펌프 런칭 전 확정, 로트 QC'},
+ {cat:'비건/인증', ref:'비건·친환경 등 인증', ours:'', status:'미확보', action:'수출용 인증 검토'}
 ];
 var writeupGaps = null;
 
@@ -8959,8 +8974,8 @@ function getWriteupData(){
  return {
   refTitle:'',
   refText:'',
-  oursTitle:'MGS 브랜드 매니페스토',
-  oursText:'MGS는 쌀겨수라는 땅 위에 집을 짓습니다.\n\n황칠나무의 기품, 어성초의 맑음, 녹두의 결, 누룩의 깊이,\n트라넥삼산의 과학, 나이아신아마이드의 정밀함, 세라마이드의 보호 —\n\n자연과 과학, 오래된 지혜와 새로운 기술이\n한 집 안에서 함께 숨 쉬는 곳.\n\n기미를 케어하면, 안티에이징이 따라옵니다.\n장벽을 세우면, 탄력이 함께 돌아옵니다.\n진정을 얻으면, 결이 같이 다듬어집니다.\n\n이것이 MGS의 약속입니다.\n하나의 기능이 아닌, 하나의 철학.\n\n자연과 공학, 젊음의 아름다움이 공존하는 곳.\nMGS · 米工所 Project',
+  oursTitle:'우리 브랜드 매니페스토 (예시)',
+  oursText:'여기에 우리 브랜드의 철학과 약속을 적어보세요.\n\n① 우리는 무엇을 믿는가 (핵심 가치)\n② 무엇을 다르게 하는가 (차별점)\n③ 고객에게 무엇을 약속하는가\n\n핵심 성분/기술과 브랜드 가치를 연결하여\n하나의 일관된 메시지로 풀어보세요.\n\n이 글은 모든 마케팅 카피의 기준점이 됩니다.',
   gaps: DEF_WRITEUP_GAPS.map(g=>({...g}))
  };
 }
@@ -9126,13 +9141,13 @@ const DEF_PERSUASION = [
   bg:'#E3F2FD',
   desc:'다른 사람들이 이미 선택했다는 증거. "나만 모르는 게 아닐까?"를 자극.',
   items:[
-   {id:'p1i1',text:'리뷰 500개 이상 쌓기 (스마트스토어 + 올리브영)',done:false,priority:'high'},
+   {id:'p1i1',text:'리뷰 500개 이상 쌓기 (자사몰 + 주요 채널)',done:false,priority:'high'},
    {id:'p1i2',text:'유명 더마 인플루언서 협찬 (구독자 5~20만)',done:false,priority:'high'},
    {id:'p1i3',text:'협찬 영상 결과 상세페이지에 인용 (조회수·반응)',done:false,priority:'high'},
    {id:'p1i4',text:'해외 짤·밈 활용 (기미 관련 공감 콘텐츠)',done:false,priority:'mid'},
    {id:'p1i5',text:'"○○명이 구매했습니다" 실시간 표시',done:false,priority:'mid'},
    {id:'p1i6',text:'픽업 리뷰어 SNS 재공유 (UGC 확산)',done:false,priority:'mid'},
-   {id:'p1i7',text:'올리브영 구매 후기 TOP100 진입',done:false,priority:'high'}
+   {id:'p1i7',text:'주요 채널 구매 후기 TOP100 진입',done:false,priority:'high'}
   ]
  },
  {id:'p2',
@@ -9142,12 +9157,12 @@ const DEF_PERSUASION = [
   bg:'#F3E5F5',
   desc:'전문가·기관이 인정했다는 신뢰. "잘 모르면 전문가를 따른다."',
   items:[
-   {id:'p2i1',text:'약국 입점 (피부과 처방 후 재구매 채널)',done:false,priority:'high'},
+   {id:'p2i1',text:'전문 채널 입점 (재구매 채널 확보)',done:false,priority:'high'},
    {id:'p2i2',text:'피부과 의사 추천 콘텐츠 확보 (유료 자문)',done:false,priority:'high'},
    {id:'p2i3',text:'개발자(체이스) 권위 콘텐츠 — "성분 직접 설계"',done:false,priority:'high'},
    {id:'p2i4',text:'임상시험 결과 수치 상세페이지 First Fold 배치',done:false,priority:'high'},
    {id:'p2i5',text:'식약처 기능성 화장품 인증 취득 (미백)',done:false,priority:'high'},
-   {id:'p2i6',text:'논문·특허 인용 (트라넥삼산·황칠나무 근거)',done:false,priority:'mid'},
+   {id:'p2i6',text:'논문·특허 인용 (핵심 성분 근거)',done:false,priority:'mid'},
    {id:'p2i7',text:'언론 기사 노출 (뷰티 전문지·경제지)',done:false,priority:'mid'},
    {id:'p2i8',text:'"트라베란™" 성분명 상표 등록',done:false,priority:'mid'}
   ]
@@ -9160,14 +9175,14 @@ const DEF_PERSUASION = [
   desc:'좋아하는 사람·브랜드의 것을 산다. 친근함·공감·스토리로 연결.',
   items:[
    {id:'p3i1',text:'브랜드 창업자 스토리 콘텐츠 (왜 이 제품을 만들었나)',done:false,priority:'high'},
-   {id:'p3i2',text:'30~40대 기미 고민 공감 카피 (나도 이랬었어)',done:false,priority:'high'},
+   {id:'p3i2',text:'타겟 고객 고민 공감 카피 (나도 이랬었어)',done:false,priority:'high'},
    {id:'p3i3',text:'패키지 디자인 — 손에 들었을 때 "예쁘다" 반응',done:false,priority:'high'},
-   {id:'p3i4',text:'고객 페르소나 맞춤 비포애프터 (30대 직장맘)',done:false,priority:'high'},
+   {id:'p3i4',text:'고객 페르소나 맞춤 비포애프터',done:false,priority:'high'},
    {id:'p3i5',text:'SNS 댓글 100% 답장 — 브랜드 친근감',done:false,priority:'mid'},
    {id:'p3i6',text:'감사 편지 동봉 (첫 구매 고객)',done:false,priority:'mid'},
-   {id:'p3i7',text:'브랜드 무드 통일 — 황금+연꽃+새벽 심상',done:false,priority:'mid'},
+   {id:'p3i7',text:'브랜드 무드 통일 — 핵심 심상 키워드',done:false,priority:'mid'},
    {id:'p3i8',text:'"이름 불러주기" 마케팅 (CRM 개인화 문자)',done:false,priority:'low'},
-   {id:'p3i9',text:'육아·직장 공감 콘텐츠로 타겟 페르소나와 공감대 형성',done:false,priority:'mid'}
+   {id:'p3i9',text:'타겟 페르소나 공감 콘텐츠로 공감대 형성',done:false,priority:'mid'}
   ]
  },
  {id:'p4',
@@ -9177,13 +9192,13 @@ const DEF_PERSUASION = [
   bg:'#E8F5E9',
   desc:'먼저 줬으니 받아야 한다는 심리. 무료 제공 → 구매 전환.',
   items:[
-   {id:'p4i1',text:'첫 구매 증정품 — 미니 트라베란™ 패드',done:false,priority:'high'},
+   {id:'p4i1',text:'첫 구매 증정품 — 미니 샘플/굿즈',done:false,priority:'high'},
    {id:'p4i2',text:'회원가입 즉시 할인 쿠폰 (10~15%)',done:false,priority:'high'},
-   {id:'p4i3',text:'기미 자가진단 PDF 무료 배포 (이메일 수집)',done:false,priority:'high'},
+   {id:'p4i3',text:'자가진단 PDF 무료 배포 (이메일 수집)',done:false,priority:'high'},
    {id:'p4i4',text:'구매 후 감사 쿠폰 자동 발송 (재구매 유도)',done:false,priority:'high'},
    {id:'p4i5',text:'무료 샘플 체험단 모집 (리뷰 의무 없음 — 자발적 후기 유도)',done:false,priority:'mid'},
    {id:'p4i6',text:'생일 쿠폰 발송 (CRM 자동화)',done:false,priority:'mid'},
-   {id:'p4i7',text:'기미 관련 유용한 정보 정기 뉴스레터 발송',done:false,priority:'low'},
+   {id:'p4i7',text:'카테고리 관련 유용한 정보 정기 뉴스레터 발송',done:false,priority:'low'},
    {id:'p4i8',text:'구독/팔로우 시 즉시 혜택 제공',done:false,priority:'mid'}
   ]
  }
@@ -9607,14 +9622,14 @@ function removeClinicalInstitution(i){if(confirm('삭제?')){clinicalInstitution
 function saveClinical(){sv();showToast('임상 체크리스트 저장 완료');}
 
 var draftSections=[
- {id:'ds1',title:'① 임상 수치 (First Fold)',content:'겉기미 20.78% 개선 | 속기미 18.03% 개선\nP&K 피부임상연구센터 | 23명 | 4주\n\n[핵심] 상세 첫 화면에 고민+임상 수치 = 구매 전환\n→ 테라로직이 고객을 잡은 방식 그대로'},
- {id:'ds2',title:'② 후킹 카피',content:'기미가 보이기 시작한다면, 이미 늦었다.\n생기기 전에 막아야 기미다.\n— 트라베란™ 4중 기미 방어 메커니즘'},
- {id:'ds3',title:'③ 신뢰 레이어',content:'[권위] 피부과 전문의 성분 검토\n[증거] 무자극 0.00 | 미백 기능성 | 여드름성 피부 사용 적합'},
- {id:'ds4',title:'④ 4중 방어 메커니즘',content:'[방어선 0] 이데베논 0.3% → ROS 중화\n[방어선 1] 트라넥삼산 5% → 멜라닌 신호 억제\n[방어선 2] 황칠나무 2% + 알파아르부틴 1% → 티로시나제 억제\n[방어선 3] 나이아신아마이드 5% → 멜라닌 전이 차단'},
- {id:'ds5',title:'⑤ 차별화',content:'경쟁사 50ml vs 우리 100g — 같은 5%, 용량 2배\n올리브영 온라인 · 네이버페이 결제 가능'},
- {id:'ds6',title:'⑥ BnA',content:'임상 완료 후 수치 삽입 예정'},
- {id:'ds7',title:'⑦ CTA',content:'초도 한정 수량 특가 | 30일 환불 보장 | 무료 배송'},
- {id:'ds8',title:'⑧ 마케팅 메모',content:'[유튜버] 5~20만 더마 유튜버 DM — 성분 검토 제안\n[채널] 올리브영+네이버페이 = 구매 결정 핵심'}
+ {id:'ds1',title:'① 임상 수치 (First Fold)',content:'상세페이지 첫 화면에 들어갈 핵심 임상 수치를 적으세요.\n예: [개선율 %] | [시험기관] | [피험자 수] | [기간]\n\n[핵심] 첫 화면에 고객 고민 + 임상 수치를 함께 노출하면 구매 전환율이 올라갑니다.'},
+ {id:'ds2',title:'② 후킹 카피',content:'스크롤을 멈추게 할 한 줄 후킹 문구를 작성하세요.\n고객의 고민을 찌르거나, 제품의 핵심 약속을 한 문장으로 표현합니다.\n예: "○○이 보이기 시작했다면, 지금이 시작할 때입니다."'},
+ {id:'ds3',title:'③ 신뢰 레이어',content:'제품을 믿을 수 있는 근거를 나열하세요.\n[권위] 전문가 검토 / 수상 / 인증\n[증거] 무자극 테스트 / 기능성 인증 / 민감성 적합 등'},
+ {id:'ds4',title:'④ 핵심 메커니즘',content:'제품이 "어떻게" 효과를 내는지 단계별로 설명하세요.\n[단계 1] 핵심 성분 → 작용\n[단계 2] 핵심 성분 → 작용\n→ 성분 농도를 함께 공개하면 신뢰도가 높아집니다.'},
+ {id:'ds5',title:'⑤ 차별화',content:'경쟁사 대비 우리 제품의 우위를 적으세요.\n예: 용량 / 농도 / 가격 / 구성 / 판매 채널 등에서의 차별점'},
+ {id:'ds6',title:'⑥ Before & After',content:'사용 전후 비교 이미지나 수치를 배치할 영역입니다.\n임상/사용 후기 데이터가 준비되면 삽입하세요.'},
+ {id:'ds7',title:'⑦ CTA (구매 유도)',content:'구매를 유도하는 마지막 한 방을 작성하세요.\n예: 한정 수량 / 환불 보장 / 무료 배송 / 첫 구매 혜택 등'},
+ {id:'ds8',title:'⑧ 마케팅 메모',content:'상세페이지와 연계할 마케팅 액션을 메모하세요.\n[인플루언서] 협업 대상 / 제안 방식\n[채널] 입점 채널 / 결제 수단 등'}
 ];
 function renderDraftSections(){
  var w=document.getElementById('draft-wrap');if(!w)return;
@@ -9623,19 +9638,20 @@ function renderDraftSections(){
   var mv='';
   if(i>0)mv+='<button class="btn" style="padding:2px 6px;font-size:10px" onclick="moveDraft('+i+',-1)">↑</button>';
   if(i<draftSections.length-1)mv+='<button class="btn" style="padding:2px 6px;font-size:10px" onclick="moveDraft('+i+',1)">↓</button>';
-  return '<div class="draft-section-row" draggable="true" data-idx="' + i + '" '
-       + 'ondragstart="onDraftDragStart(event,' + i + ')" '
+  return '<div class="draft-section-row" data-idx="' + i + '" '
        + 'ondragover="onDraftDragOver(event)" '
        + 'ondragleave="onDraftDragLeave(event)" '
        + 'ondrop="onDraftDrop(event,' + i + ')" '
-       + 'ondragend="onDraftDragEnd(event)" '
-       + 'style="border:1px solid var(--bd);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--sur);transition:background .15s">'
-       + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
-       + '<div style="display:flex;align-items:center;gap:6px;flex:1">'
-       + '<span class="drag-handle" style="cursor:grab;color:var(--hi);font-size:13px;user-select:none;padding:2px 2px" title="드래그하여 순서 변경">⋮⋮</span>'
+       + 'style="border:1px solid var(--bd);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--sur);transition:background .15s;position:relative">'
+       + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:6px">'
        + '<input value="'+(s.title||'').replace(/"/g,'&quot;')+'" onchange="draftSections['+i+'].title=this.value;sv()" style="flex:1;border:none;background:transparent;font-size:12px;font-weight:500;color:var(--tx);outline:none;padding:2px 4px">'
+       + '<div style="display:flex;gap:3px;align-items:center">'+mv
+       + '<button class="btn" style="padding:2px 6px;font-size:10px;color:var(--red)" onclick="removeDraft('+i+')">✕</button>'
+       + '<span class="draft-drag-handle" draggable="true" '
+         + 'ondragstart="onDraftDragStart(event,' + i + ')" '
+         + 'ondragend="onDraftDragEnd(event)" '
+         + 'style="cursor:grab;color:var(--mu);font-size:15px;user-select:none;padding:2px 6px;border:1px solid var(--bd);border-radius:5px;line-height:1;background:#fff" title="여기를 드래그하여 순서 변경">☰</span>'
        + '</div>'
-       + '<div style="display:flex;gap:3px">'+mv+'<button class="btn" style="padding:2px 6px;font-size:10px;color:var(--red)" onclick="removeDraft('+i+')">✕</button></div>'
        + '</div>'
        + '<textarea rows="5" style="width:100%;padding:7px 9px;border:1px solid var(--bd);border-radius:5px;font-family:var(--sa);font-size:12px;color:var(--tx);background:var(--bg);outline:none;resize:vertical;line-height:1.7" onchange="draftSections['+i+'].content=this.value;sv()">'+(s.content||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</textarea>'
        + '</div>';
@@ -9647,7 +9663,9 @@ var _draggedDraftIdx = null;
 window.onDraftDragStart = function(e, i){
   _draggedDraftIdx = i;
   e.dataTransfer.effectAllowed = 'move';
-  e.currentTarget.style.opacity = '0.4';
+  e.dataTransfer.setData('text/plain', String(i));  // Firefox 호환
+  var row = e.currentTarget.closest('.draft-section-row');
+  if(row) row.style.opacity = '0.4';
 };
 window.onDraftDragOver = function(e){
   e.preventDefault();
@@ -9669,11 +9687,12 @@ window.onDraftDrop = function(e, dropIdx){
   renderDraftSections();
 };
 window.onDraftDragEnd = function(e){
-  e.currentTarget.style.opacity = '';
   document.querySelectorAll('.draft-section-row').forEach(function(el){
+    el.style.opacity = '';
     el.style.background = 'var(--sur)';
     el.style.borderColor = 'var(--bd)';
   });
+  _draggedDraftIdx = null;
 };
 function addDraftSection(){if(!draftSections)draftSections=[];draftSections.push({id:'ds'+Date.now(),title:'새 섹션',content:''});renderDraftSections();sv();}
 function removeDraft(i){draftSections.splice(i,1);renderDraftSections();sv();}
@@ -10726,6 +10745,17 @@ function renderAdPlans(){
     <textarea onchange="adPlans[${pi}].script=this.value;sv()" style="width:100%;min-height:400px;padding:10px;border:1px solid var(--bd);border-radius:6px;font-family:var(--sa);font-size:13px;color:var(--tx);background:var(--bg);outline:none;resize:vertical;line-height:1.8">${plan.script||''}</textarea>
     <div style="margin-top:8px;background:#F0F6FF;border-radius:6px;padding:10px;font-size:11px;color:#1565C0;line-height:1.7">
      <strong>💡 작성 팁:</strong> 첫 3초 훅 → 문제 공감 → 해결책(제품) → 근거(성분/임상) → 사회적 증거 → CTA 순서로 작성
+    </div>
+    <!-- 📊 결과값 (실제 집행 후 반응) -->
+    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--bd)">
+     <label style="font-size:11px;color:#1565C0;font-weight:700;display:block;margin-bottom:6px">📊 결과값 (실제 집행 후 반응)</label>
+     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px">
+      <div class="fi"><label style="font-size:10px">👁 노출수 / 도달</label><input value="${plan.rReach||''}" placeholder="0" onchange="adPlans[${pi}].rReach=this.value;sv()" style="padding:5px 8px;border:1px solid #90CAF9;border-radius:5px;font-size:12px;background:#F5FAFF;color:var(--tx);outline:none"></div>
+      <div class="fi"><label style="font-size:10px">🖱 클릭 / CTR</label><input value="${plan.rClick||''}" placeholder="0" onchange="adPlans[${pi}].rClick=this.value;sv()" style="padding:5px 8px;border:1px solid #90CAF9;border-radius:5px;font-size:12px;background:#F5FAFF;color:var(--tx);outline:none"></div>
+      <div class="fi"><label style="font-size:10px">💰 광고비 소진</label><input value="${plan.rSpend||''}" placeholder="0" onchange="adPlans[${pi}].rSpend=this.value;sv()" style="padding:5px 8px;border:1px solid #90CAF9;border-radius:5px;font-size:12px;background:#F5FAFF;color:var(--tx);outline:none"></div>
+      <div class="fi"><label style="font-size:10px">🛒 전환 / ROAS</label><input value="${plan.rRoas||''}" placeholder="0" onchange="adPlans[${pi}].rRoas=this.value;sv()" style="padding:5px 8px;border:1px solid #90CAF9;border-radius:5px;font-size:12px;background:#F5FAFF;color:var(--tx);outline:none"></div>
+     </div>
+     <textarea placeholder="💬 반응 평가 — 어떤 훅/소재가 잘 먹혔는지, 다음 개선 방향" onchange="adPlans[${pi}].rMemo=this.value;sv()" style="width:100%;padding:8px;border:1px solid #90CAF9;border-radius:6px;font-family:var(--sa);font-size:12px;color:var(--tx);background:#F5FAFF;outline:none;resize:vertical;min-height:60px;line-height:1.6">${plan.rMemo||''}</textarea>
     </div>
    </div>
   </div>
@@ -11857,7 +11887,7 @@ function forceIsolationReset(){
               <strong>2.헌신/일관성:</strong> 페인포인트 공감 → 제품<br>
               <strong>3.사회적 증거:</strong> 실제 사용 후기, 임상<br>
               <strong>4.권위:</strong> 성분 특허, 피부과 추천<br>
-              <strong>5.호감:</strong> 브랜드 스토리, 황칠 헤리티지<br>
+              <strong>5.호감:</strong> 브랜드 스토리, 헤리티지/철학<br>
               <strong>6.희소성:</strong> 한정 수량/기간
             </div>
           </div>
@@ -11877,10 +11907,10 @@ function forceIsolationReset(){
           <div style="padding:10px 14px" id="detail-structure">
   
             <div style="display:flex;gap:8px;padding:8px 10px;border-radius:6px;border:.5px solid var(--bd);margin-bottom:6px;background:var(--sur)"><div style="font-size:11px;font-family:var(--mn);color:var(--hi);min-width:20px;padding-top:1px">01</div><div style="flex:1"><div style="font-size:12px;font-weight:500">후킹 섹션</div><div style="font-size:11px;color:var(--mu);margin-top:2px;line-height:1.5">기미가 보이기 시작한다면, 이미 늦었다. — 문제 직면 + 강렬한 비포애프터 이미지</div></div><div style="font-size:10px;color:var(--hi);background:var(--bg);padding:2px 7px;border-radius:20px;align-self:flex-start;white-space:nowrap">손실 회피 + 첫 인상</div></div>
-            <div style="display:flex;gap:8px;padding:8px 10px;border-radius:6px;border:.5px solid var(--bd);margin-bottom:6px;background:var(--sur)"><div style="font-size:11px;font-family:var(--mn);color:var(--hi);min-width:20px;padding-top:1px">02</div><div style="flex:1"><div style="font-size:12px;font-weight:500">브랜드 스토리</div><div style="font-size:11px;color:var(--mu);margin-top:2px;line-height:1.5">조선 왕실이 선택한 황칠나무 → 현대 피부 갑옷으로 — K-헤리티지 후킹</div></div><div style="font-size:10px;color:var(--hi);background:var(--bg);padding:2px 7px;border-radius:20px;align-self:flex-start;white-space:nowrap">호감 + 스토리텔링</div></div>
-            <div style="display:flex;gap:8px;padding:8px 10px;border-radius:6px;border:.5px solid var(--bd);margin-bottom:6px;background:var(--sur)"><div style="font-size:11px;font-family:var(--mn);color:var(--hi);min-width:20px;padding-top:1px">03</div><div style="flex:1"><div style="font-size:12px;font-weight:500">핵심 성분 3단계</div><div style="font-size:11px;color:var(--mu);margin-top:2px;line-height:1.5">트라베논(멜라닌 억제) + 황칠(항산화 방어) + 에어로젤 피막(성분 고정) = 기미 방어선 3겹</div></div><div style="font-size:10px;color:var(--hi);background:var(--bg);padding:2px 7px;border-radius:20px;align-self:flex-start;white-space:nowrap">권위 + 원리 이해</div></div>
+            <div style="display:flex;gap:8px;padding:8px 10px;border-radius:6px;border:.5px solid var(--bd);margin-bottom:6px;background:var(--sur)"><div style="font-size:11px;font-family:var(--mn);color:var(--hi);min-width:20px;padding-top:1px">02</div><div style="flex:1"><div style="font-size:12px;font-weight:500">브랜드 스토리</div><div style="font-size:11px;color:var(--mu);margin-top:2px;line-height:1.5">브랜드의 핵심 스토리를 한 줄로 — 원료 유래, 창업 계기, 차별화된 철학 등으로 후킹</div></div><div style="font-size:10px;color:var(--hi);background:var(--bg);padding:2px 7px;border-radius:20px;align-self:flex-start;white-space:nowrap">호감 + 스토리텔링</div></div>
+            <div style="display:flex;gap:8px;padding:8px 10px;border-radius:6px;border:.5px solid var(--bd);margin-bottom:6px;background:var(--sur)"><div style="font-size:11px;font-family:var(--mn);color:var(--hi);min-width:20px;padding-top:1px">03</div><div style="flex:1"><div style="font-size:12px;font-weight:500">핵심 성분 3단계</div><div style="font-size:11px;color:var(--mu);margin-top:2px;line-height:1.5">핵심 성분 A(작용) + 성분 B(작용) + 성분 C(작용) = 우리 제품만의 메커니즘</div></div><div style="font-size:10px;color:var(--hi);background:var(--bg);padding:2px 7px;border-radius:20px;align-self:flex-start;white-space:nowrap">권위 + 원리 이해</div></div>
             <div style="display:flex;gap:8px;padding:8px 10px;border-radius:6px;border:.5px solid var(--bd);margin-bottom:6px;background:var(--sur)"><div style="font-size:11px;font-family:var(--mn);color:var(--hi);min-width:20px;padding-top:1px">04</div><div style="flex:1"><div style="font-size:12px;font-weight:500">임상 결과</div><div style="font-size:11px;color:var(--mu);margin-top:2px;line-height:1.5">기미 개선 ~% (인체적용시험 완료) — 수치와 그래프로 시각화</div></div><div style="font-size:10px;color:var(--hi);background:var(--bg);padding:2px 7px;border-radius:20px;align-self:flex-start;white-space:nowrap">사회적 증거 + 권위</div></div>
-            <div style="display:flex;gap:8px;padding:8px 10px;border-radius:6px;border:.5px solid var(--bd);margin-bottom:6px;background:var(--sur)"><div style="font-size:11px;font-family:var(--mn);color:var(--hi);min-width:20px;padding-top:1px">05</div><div style="flex:1"><div style="font-size:12px;font-weight:500">제형 차별화</div><div style="font-size:11px;color:var(--mu);margin-top:2px;line-height:1.5">에어로젤 나노 피막 — 공기처럼 가볍지만 성분은 피부에 밀착 고정 — 비주얼 시연</div></div><div style="font-size:10px;color:var(--hi);background:var(--bg);padding:2px 7px;border-radius:20px;align-self:flex-start;white-space:nowrap">차별화 + 작동 원리</div></div>
+            <div style="display:flex;gap:8px;padding:8px 10px;border-radius:6px;border:.5px solid var(--bd);margin-bottom:6px;background:var(--sur)"><div style="font-size:11px;font-family:var(--mn);color:var(--hi);min-width:20px;padding-top:1px">05</div><div style="flex:1"><div style="font-size:12px;font-weight:500">제형 차별화</div><div style="font-size:11px;color:var(--mu);margin-top:2px;line-height:1.5">핵심 기술/제형의 차별점을 비주얼로 시연 — 사용감, 흡수력, 지속력 등</div></div><div style="font-size:10px;color:var(--hi);background:var(--bg);padding:2px 7px;border-radius:20px;align-self:flex-start;white-space:nowrap">차별화 + 작동 원리</div></div>
             <div style="display:flex;gap:8px;padding:8px 10px;border-radius:6px;border:.5px solid var(--bd);margin-bottom:6px;background:var(--sur)"><div style="font-size:11px;font-family:var(--mn);color:var(--hi);min-width:20px;padding-top:1px">06</div><div style="flex:1"><div style="font-size:12px;font-weight:500">실제 후기</div><div style="font-size:11px;color:var(--mu);margin-top:2px;line-height:1.5">실제 구매자 비포애프터 + 텍스트 리뷰 모음</div></div><div style="font-size:10px;color:var(--hi);background:var(--bg);padding:2px 7px;border-radius:20px;align-self:flex-start;white-space:nowrap">사회적 증거</div></div>
             <div style="display:flex;gap:8px;padding:8px 10px;border-radius:6px;border:.5px solid var(--bd);margin-bottom:6px;background:var(--sur)"><div style="font-size:11px;font-family:var(--mn);color:var(--hi);min-width:20px;padding-top:1px">07</div><div style="flex:1"><div style="font-size:12px;font-weight:500">FAQ</div><div style="font-size:11px;color:var(--mu);margin-top:2px;line-height:1.5">자주 묻는 질문 — 자극 없나요? 임신 중 사용? 다른 제품과 병행?</div></div><div style="font-size:10px;color:var(--hi);background:var(--bg);padding:2px 7px;border-radius:20px;align-self:flex-start;white-space:nowrap">불안 해소</div></div>
             <div style="display:flex;gap:8px;padding:8px 10px;border-radius:6px;border:.5px solid var(--bd);margin-bottom:6px;background:var(--sur)"><div style="font-size:11px;font-family:var(--mn);color:var(--hi);min-width:20px;padding-top:1px">08</div><div style="flex:1"><div style="font-size:12px;font-weight:500">구매 전환 CTA</div><div style="font-size:11px;color:var(--mu);margin-top:2px;line-height:1.5">오늘까지 특가 + 무료 배송 + 30일 환불 보장 — 긴박감 + 리스크 제거</div></div><div style="font-size:10px;color:var(--hi);background:var(--bg);padding:2px 7px;border-radius:20px;align-self:flex-start;white-space:nowrap">희소성 + 안심</div></div>
@@ -11974,6 +12004,7 @@ function forceIsolationReset(){
       <button class="stab active" id="t15-sub-meta-btn" onclick="showAdSubTab('meta')">📹 메타 광고</button>
       <button class="stab" id="t15-sub-power-btn" onclick="showAdSubTab('power')">📝 파워 컨텐츠</button>
       <button class="stab" id="t15-sub-display-btn" onclick="showAdSubTab('display')">🖼 디스플레이 배너</button>
+      <button class="stab" id="t15-sub-message-btn" onclick="showAdSubTab('message')">💬 메시지 반응</button>
     </div>
   </div>
   
@@ -12019,6 +12050,20 @@ function forceIsolationReset(){
     <div style="padding:0 18px 18px">
       <div id="display-banner-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-bottom:8px;border-bottom:1px solid var(--bd)"></div>
       <div id="display-banner-list" style="display:flex;flex-direction:column;gap:12px;margin-top:12px"></div>
+    </div>
+  </div>
+  
+  <!-- 서브탭 4: 💬 메시지 반응 -->
+  <div id="t15-sub-message" style="display:none">
+    <div class="hbar">
+      <div>
+        <div style="font-size:12px;font-weight:500">💬 주요 메시지 반응 기록</div>
+        <div style="font-size:10.5px;color:var(--mu);margin-top:2px">어떤 메시지를 주요 포인트로 썼고 반응이 어땠는지 일자별로 기록</div>
+      </div>
+      <button class="btn btn-grn-bos" onclick="addAdMessage_BOS()">＋ 메시지 기록 추가</button>
+    </div>
+    <div style="padding:0 18px 18px">
+      <div id="ad-message-list" style="margin-top:12px"></div>
     </div>
   </div>
 </div>
@@ -12217,7 +12262,7 @@ function forceIsolationReset(){
           <div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <label style="font-size:11px;font-weight:600;color:#2E7D32">🎯 우리 설명</label>
-              <input id="writeup-ours-title" placeholder="우리 제목 (예: 배릭스 트라베란 크림)" style="flex:1;margin-left:8px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:var(--bg);color:var(--tx);outline:none" oninput="saveWriteup()">
+              <input id="writeup-ours-title" placeholder="우리 제목 (예: 우리 브랜드 제품명)" style="flex:1;margin-left:8px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:var(--bg);color:var(--tx);outline:none" oninput="saveWriteup()">
             </div>
             <textarea id="writeup-ours" rows="20" style="width:100%;padding:10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;font-family:var(--sa);line-height:1.7;background:#E8F5E940;color:var(--tx);outline:none;resize:vertical;min-height:400px" placeholder="레퍼런스 구조에 맞춰 우리 브랜드 설명글을 작성/붙여넣으세요" oninput="saveWriteup()"></textarea>
           </div>
@@ -12268,9 +12313,16 @@ function forceIsolationReset(){
   <div class="card" style="padding:20px;margin-bottom:14px">
     <div class="cal-items-section-bos">
       <div class="cal-items-header-bos">
-        <span style="font-size:13px;font-weight:700;color:var(--tx)">📌 추적 항목 (시작 주차별 색상 표기)</span>
-        <button class="btn btn-grn-bos" onclick="addCalendarItem_BOS()">＋ 항목 추가</button>
+        <span style="font-size:13px;font-weight:700;color:var(--tx)">📌 추적 항목</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:inline-flex;border:1px solid var(--bd);border-radius:6px;overflow:hidden">
+            <button id="cal-view-plan-btn" onclick="setCalItemView_BOS('plan')" style="padding:5px 11px;font-size:11px;border:none;cursor:pointer;background:#1A6B4A;color:#fff;font-weight:600">📋 예상·목표</button>
+            <button id="cal-view-actual-btn" onclick="setCalItemView_BOS('actual')" style="padding:5px 11px;font-size:11px;border:none;cursor:pointer;background:#fff;color:var(--tx);font-weight:500">✅ 실제 완료</button>
+          </div>
+          <button class="btn btn-grn-bos" onclick="addCalendarItem_BOS()">＋ 항목 추가</button>
+        </div>
       </div>
+      <div id="cal-actual-summary-bos" style="display:none"></div>
       
       <!-- 정렬 + 카테고리 필터 -->
       <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 12px;background:#FAFAF8;border:1px solid var(--bd);border-radius:8px;margin-bottom:12px">
@@ -12320,7 +12372,7 @@ function forceIsolationReset(){
       
       <!-- 테이블 -->
       <div style="overflow-x:auto;border:1px solid var(--bd);border-radius:8px">
-        <table id="sample-table-bos" style="width:100%;border-collapse:collapse;font-size:12px;min-width:1380px">
+        <table id="sample-table-bos" style="width:100%;border-collapse:collapse;font-size:12px;min-width:1480px">
           <thead style="background:#FAFAF8;border-bottom:2px solid var(--bd)">
             <tr>
               <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:130px">업체명</th>
@@ -12332,12 +12384,13 @@ function forceIsolationReset(){
               <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">실제 도착일</th>
               <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:100px">실제소요</th>
               <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:54px" title="문안검수 · CT Test · 양산 일정">공정</th>
+              <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;width:90px" title="업체 선정 평가 (담당자 응대·요청 반영·제작 속도)">📋 평가</th>
               <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px">메모</th>
               <th style="padding:9px 8px;width:36px"></th>
             </tr>
           </thead>
           <tbody id="sample-tbody-bos">
-            <tr><td colspan="11" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">샘플 의뢰 내역이 없습니다. <b>＋ 샘플 의뢰 추가</b> 를 눌러 시작하세요.</td></tr>
+            <tr><td colspan="12" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">샘플 의뢰 내역이 없습니다. <b>＋ 샘플 의뢰 추가</b> 를 눌러 시작하세요.</td></tr>
           </tbody>
         </table>
       </div>
@@ -12356,7 +12409,9 @@ function forceIsolationReset(){
             <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#27AE60;vertical-align:middle"></span> 실제 도착</span>
             <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7A4AA8;vertical-align:middle"></span> 문안검수</span>
             <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#C0392B;vertical-align:middle"></span> CT Test</span>
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#16A085;vertical-align:middle"></span> 부자재·양산</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#0097A7;vertical-align:middle"></span> 임상시험</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8D6E63;vertical-align:middle"></span> 부자재 입고</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#16A085;vertical-align:middle"></span> 양산 완료</span>
           </div>
         </div>
         <div id="sample-minical-bos"></div>
@@ -12377,7 +12432,7 @@ function forceIsolationReset(){
       
       <!-- 카테고리 필터 -->
       <div style="display:flex;gap:6px;flex-wrap:wrap;padding:10px 12px;background:#FAFAF8;border:1px solid var(--bd);border-radius:8px;margin-bottom:14px;align-items:center">
-        <span style="font-size:11px;color:var(--mu);font-weight:600">📂 카테고리</span>
+        <span style="font-size:11px;color:var(--mu);font-weight:600">📂 분류</span>
         <div id="outsource-cat-filter-bos" style="display:flex;gap:5px;flex-wrap:wrap"></div>
       </div>
       
@@ -12550,13 +12605,10 @@ function forceIsolationReset(){
       <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">🖼 스크린샷 (선택, 클립보드 붙여넣기 또는 파일 선택)</label>
       <div id="info-paste-area" tabindex="0" style="border:2px dashed var(--bd);border-radius:8px;padding:14px;text-align:center;background:#fafaf8;cursor:pointer;transition:.15s;outline:none" 
            onclick="document.getElementById('info-file-input').click()">
-        <div id="info-paste-hint" style="font-size:11px;color:var(--mu)">📋 여기 클릭 후 Ctrl+V 또는 파일 선택<br>이미지 파일 (PNG, JPG)</div>
-        <input type="file" id="info-file-input" accept="image/*" style="display:none" onchange="handleInfoFileSelect(event)">
+        <div id="info-paste-hint" style="font-size:11px;color:var(--mu)">📋 여기 클릭 후 Ctrl+V 또는 파일 선택 (여러 장 가능)<br>이미지는 자동으로 용량 축소되어 저장됩니다</div>
+        <input type="file" id="info-file-input" accept="image/*" multiple style="display:none" onchange="handleInfoFileSelect(event)">
       </div>
-      <div id="info-image-preview" style="margin-top:8px;display:none">
-        <img id="info-image-thumb" style="max-width:100%;max-height:200px;border-radius:6px;border:1px solid var(--bd)">
-        <button onclick="removeInfoImage()" style="margin-top:6px;padding:4px 10px;background:#C0392B;color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer">🗑 이미지 제거</button>
-      </div>
+      <div id="info-image-preview" style="margin-top:8px;display:none"><!-- JS가 여러 이미지 그리드 렌더 --></div>
       <input type="hidden" id="info-item-image">
     </div>
     
@@ -12599,18 +12651,7 @@ function forceIsolationReset(){
       <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">📂 카테고리</label>
       <select id="bos-cal-item-category" onchange="onCalCategoryChange_BOS(this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit;background:#fff">
         <option value="">— 카테고리 선택 —</option>
-        <option value="기획">🎯 기획</option>
-        <option value="샘플의뢰">🧪 샘플의뢰</option>
-        <option value="사양픽스">📋 사양픽스</option>
-        <option value="생산">🏭 생산</option>
-        <option value="패키지 디자인">📦 패키지 디자인</option>
-        <option value="상세페이지 디자인">🎨 상세페이지 디자인</option>
-        <option value="광고 영상 제작">🎬 광고 영상 제작</option>
-        <option value="웹사이트 세팅">💻 웹사이트 세팅</option>
-        <option value="런칭">🚀 런칭</option>
-        <option value="협찬 마케팅">🤝 협찬 마케팅</option>
-        <option value="공동 구매">🛒 공동 구매</option>
-        <option value="기타">📌 기타</option>
+        <!-- CAL_CATEGORIES_BOS 기반 동적 생성 (fillCalCategoryOptions_BOS) -->
       </select>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
@@ -12857,6 +12898,47 @@ function forceIsolationReset(){
     wrap.innerHTML = html;
   }
   
+  var _calItemView_BOS = 'plan';  // 'plan'(예상·목표) | 'actual'(실제 완료)
+  
+  window.setCalItemView_BOS = function(view){
+    _calItemView_BOS = view;
+    var planBtn = document.getElementById('cal-view-plan-btn');
+    var actBtn = document.getElementById('cal-view-actual-btn');
+    if(planBtn && actBtn){
+      var on = '#1A6B4A', onTxt = '#fff', off = '#fff', offTxt = 'var(--tx)';
+      planBtn.style.background = view==='plan'?on:off;
+      planBtn.style.color = view==='plan'?onTxt:offTxt;
+      planBtn.style.fontWeight = view==='plan'?'600':'500';
+      actBtn.style.background = view==='actual'?on:off;
+      actBtn.style.color = view==='actual'?onTxt:offTxt;
+      actBtn.style.fontWeight = view==='actual'?'600':'500';
+    }
+    renderCalendarItems_BOS();
+  };
+  
+  // 실제 완료 요약 (완료/미완료, 평균 지연)
+  function renderCalActualSummary_BOS(allItems){
+    var box = document.getElementById('cal-actual-summary-bos');
+    if(!box) return;
+    if(_calItemView_BOS !== 'actual'){ box.style.display = 'none'; return; }
+    var real = allItems.filter(function(i){ return !i._isDeadline; });
+    var total = real.length;
+    var done = real.filter(function(i){ return !!i.actualDate; }).length;
+    var diffs = real.filter(function(i){ return i.actualDate && i.endDate; }).map(function(i){
+      return Math.round((new Date(i.actualDate+'T00:00:00') - new Date(i.endDate+'T00:00:00'))/86400000);
+    });
+    var onTime = diffs.filter(function(d){ return d<=0; }).length;
+    var late = diffs.filter(function(d){ return d>0; }).length;
+    var avgDelay = diffs.length ? Math.round(diffs.reduce(function(a,b){return a+b;},0)/diffs.length) : 0;
+    box.style.display = '';
+    box.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:12px">'
+      + '<div style="background:#EAF3EE;border:1px solid #B8DCC8;border-radius:7px;padding:8px;text-align:center"><div style="font-size:9px;color:#1A6B4A">완료</div><div style="font-size:15px;font-weight:700;color:#1A6B4A">' + done + ' / ' + total + '</div></div>'
+      + '<div style="background:#E3F2FD;border:1px solid #90CAF9;border-radius:7px;padding:8px;text-align:center"><div style="font-size:9px;color:#1565C0">예정대로/빠름</div><div style="font-size:15px;font-weight:700;color:#1565C0">' + onTime + '건</div></div>'
+      + '<div style="background:#FFEBEE;border:1px solid #EF9A9A;border-radius:7px;padding:8px;text-align:center"><div style="font-size:9px;color:#C0392B">지연</div><div style="font-size:15px;font-weight:700;color:#C0392B">' + late + '건</div></div>'
+      + '<div style="background:#F7F5F0;border:1px solid var(--bd);border-radius:7px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--mu)">평균 차이</div><div style="font-size:15px;font-weight:700;color:' + (avgDelay>0?'#C0392B':'#1A6B4A') + '">' + (avgDelay>0?'+':'') + avgDelay + '일</div></div>'
+      + '</div>';
+  }
+  
   function renderCalendarItems_BOS(){
     var container = document.getElementById('bos-cal-items-list');
     if(!container) return;
@@ -12920,6 +13002,20 @@ function forceIsolationReset(){
       return 0;
     });
     
+    // 실제 완료 요약 (actual 뷰)
+    renderCalActualSummary_BOS(items);
+    
+    // 실제 완료 뷰: 미완료를 위로(처리 필요), 완료는 아래로
+    if(_calItemView_BOS === 'actual'){
+      items.sort(function(a, b){
+        var ad = a.actualDate ? 1 : 0, bd = b.actualDate ? 1 : 0;
+        if(ad !== bd) return ad - bd;  // 미완료(0) 먼저
+        var sa = a.endDate || a.startDate || '';
+        var sb = b.endDate || b.startDate || '';
+        return sa < sb ? -1 : (sa > sb ? 1 : 0);
+      });
+    }
+    
     container.innerHTML = items.map(function(item){
       var today = new Date(); today.setHours(0,0,0,0);
       var start = new Date(item.startDate + 'T00:00:00');
@@ -12970,10 +13066,45 @@ function forceIsolationReset(){
             + ' ' + weekText
           + '</div>'
           + (item.note ? '<div class="cal-item-note-bos">' + escapeHtml_BOS(item.note) + '</div>' : '')
+          + buildActualRow_BOS(item)
         + '</div>'
         + '</div>';
     }).join('');
   }
+  
+  // ━━ ✅ 실제 완료 행 (예상 vs 실제 차이) ━━
+  function buildActualRow_BOS(item){
+    if(item._isDeadline) return '';  // 데드라인 항목은 읽기 전용
+    var hasActual = !!item.actualDate;
+    // 예상·목표 뷰: 실제 완료가 있으면 간략 표시, 없으면 숨김. 실제 완료 뷰: 항상 입력 가능
+    if(_calItemView_BOS !== 'actual' && !hasActual) return '';
+    var diffHtml = '';
+    if(hasActual && item.endDate){
+      var exp = new Date(item.endDate + 'T00:00:00');
+      var act = new Date(item.actualDate + 'T00:00:00');
+      if(!isNaN(exp.getTime()) && !isNaN(act.getTime())){
+        var diff = Math.round((act - exp) / 86400000);
+        if(diff === 0) diffHtml = '<span style="color:#1A6B4A;font-weight:600">🎯 예정대로</span>';
+        else if(diff > 0) diffHtml = '<span style="color:#C0392B;font-weight:600">⏰ ' + diff + '일 늦음</span>';
+        else diffHtml = '<span style="color:#1565C0;font-weight:600">⚡ ' + Math.abs(diff) + '일 빠름</span>';
+      }
+    }
+    return '<div onclick="event.stopPropagation()" style="margin-top:7px;padding-top:7px;border-top:1px dashed var(--bd);display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+      + '<span style="font-size:10px;color:var(--mu);font-weight:600;flex-shrink:0">✅ 실제 완료</span>'
+      + '<input type="date" value="' + (item.actualDate || '') + '" onchange="updateCalActual_BOS(\'' + item.id + '\',\'actualDate\',this.value)" style="padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-size:10.5px;background:#fff">'
+      + (diffHtml ? '<span style="font-size:10.5px">' + diffHtml + '</span>' : '')
+      + '<input value="' + (item.actualNote || '').replace(/"/g,'&quot;') + '" placeholder="완료 방법·비고" onchange="updateCalActual_BOS(\'' + item.id + '\',\'actualNote\',this.value)" style="flex:1;min-width:100px;padding:3px 7px;border:1px solid transparent;border-radius:4px;font-size:10.5px;color:var(--mu);background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">'
+      + '</div>';
+  }
+  
+  window.updateCalActual_BOS = function(id, key, val){
+    var item = (calData_BOS.items||[]).find(function(i){ return i.id === id; });
+    if(!item) return;
+    item[key] = val;
+    if(typeof saveCalData_BOS === 'function') saveCalData_BOS();
+    else { try { localStorage.setItem(STORAGE_KEY_BOS, JSON.stringify(calData_BOS)); } catch(e){} }
+    renderCalendarItems_BOS();
+  };
   
   function renderCalendarGrid_BOS(){
     var container = document.getElementById('bos-cal-grid');
@@ -13026,7 +13157,15 @@ function forceIsolationReset(){
       var isToday = date.getTime() === today.getTime();
       var dayOfWeek = date.getDay();
       
-      var activeItems = (calData_BOS.items||[]).filter(function(item){
+      var allCalItems = (calData_BOS.items||[]).slice();
+      // ★ 데드라인(⑨) 항목도 타임라인에 표시 (읽기 전용)
+      try {
+        if(typeof getDeadlineCalItems_BOS === 'function'){
+          allCalItems = allCalItems.concat(getDeadlineCalItems_BOS());
+        }
+      } catch(e){}
+      var activeItems = allCalItems.filter(function(item){
+        if(!item.startDate) return false;
         var s = new Date(item.startDate + 'T00:00:00');
         var e = item.endDate ? new Date(item.endDate + 'T00:00:00') : null;
         return date >= s && (!e || date <= e);
@@ -13073,6 +13212,8 @@ function forceIsolationReset(){
         ? '<div class="cal-cell-badges-bos">' + visibleBadges.map(function(b){
             return '<span class="cal-cell-week-bos" style="background:' + b.color + ';cursor:pointer" '
               + 'data-cal-badge-id="' + b.id + '" '
+              + 'onmouseenter="highlightCalCard_BOS(\'' + b.id + '\')" '
+              + 'onmouseleave="clearCalCardHighlight_BOS()" '
               + 'onclick="event.stopPropagation();editCalendarItem_BOS(\'' + b.id + '\')" '
               + 'title="' + escapeAttr_BOS(b.title) + ' - ' + b.weekNum + '주차 (클릭하여 편집)">' + b.weekNum + '</span>';
           }).join('') 
@@ -13121,6 +13262,7 @@ function forceIsolationReset(){
     document.getElementById('bos-cal-modal-title').textContent = '📌 항목 추가';
     document.getElementById('bos-cal-item-id').value = '';
     document.getElementById('bos-cal-item-title').value = '';
+    if(typeof fillCalCategoryOptions_BOS==='function') fillCalCategoryOptions_BOS('');
     var _catEl = document.getElementById('bos-cal-item-category');
     if(_catEl) _catEl.value = '';
     var todayStr = new Date().toISOString().slice(0,10);
@@ -13139,12 +13281,17 @@ function forceIsolationReset(){
   };
   
   window.editCalendarItem_BOS = function(itemId){
+    if(itemId && String(itemId).indexOf('dl_') === 0){
+      if(typeof showToast === 'function') showToast('⑨ 데드라인 항목입니다 — 데드라인 탭에서 수정하세요');
+      return;
+    }
     var item = (calData_BOS.items||[]).find(function(i){ return i.id === itemId; });
     if(!item) return;
     calEditingItemId_BOS = itemId;
     document.getElementById('bos-cal-modal-title').textContent = '📌 항목 편집';
     document.getElementById('bos-cal-item-id').value = itemId;
     document.getElementById('bos-cal-item-title').value = item.title || '';
+    if(typeof fillCalCategoryOptions_BOS==='function') fillCalCategoryOptions_BOS(item.category || '');
     var _catEl2 = document.getElementById('bos-cal-item-category');
     if(_catEl2) _catEl2.value = item.category || '';
     document.getElementById('bos-cal-item-start').value = item.startDate || '';
@@ -13459,8 +13606,12 @@ function forceIsolationReset(){
       
       // 스크린샷
       var imgHtml = '';
-      if(it.image){
-        imgHtml = '<img src="' + escapeAttrInfo(it.image) + '" style="max-width:90px;max-height:60px;border-radius:4px;border:1px solid var(--bd);cursor:zoom-in" onclick="event.stopPropagation();zoomInfoImage(\'' + it.id + '\')">';
+      var itImgs = (it.images && it.images.length) ? it.images : (it.image ? [it.image] : []);
+      if(itImgs.length){
+        imgHtml = '<div style="position:relative;display:inline-block">'
+          + '<img src="' + escapeAttrInfo(itImgs[0]) + '" style="max-width:90px;max-height:60px;border-radius:4px;border:1px solid var(--bd);cursor:zoom-in" onclick="event.stopPropagation();zoomInfoImage(\'' + it.id + '\')">'
+          + (itImgs.length > 1 ? '<span style="position:absolute;top:-6px;right:-6px;background:#1A6B4A;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px;border:1.5px solid #fff">+' + (itImgs.length-1) + '</span>' : '')
+          + '</div>';
       } else {
         imgHtml = '<span style="font-size:10px;color:var(--mu);font-style:italic">-</span>';
       }
@@ -13492,6 +13643,8 @@ function forceIsolationReset(){
     document.getElementById('info-item-link').value = '';
     document.getElementById('info-item-memo').value = '';
     document.getElementById('info-item-image').value = '';
+    window._infoImages = [];  // ★ 이미지 배열 초기화
+    if(typeof renderInfoImagePreviews==='function') renderInfoImagePreviews();
     document.getElementById('info-image-preview').style.display = 'none';
     document.getElementById('info-delete-btn').style.display = 'none';
     // 분류: 현재 필터 선택값으로 기본 세팅 (있으면)
@@ -13523,6 +13676,9 @@ function forceIsolationReset(){
     document.getElementById('info-item-link').value = item.link || '';
     document.getElementById('info-item-memo').value = item.memo || '';
     document.getElementById('info-item-image').value = item.image || '';
+    // ★ 기존 이미지 → 배열로 로드 (images 우선, 없으면 image 단일)
+    window._infoImages = (item.images && item.images.length) ? item.images.slice() : (item.image ? [item.image] : []);
+    if(typeof renderInfoImagePreviews==='function') renderInfoImagePreviews();
     
     // 분류 채우기
     var catSel = document.getElementById('info-item-category');
@@ -13539,12 +13695,7 @@ function forceIsolationReset(){
       }
     }
     
-    if(item.image){
-      document.getElementById('info-image-thumb').src = item.image;
-      document.getElementById('info-image-preview').style.display = '';
-    } else {
-      document.getElementById('info-image-preview').style.display = 'none';
-    }
+    // (구버전 단일 미리보기 → renderInfoImagePreviews로 대체됨)
     
     document.getElementById('info-delete-btn').style.display = '';
     document.getElementById('info-storage-modal').style.display = 'flex';
@@ -13580,7 +13731,8 @@ function forceIsolationReset(){
       title: title,
       reason: document.getElementById('info-item-reason').value.trim(),
       link: document.getElementById('info-item-link').value.trim(),
-      image: document.getElementById('info-item-image').value || '',
+      images: (window._infoImages || []).slice(),  // ★ 여러 장
+      image: (window._infoImages && window._infoImages[0]) || '',  // 호환용 (첫 장)
       memo: document.getElementById('info-item-memo').value.trim()
     };
     
@@ -13616,39 +13768,91 @@ function forceIsolationReset(){
   
   window.zoomInfoImage = function(id){
     var item = infoData.find(function(it){ return it.id === id; });
-    if(!item || !item.image) return;
-    document.getElementById('info-image-zoom-img').src = item.image;
+    if(!item) return;
+    var zsrc = (item.images && item.images.length) ? item.images[0] : item.image;
+    if(!zsrc) return;
+    document.getElementById('info-image-zoom-img').src = zsrc;
     document.getElementById('info-image-zoom').style.display = 'flex';
   };
   
   window.removeInfoImage = function(){
+    window._infoImages = [];
     document.getElementById('info-item-image').value = '';
-    document.getElementById('info-image-preview').style.display = 'none';
+    if(typeof renderInfoImagePreviews==='function') renderInfoImagePreviews();
   };
   
   window.handleInfoFileSelect = function(e){
-    var file = e.target.files[0];
-    if(!file) return;
-    processInfoImage(file);
+    var files = Array.prototype.slice.call(e.target.files || []);
+    files.forEach(function(f){ processInfoImage(f); });
+    e.target.value = '';  // 같은 파일 재선택 가능
   };
+  
+  // 현재 편집 중인 이미지 배열 (여러 장)
+  window._infoImages = window._infoImages || [];
   
   function processInfoImage(file){
     if(!file.type.startsWith('image/')){
       alert('이미지 파일만 지원합니다');
       return;
     }
-    if(file.size > 3 * 1024 * 1024){
-      if(!confirm('이미지가 3MB를 초과합니다 (' + (file.size/1024/1024).toFixed(1) + 'MB). 계속하시겠습니까?\n\n* localStorage 용량 초과 가능성 있음.')) return;
-    }
     var reader = new FileReader();
     reader.onload = function(ev){
-      var dataUrl = ev.target.result;
-      document.getElementById('info-item-image').value = dataUrl;
-      document.getElementById('info-image-thumb').src = dataUrl;
-      document.getElementById('info-image-preview').style.display = '';
+      var img = new Image();
+      img.onload = function(){
+        // ★ 자동 리사이즈 (긴 변 900px) + JPEG 0.72 → localStorage 용량 문제 해결
+        var MAX = 900;
+        var w = img.width, h = img.height;
+        if(w > MAX || h > MAX){
+          if(w >= h){ h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+        window._infoImages.push(dataUrl);  // ★ 배열에 추가 (여러 장)
+        renderInfoImagePreviews();
+      };
+      img.onerror = function(){ alert('이미지를 읽을 수 없습니다'); };
+      img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
   }
+  
+  // 미리보기 그리드 렌더 (여러 장)
+  function renderInfoImagePreviews(){
+    var prev = document.getElementById('info-image-preview');
+    if(!prev) return;
+    var imgs = window._infoImages || [];
+    if(imgs.length === 0){
+      prev.style.display = 'none';
+      prev.innerHTML = '';
+      return;
+    }
+    prev.style.display = '';
+    prev.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px">'
+      + imgs.map(function(src, i){
+        return '<div style="position:relative;border:1px solid var(--bd);border-radius:6px;overflow:hidden;aspect-ratio:1.4;background:#fafaf8">'
+          + '<img src="' + src + '" onclick="zoomInfoImageSrc(' + i + ')" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in" title="클릭하여 크게 보기">'
+          + '<button onclick="removeInfoImageAt(' + i + ')" title="이 이미지 삭제" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:4px;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1">✕</button>'
+          + '</div>';
+      }).join('')
+      + '</div>';
+  }
+  
+  window.removeInfoImageAt = function(i){
+    if(!window._infoImages) return;
+    window._infoImages.splice(i, 1);
+    renderInfoImagePreviews();
+  };
+  
+  window.zoomInfoImageSrc = function(i){
+    var src = (window._infoImages || [])[i];
+    if(!src) return;
+    var zoomImg = document.getElementById('info-image-zoom-img');
+    var zoom = document.getElementById('info-image-zoom');
+    if(zoomImg && zoom){ zoomImg.src = src; zoom.style.display = 'flex'; }
+  };
   
   function setupPasteHandler(){
     var modal = document.getElementById('info-storage-modal');
@@ -14040,7 +14244,8 @@ function forceIsolationReset(){
     'bos_cal_max_year',        // 📅 캘린더 최대 연도 (확장 상태)
     'bos_cal_min_year',        // 📅 캘린더 최소 연도
     'bos_cal_range_v1',        // 📅 직접 선택한 기간
-    'bos_contacts_v1'          // 📇 거래처 연락처 카드 (명함 이미지 포함)
+    'bos_contacts_v1',         // 📇 거래처 연락처 카드 (명함 이미지 포함)
+    'bos_ad_messages_v1'       // 💬 광고 메시지 반응 기록
   ];
   
   // ━━ 동적 키 prefix (제품별 데이터: epitect-v7__제품ID) ━━
@@ -16806,6 +17011,17 @@ window.addEventListener('resize', function(){
   var _userChangedColor = false;  // 사용자가 색을 수동 변경했는지 추적
   
   // ━━ 카테고리 변경 → 기본 색 자동 설정 (사용자 변경 플래그 무시 - 항상 적용) ━━
+  window.fillCalCategoryOptions_BOS = function(selectedKey){
+    var sel = document.getElementById('bos-cal-item-category');
+    if(!sel) return;
+    var cats = (typeof CAL_CATEGORIES_BOS !== 'undefined' && CAL_CATEGORIES_BOS) || [];
+    var h = '<option value="">— 카테고리 선택 —</option>';
+    cats.forEach(function(c){
+      h += '<option value="' + c.key + '"' + (c.key === selectedKey ? ' selected' : '') + '>' + (c.emoji||'') + ' ' + c.key + '</option>';
+    });
+    sel.innerHTML = h;
+  };
+  
   window.onCalCategoryChange_BOS = function(catKey){
     var badge = document.getElementById('bos-cal-color-from-cat');
     if(!catKey){
@@ -17520,14 +17736,16 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
   
   // ━━ 아웃소싱 카테고리 (사용자 요청) ━━
   var OUTSOURCE_CATS = [
-    {key:'전체',   emoji:'📋', color:'#7F8C8D'},
-    {key:'부자재', emoji:'📦', color:'#9ACD32'},
-    {key:'생산',   emoji:'🏭', color:'#F1C40F'},
-    {key:'발주',   emoji:'📝', color:'#E67E22'},
-    {key:'디자인', emoji:'🎨', color:'#27AE60'},
-    {key:'영상',   emoji:'🎬', color:'#16A085'},
-    {key:'마케팅', emoji:'📈', color:'#7A4AA8'},
-    {key:'기타',   emoji:'📌', color:'#95A5A6'}
+    {key:'전체',       emoji:'📋', color:'#7F8C8D'},
+    {key:'제품생산',    emoji:'🏭', color:'#F1C40F'},
+    {key:'임상시험',    emoji:'🔬', color:'#0097A7'},
+    {key:'1차용기',     emoji:'🧴', color:'#E67E22'},
+    {key:'2차상자',     emoji:'📦', color:'#9ACD32'},
+    {key:'패키지디자인', emoji:'🎁', color:'#27AE60'},
+    {key:'상세디자인',   emoji:'🎨', color:'#16A085'},
+    {key:'영상제작',    emoji:'🎬', color:'#2980B9'},
+    {key:'바이럴',      emoji:'🌐', color:'#7A4AA8'},
+    {key:'기타',       emoji:'📌', color:'#95A5A6'}
   ];
   window.OUTSOURCE_CATS = OUTSOURCE_CATS;
   
@@ -17659,6 +17877,8 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
           + '<button onclick="toggleSamplePhases_BOS(\'' + s.id + '\')" title="공정 일정 펼치기 (문안검수 · CT Test · 양산)" '
           + 'style="background:' + ((s.reviewStart || s.ctStart || s.materialDate) ? '#EAF3EE' : 'none') + ';border:1px solid var(--bd);border-radius:4px;padding:3px 7px;font-size:12px;cursor:pointer;line-height:1">⚙</button>'
         + '</td>'
+        // 8.7) 📋 평가 (업체 선정 점수 + 최종 선정)
+        + '<td style="padding:5px 4px;text-align:center">' + buildSampleEvalCell_BOS(s) + '</td>'
         // 9) 메모
         + '<td style="padding:5px 6px"><input value="' + escAttr(s.memo) + '" placeholder="메모" oninput="updateSampleField_BOS(\'' + s.id + '\',\'memo\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11px;color:var(--mu);background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\';this.style.color=\'var(--tx)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\';this.style.color=\'var(--mu)\'"></td>'
         // 10) 삭제
@@ -17863,9 +18083,12 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
   
   window.addOutsourceEntry_BOS = function(){
     var data = loadOutsource();
+    // 현재 선택된 탭(필터)이 '전체'/'기타'가 아니면 그 카테고리로 자동 설정
+    var curFilter = (typeof loadOutsourceFilter === 'function') ? loadOutsourceFilter() : '전체';
+    var defCat = (curFilter !== '전체' && curFilter !== '기타') ? curFilter : '제품생산';
     data.unshift({
       id: 'out_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
-      category: '부자재',
+      category: defCat,
       vendor: '',
       contact: '',
       requestDate: new Date().toISOString().slice(0,10),
@@ -18170,6 +18393,17 @@ body.cal-highlighting .cal-cell-week-bos.cal-item-highlight{
   position:relative;
   animation:cal-pulse-bos 1.2s ease-in-out infinite;
 }
+/* ━━ 캘린더 배지 호버 → 위 카드 역강조 ━━ */
+body.cal-card-highlighting .cal-item-card-bos{
+  opacity:0.4;
+}
+.cal-item-card-bos.cal-card-highlighted{
+  opacity:1 !important;
+  transform:translateY(-2px) scale(1.02);
+  box-shadow:0 4px 16px rgba(255,167,38,.4);
+  border-color:#FFB300;
+  z-index:5;
+}
 @keyframes cal-pulse-bos{
   0%, 100% { box-shadow: 0 0 10px rgba(255,167,38,.7), 0 0 0 1px #FF8F00 inset; }
   50% { box-shadow: 0 0 18px rgba(255,167,38,1), 0 0 0 1px #FF6F00 inset; }
@@ -18216,6 +18450,29 @@ body.cal-highlighting .cal-item-card-bos:hover{
         var cell = b.closest('.cal-cell-bos');
         if(cell) cell.classList.add('cal-cell-has-highlighted');
       }
+    });
+  };
+  
+  window.highlightCalCard_BOS = function(itemId){
+    if(!itemId) return;
+    document.body.classList.add('cal-card-highlighting');
+    document.querySelectorAll('.cal-item-card-bos').forEach(function(c){
+      var match = c.getAttribute('data-item-id') === itemId;
+      c.classList.toggle('cal-card-highlighted', match);
+      // 강조된 카드로 스크롤(보이지 않을 때만)
+      if(match){
+        var rect = c.getBoundingClientRect();
+        if(rect.top < 0 || rect.bottom > window.innerHeight){
+          c.scrollIntoView({behavior:'smooth', block:'nearest'});
+        }
+      }
+    });
+  };
+  
+  window.clearCalCardHighlight_BOS = function(){
+    document.body.classList.remove('cal-card-highlighting');
+    document.querySelectorAll('.cal-card-highlighted').forEach(function(c){
+      c.classList.remove('cal-card-highlighted');
     });
   };
   
@@ -18386,7 +18643,7 @@ body.cal-highlighting .cal-item-card-bos:hover{
   };
   
   window.showAdSubTab = function(name){
-    var subs = ['meta', 'power', 'display'];
+    var subs = ['meta', 'power', 'display', 'message'];
     subs.forEach(function(s){
       var btn = document.getElementById('t15-sub-' + s + '-btn');
       var pane = document.getElementById('t15-sub-' + s);
@@ -18395,6 +18652,7 @@ body.cal-highlighting .cal-item-card-bos:hover{
     });
     if(name === 'power') renderPowerContents_BOS();
     if(name === 'display') renderDisplayBanners_BOS();
+    if(name === 'message') renderAdMessages_BOS();
   };
   
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -18496,6 +18754,19 @@ body.cal-highlighting .cal-item-card-bos:hover{
           + '<div><label style="font-size:10px;color:var(--mu);font-weight:600;display:block;margin-bottom:3px">📝 메모</label>'
             + '<input value="' + escAttr(p.memo) + '" placeholder="참고사항" oninput="updatePowerField_BOS(\'' + p.id + '\',\'memo\',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11px"></div>'
         + '</div>'
+        // ━━ 📊 결과값 (실제 돌렸을 때 반응) ━━
+        + '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--bd)">'
+          + '<label style="font-size:11px;color:#1565C0;font-weight:700;display:block;margin-bottom:6px">📊 결과값 (실제 발행 후 반응)</label>'
+          + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:8px">'
+            + '<div><label style="font-size:9px;color:var(--mu);display:block;margin-bottom:2px">👁 조회수</label>'
+              + '<input value="' + escAttr(p.rView) + '" placeholder="0" oninput="updatePowerField_BOS(\'' + p.id + '\',\'rView\',this.value)" style="width:100%;padding:5px 7px;border:1px solid #90CAF9;border-radius:4px;font-size:11.5px;background:#F5FAFF"></div>'
+            + '<div><label style="font-size:9px;color:var(--mu);display:block;margin-bottom:2px">🔗 유입수</label>'
+              + '<input value="' + escAttr(p.rClick) + '" placeholder="0" oninput="updatePowerField_BOS(\'' + p.id + '\',\'rClick\',this.value)" style="width:100%;padding:5px 7px;border:1px solid #90CAF9;border-radius:4px;font-size:11.5px;background:#F5FAFF"></div>'
+            + '<div><label style="font-size:9px;color:var(--mu);display:block;margin-bottom:2px">🛒 전환/구매</label>'
+              + '<input value="' + escAttr(p.rConv) + '" placeholder="0" oninput="updatePowerField_BOS(\'' + p.id + '\',\'rConv\',this.value)" style="width:100%;padding:5px 7px;border:1px solid #90CAF9;border-radius:4px;font-size:11.5px;background:#F5FAFF"></div>'
+          + '</div>'
+          + '<textarea placeholder="💬 반응 평가 — 어떤 점이 좋았고 아쉬웠는지, 다음에 어떻게 개선할지" oninput="updatePowerField_BOS(\'' + p.id + '\',\'rMemo\',this.value)" style="width:100%;padding:6px 9px;border:1px solid #90CAF9;border-radius:4px;font-size:11.5px;font-family:inherit;resize:vertical;min-height:44px;background:#F5FAFF">' + escHtml(p.rMemo || '') + '</textarea>'
+        + '</div>'
       + '</div>';
     }).join('');
   };
@@ -18518,7 +18789,8 @@ body.cal-highlighting .cal-item-card-bos:hover{
       solution: '',
       cta: '',
       url: '',
-      memo: ''
+      memo: '',
+      rView: '', rClick: '', rConv: '', rMemo: ''
     });
     savePower(data);
     renderPowerContents_BOS();
@@ -18673,6 +18945,21 @@ body.cal-highlighting .cal-item-card-bos:hover{
             + imgPreview
           + '</div>'
         + '</div>'
+        // ━━ 📊 결과값 (실제 송출 후 반응) ━━
+        + '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--bd)">'
+          + '<label style="font-size:11px;color:#1565C0;font-weight:700;display:block;margin-bottom:6px">📊 결과값 (실제 송출 후 반응)</label>'
+          + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:8px">'
+            + '<div><label style="font-size:9px;color:var(--mu);display:block;margin-bottom:2px">👁 노출수</label>'
+              + '<input value="' + escAttr(b.rImp) + '" placeholder="0" oninput="updateBannerField_BOS(\'' + b.id + '\',\'rImp\',this.value)" style="width:100%;padding:5px 7px;border:1px solid #90CAF9;border-radius:4px;font-size:11.5px;background:#F5FAFF"></div>'
+            + '<div><label style="font-size:9px;color:var(--mu);display:block;margin-bottom:2px">🖱 클릭수</label>'
+              + '<input value="' + escAttr(b.rClick) + '" placeholder="0" oninput="updateBannerField_BOS(\'' + b.id + '\',\'rClick\',this.value)" style="width:100%;padding:5px 7px;border:1px solid #90CAF9;border-radius:4px;font-size:11.5px;background:#F5FAFF"></div>'
+            + '<div><label style="font-size:9px;color:var(--mu);display:block;margin-bottom:2px">📈 CTR(%)</label>'
+              + '<input value="' + escAttr(b.rCtr) + '" placeholder="0.0" oninput="updateBannerField_BOS(\'' + b.id + '\',\'rCtr\',this.value)" style="width:100%;padding:5px 7px;border:1px solid #90CAF9;border-radius:4px;font-size:11.5px;background:#F5FAFF"></div>'
+            + '<div><label style="font-size:9px;color:var(--mu);display:block;margin-bottom:2px">🛒 전환</label>'
+              + '<input value="' + escAttr(b.rConv) + '" placeholder="0" oninput="updateBannerField_BOS(\'' + b.id + '\',\'rConv\',this.value)" style="width:100%;padding:5px 7px;border:1px solid #90CAF9;border-radius:4px;font-size:11.5px;background:#F5FAFF"></div>'
+          + '</div>'
+          + '<textarea placeholder="💬 반응 평가 — 어떤 카피/소재가 잘 먹혔는지, 다음 개선 방향" oninput="updateBannerField_BOS(\'' + b.id + '\',\'rMemo\',this.value)" style="width:100%;padding:6px 9px;border:1px solid #90CAF9;border-radius:4px;font-size:11.5px;font-family:inherit;resize:vertical;min-height:44px;background:#F5FAFF">' + escHtml(b.rMemo || '') + '</textarea>'
+        + '</div>'
       + '</div>';
     }).join('');
   };
@@ -18697,7 +18984,8 @@ body.cal-highlighting .cal-item-card-bos:hover{
       ctaText: '',
       imageUrl: '',
       linkUrl: '',
-      memo: ''
+      memo: '',
+      rImp: '', rClick: '', rCtr: '', rConv: '', rMemo: ''
     });
     saveBanner(data);
     renderDisplayBanners_BOS();
@@ -19181,7 +19469,7 @@ body.cal-highlighting .cal-item-card-bos:hover{
         SAMPLE_PHASES_BOS.forEach(function(ph){
           var st = s[ph.startKey];
           if(!st) return;
-          events.push({date: st, color: ph.color, label:'[' + ph.startLabel + '] ' + name});
+          events.push({date: st, color: ph.startColor || ph.color, label:'[' + ph.startLabel + '] ' + name});
           var end = (typeof calcPhaseEnd_BOS === 'function') ? calcPhaseEnd_BOS(st, s[ph.durKey], s[ph.unitKey]) : '';
           if(end && end !== st) events.push({date: end, color: ph.color, label:'[' + ph.endLabel + '] ' + name});
         });
@@ -19404,6 +19692,10 @@ body.cal-highlighting .cal-item-card-bos:hover{
 (function(){
   // ━━ 공정 정의 ━━
   window.SAMPLE_PHASES_BOS = [
+    {key:'request', icon:'🧪', title:'샘플의뢰',
+     startKey:'sreqStart', durKey:'sreqDur', unitKey:'sreqUnit',
+     startPh:'의뢰일', color:'#E67E22',
+     startLabel:'샘플의뢰', endLabel:'샘플 수령 예정'},
     {key:'review', icon:'✍️', title:'문안검수',
      startKey:'reviewStart', durKey:'reviewDur', unitKey:'reviewUnit',
      startPh:'시작일', color:'#7A4AA8',
@@ -19412,10 +19704,15 @@ body.cal-highlighting .cal-item-card-bos:hover{
      startKey:'ctStart', durKey:'ctDur', unitKey:'ctUnit',
      startPh:'시작일', color:'#C0392B',
      startLabel:'CT Test 시작', endLabel:'CT Test 종료 예정'},
+    {key:'clinical', icon:'🔬', title:'임상시험',
+     startKey:'clinStart', durKey:'clinDur', unitKey:'clinUnit',
+     startPh:'시작일', color:'#0097A7',
+     startLabel:'임상시험 시작', endLabel:'임상시험 종료 예정'},
     {key:'prod', icon:'🏭', title:'양산 (부자재 입고 후)',
      startKey:'materialDate', durKey:'prodDur', unitKey:'prodUnit',
      startPh:'부자재 입고 예정일', color:'#16A085',
-     startLabel:'부자재 입고 예정', endLabel:'양산 완료 예상'}
+     startLabel:'부자재 입고 예정', endLabel:'양산 완료 예상',
+     startColor:'#8D6E63'}
   ];
   
   window._sampleExpanded_BOS = window._sampleExpanded_BOS || {};
@@ -19472,7 +19769,7 @@ body.cal-highlighting .cal-item-card-bos:hover{
     }).join('');
     
     return '<tr class="sample-detail-row" data-detail-for="' + s.id + '" style="display:' + (open ? 'table-row' : 'none') + ';background:#FBFAF7">'
-      + '<td colspan="11" style="padding:10px 14px;border-bottom:1px solid var(--bd)">'
+      + '<td colspan="12" style="padding:10px 14px;border-bottom:1px solid var(--bd)">'
         + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px">' + blocks + '</div>'
         + '<div style="font-size:9.5px;color:var(--mu);margin-top:7px">💡 입력한 일정은 아래 🗓 캘린더에 색 점으로 표시됩니다 (시작 + 종료 예정일)</div>'
       + '</td>'
@@ -19579,22 +19876,22 @@ setTimeout(function(){
     }
     
     var budget = parseInt(inp.value) || 0;
-    // 사용 예산 = costData VAT 포함 합계
+    // ★ 실지출 합계 = 각 항목 payments(실제 지출 완료분)의 합
     var used = 0;
     if(typeof costData !== 'undefined' && Array.isArray(costData)){
-      used = costData.reduce(function(s, c){ return s + Math.round((parseInt(c.ex)||0) * 1.1); }, 0);
+      used = costData.reduce(function(s, c){
+        var pays = (c.payments||[]);
+        return s + pays.reduce(function(ss, p){ return ss + (parseInt(p.amount)||0); }, 0);
+      }, 0);
     }
     var remain = budget - used;
     var pct = budget > 0 ? Math.round(used / budget * 100) : 0;
     
-    // 초도 필요 투자금 = 준비비용(VAT포함) + 생산 초도투자(단가×MOQ×1.1)
-    var prodInvest = 0;
-    if(typeof cogsData !== 'undefined' && Array.isArray(cogsData)){
-      prodInvest = Math.round(cogsData.reduce(function(s, r){
-        return s + (r.unitPrice||r.amount||0) * (r.moq||0);
-      }, 0) * 1.1);
+    // ★ 초도 필요 투자금 = 준비비용 항목 예상액(VAT 포함) 합계 — 실지출과 별개
+    var totalInvest = 0;
+    if(typeof costData !== 'undefined' && Array.isArray(costData)){
+      totalInvest = Math.round(costData.reduce(function(s, c){ return s + (parseInt(c.ex)||0); }, 0) * 1.1);
     }
-    var totalInvest = used + prodInvest;
     
     var el;
     el = document.getElementById('cost-sum-used');   if(el) el.textContent = N(used) + '원';
@@ -19822,6 +20119,817 @@ setTimeout(function(){
   };
   
   console.log('[T5] 준비비용 요약 + 3개월 광고 플래너 + 일괄입력 준비됨');
+})();
+</script>
+
+<!-- ━━━ 💸 준비비용 항목별 지출 기록 모달 ━━━ -->
+<div id="cost-payment-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9350;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:22px;max-width:540px;width:94%;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;padding-bottom:12px;border-bottom:1px solid var(--bd)">
+      <div>
+        <div style="font-size:15px;font-weight:700">💸 지출 기록</div>
+        <div id="cpay-subtitle" style="font-size:11px;color:var(--mu);margin-top:3px"></div>
+      </div>
+      <button onclick="closeCostPayments_BOS()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu);line-height:1;padding:0">×</button>
+    </div>
+    
+    <!-- 예상 vs 실지출 요약 -->
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <div style="flex:1;background:#FFF8E1;border:1px solid #FFE082;border-radius:7px;padding:8px;text-align:center">
+        <div style="font-size:9px;color:#8B5E00">예상 금액 (VAT 포함)</div>
+        <div id="cpay-expected" style="font-size:14px;font-weight:600;font-family:var(--mn);color:#8B5E00">0원</div>
+      </div>
+      <div style="flex:1;background:#E3F2FD;border:1px solid #90CAF9;border-radius:7px;padding:8px;text-align:center">
+        <div style="font-size:9px;color:#1565C0">실지출 합계</div>
+        <div id="cpay-actual" style="font-size:14px;font-weight:600;font-family:var(--mn);color:#1565C0">0원</div>
+      </div>
+      <div style="flex:1;background:#F5F5F5;border:1px solid var(--bd);border-radius:7px;padding:8px;text-align:center">
+        <div style="font-size:9px;color:var(--mu)">차액</div>
+        <div id="cpay-diff" style="font-size:14px;font-weight:600;font-family:var(--mn)">0원</div>
+      </div>
+    </div>
+    
+    <!-- 지출 기록 목록 -->
+    <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:6px">📋 지출 내역 (실제 지출 완료한 것만 기록)</div>
+    <div id="cpay-list"></div>
+    
+    <!-- 새 지출 추가 -->
+    <div style="background:#FAFAF8;border:1px dashed var(--bd);border-radius:8px;padding:12px;margin-top:10px">
+      <div style="font-size:11px;font-weight:700;margin-bottom:8px">＋ 지출 추가</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <span style="font-size:9px;color:var(--mu)">지출일</span>
+          <input type="date" id="cpay-new-date" style="padding:6px 8px;border:1px solid var(--bd);border-radius:5px;font-size:12px">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:110px">
+          <span style="font-size:9px;color:var(--mu)">실지출 금액 (원)</span>
+          <input type="number" id="cpay-new-amount" placeholder="0" style="padding:6px 8px;border:1px solid var(--bd);border-radius:5px;font-size:12px;font-family:var(--mn);text-align:right">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px;flex:1.5;min-width:120px">
+          <span style="font-size:9px;color:var(--mu)">메모 (선택)</span>
+          <input type="text" id="cpay-new-memo" placeholder="결제수단, 비고 등" style="padding:6px 8px;border:1px solid var(--bd);border-radius:5px;font-size:12px">
+        </div>
+        <button onclick="addCostPayment_BOS()" style="background:#1A6B4A;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer">추가</button>
+      </div>
+    </div>
+    
+    <div style="display:flex;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--bd)">
+      <button onclick="closeCostPayments_BOS()" style="background:#1A6B4A;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:12px;font-weight:600;cursor:pointer">완료</button>
+    </div>
+  </div>
+</div>
+
+<script id="cost-payment-script">
+(function(){
+  var N = function(n){ return (n||0).toLocaleString('ko-KR'); };
+  var _payIdx = -1;  // 현재 편집 중인 costData 인덱스
+  
+  window.openCostPayments_BOS = function(idx){
+    if(typeof costData === 'undefined' || !costData[idx]) return;
+    _payIdx = idx;
+    var item = costData[idx];
+    if(!item.payments) item.payments = [];
+    
+    document.getElementById('cpay-subtitle').textContent = (item.name || '(이름 없음)') + ' · 예상 ' + N(Math.round((item.ex||0)*1.1)) + '원';
+    // 오늘 날짜 기본값
+    var today = new Date();
+    document.getElementById('cpay-new-date').value = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+    document.getElementById('cpay-new-amount').value = '';
+    document.getElementById('cpay-new-memo').value = '';
+    
+    renderCostPayments();
+    document.getElementById('cost-payment-modal').style.display = 'flex';
+  };
+  
+  window.closeCostPayments_BOS = function(){
+    document.getElementById('cost-payment-modal').style.display = 'none';
+    _payIdx = -1;
+    // 표 + 요약 갱신
+    if(typeof renderCosts === 'function') renderCosts();
+    if(typeof updateCostBudgetSummary_BOS === 'function') updateCostBudgetSummary_BOS(false);
+  };
+  
+  function renderCostPayments(){
+    var item = costData[_payIdx];
+    if(!item) return;
+    var pays = item.payments || [];
+    var expected = Math.round((item.ex||0) * 1.1);
+    var actual = pays.reduce(function(s,p){ return s + (parseInt(p.amount)||0); }, 0);
+    var diff = actual - expected;
+    
+    document.getElementById('cpay-expected').textContent = N(expected) + '원';
+    document.getElementById('cpay-actual').textContent = N(actual) + '원';
+    var diffEl = document.getElementById('cpay-diff');
+    diffEl.textContent = (diff>0?'+':'') + N(diff) + '원';
+    diffEl.style.color = diff > 0 ? 'var(--red)' : (diff < 0 ? 'var(--green)' : 'var(--mu)');
+    
+    var list = document.getElementById('cpay-list');
+    if(pays.length === 0){
+      list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--mu);font-size:11px;background:#FAFAF8;border-radius:6px">아직 지출 기록이 없습니다.<br>실제로 지출한 건만 아래에서 추가하세요.</div>';
+      return;
+    }
+    // 날짜순 정렬
+    var sorted = pays.map(function(p,i){ return {p:p, i:i}; }).sort(function(a,b){ return (a.p.date||'').localeCompare(b.p.date||''); });
+    list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:11.5px">'
+      + '<thead><tr style="border-bottom:1px solid var(--bd)"><th style="text-align:left;padding:5px 6px;color:var(--mu);font-weight:600">지출일</th><th style="text-align:right;padding:5px 6px;color:var(--mu);font-weight:600">금액</th><th style="text-align:left;padding:5px 6px;color:var(--mu);font-weight:600">메모</th><th style="width:28px"></th></tr></thead>'
+      + '<tbody>'
+      + sorted.map(function(o){
+          return '<tr style="border-bottom:1px solid #F0F0F0">'
+            + '<td style="padding:5px 6px;font-family:var(--mn)">' + (o.p.date||'-') + '</td>'
+            + '<td style="padding:5px 6px;text-align:right;font-family:var(--mn);font-weight:600;color:#1565C0">' + N(parseInt(o.p.amount)||0) + '원</td>'
+            + '<td style="padding:5px 6px;color:var(--mu)">' + (o.p.memo ? String(o.p.memo).replace(/</g,'&lt;') : '-') + '</td>'
+            + '<td style="text-align:center"><button onclick="delCostPayment_BOS(' + o.i + ')" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:12px">✕</button></td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table>';
+  }
+  
+  window.addCostPayment_BOS = function(){
+    if(_payIdx < 0 || !costData[_payIdx]) return;
+    var date = document.getElementById('cpay-new-date').value;
+    var amount = parseInt(document.getElementById('cpay-new-amount').value) || 0;
+    var memo = document.getElementById('cpay-new-memo').value.trim();
+    if(amount <= 0){ alert('지출 금액을 입력하세요'); return; }
+    if(!date){ alert('지출일을 선택하세요'); return; }
+    
+    if(!costData[_payIdx].payments) costData[_payIdx].payments = [];
+    costData[_payIdx].payments.push({date: date, amount: amount, memo: memo});
+    
+    // 입력 필드 초기화 (날짜는 유지)
+    document.getElementById('cpay-new-amount').value = '';
+    document.getElementById('cpay-new-memo').value = '';
+    
+    renderCostPayments();
+    if(typeof sv === 'function') sv('지출 기록 추가');
+  };
+  
+  window.delCostPayment_BOS = function(i){
+    if(_payIdx < 0 || !costData[_payIdx] || !costData[_payIdx].payments) return;
+    if(!confirm('이 지출 기록을 삭제하시겠습니까?')) return;
+    costData[_payIdx].payments.splice(i, 1);
+    renderCostPayments();
+    if(typeof sv === 'function') sv('지출 기록 삭제');
+  };
+  
+  // ESC + 배경 클릭 닫기
+  var modal = document.getElementById('cost-payment-modal');
+  if(modal){
+    modal.addEventListener('click', function(e){ if(e.target === modal) closeCostPayments_BOS(); });
+  }
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && !e.isComposing){
+      var m = document.getElementById('cost-payment-modal');
+      if(m && m.style.display === 'flex'){ closeCostPayments_BOS(); e.preventDefault(); e.stopPropagation(); }
+    }
+  }, true);
+  
+  console.log('[CostPayments] 준비비용 지출 기록 모달 준비됨');
+})();
+</script>
+
+<!-- ━━━ 📅 가중목 기간 관리 모달 ━━━ -->
+<div id="wig-period-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9350;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:22px;max-width:440px;width:92%;box-shadow:0 10px 40px rgba(0,0,0,.3)" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-bottom:12px;border-bottom:1px solid var(--bd)">
+      <div id="wig-modal-title" style="font-size:15px;font-weight:700">📅 기간 추가</div>
+      <button onclick="closeWIGPeriodModal_BOS()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu);line-height:1;padding:0">×</button>
+    </div>
+    
+    <!-- 빠른 생성 (연/분기/월) -->
+    <div id="wig-quick-section">
+      <label style="display:block;font-size:10.5px;font-weight:700;color:var(--mu);margin-bottom:5px">⚡ 빠른 생성</label>
+      <div style="display:flex;gap:6px;margin-bottom:6px">
+        <input type="number" id="wig-quick-year" placeholder="2026" style="width:90px;padding:7px 9px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:var(--mn)">
+        <select id="wig-quick-type" onchange="onWIGQuickType_BOS()" style="flex:1;padding:7px 9px;border:1px solid var(--bd);border-radius:6px;font-size:13px;background:#fff">
+          <option value="year">연간 (1년 전체)</option>
+          <option value="quarter">분기</option>
+          <option value="month">월</option>
+        </select>
+        <select id="wig-quick-sub" style="display:none;padding:7px 9px;border:1px solid var(--bd);border-radius:6px;font-size:13px;background:#fff"></select>
+      </div>
+      <button onclick="quickAddWIGPeriod_BOS()" style="width:100%;background:#1A6B4A;color:#fff;border:none;border-radius:6px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:14px">＋ 이 기간 생성</button>
+    </div>
+    
+    <!-- 직접 입력 / 수정 -->
+    <label style="display:block;font-size:10.5px;font-weight:700;color:var(--mu);margin-bottom:5px">✏️ 기간 이름 (직접 입력/수정)</label>
+    <input type="text" id="wig-period-label" placeholder="예: 2026년 1분기" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;box-sizing:border-box;margin-bottom:14px">
+    
+    <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--bd)">
+      <button id="wig-period-delete" onclick="deleteWIGPeriod_BOS()" style="display:none;background:#fff;border:1px solid #E0B0B0;color:#C0392B;border-radius:6px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer">🗑 삭제</button>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button onclick="closeWIGPeriodModal_BOS()" style="background:#fff;border:1px solid var(--bd);border-radius:6px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer">취소</button>
+        <button onclick="saveWIGPeriod_BOS()" style="background:#1A6B4A;color:#fff;border:none;border-radius:6px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer">💾 저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="wig-period-script">
+(function(){
+  var _editingPeriodId = null;
+  
+  window.openWIGPeriodModal_BOS = function(periodId){
+    if(typeof wigData === 'undefined' || !wigData) wigData = {periods:[], currentPeriodId:null};
+    if(!wigData.periods) wigData.periods = [];
+    _editingPeriodId = periodId || null;
+    
+    var titleEl = document.getElementById('wig-modal-title');
+    var labelEl = document.getElementById('wig-period-label');
+    var delBtn = document.getElementById('wig-period-delete');
+    var quickSection = document.getElementById('wig-quick-section');
+    
+    if(_editingPeriodId){
+      // 수정 모드
+      var p = wigData.periods.find(function(x){ return x.id === _editingPeriodId; });
+      titleEl.textContent = '📅 기간 수정';
+      labelEl.value = p ? p.label : '';
+      delBtn.style.display = wigData.periods.length > 1 ? '' : 'none';  // 마지막 1개는 삭제 불가
+      quickSection.style.display = 'none';  // 수정 시 빠른생성 숨김
+    } else {
+      // 추가 모드
+      titleEl.textContent = '📅 기간 추가';
+      labelEl.value = '';
+      delBtn.style.display = 'none';
+      quickSection.style.display = '';
+      var yEl = document.getElementById('wig-quick-year');
+      if(yEl && !yEl.value) yEl.value = new Date().getFullYear();
+      onWIGQuickType_BOS();
+    }
+    
+    document.getElementById('wig-period-modal').style.display = 'flex';
+  };
+  
+  window.closeWIGPeriodModal_BOS = function(){
+    document.getElementById('wig-period-modal').style.display = 'none';
+    _editingPeriodId = null;
+  };
+  
+  window.onWIGQuickType_BOS = function(){
+    var type = document.getElementById('wig-quick-type').value;
+    var sub = document.getElementById('wig-quick-sub');
+    if(type === 'quarter'){
+      sub.style.display = '';
+      sub.innerHTML = ['1분기','2분기','3분기','4분기'].map(function(q,i){ return '<option value="'+(i+1)+'">'+q+'</option>'; }).join('');
+    } else if(type === 'month'){
+      sub.style.display = '';
+      var h = '';
+      for(var m=1;m<=12;m++) h += '<option value="'+m+'">'+m+'월</option>';
+      sub.innerHTML = h;
+    } else {
+      sub.style.display = 'none';
+    }
+  };
+  
+  window.quickAddWIGPeriod_BOS = function(){
+    var year = parseInt(document.getElementById('wig-quick-year').value) || new Date().getFullYear();
+    var type = document.getElementById('wig-quick-type').value;
+    var sub = document.getElementById('wig-quick-sub');
+    var label, id;
+    if(type === 'year'){
+      label = year + '년';
+      id = 'y' + year;
+    } else if(type === 'quarter'){
+      var q = sub.value || '1';
+      label = year + '년 ' + q + '분기';
+      id = 'y' + year + 'q' + q;
+    } else {
+      var mo = sub.value || '1';
+      label = year + '년 ' + mo + '월';
+      id = 'y' + year + 'm' + mo;
+    }
+    // 중복 체크
+    if(wigData.periods.some(function(p){ return p.id === id; })){
+      alert('이미 같은 기간이 있습니다: ' + label);
+      return;
+    }
+    wigData.periods.push({id:id, label:label, wigs:[]});
+    wigData.currentPeriodId = id;
+    if(typeof sv === 'function') sv('가중목 기간 추가');
+    closeWIGPeriodModal_BOS();
+    if(typeof buildWIG === 'function') buildWIG();
+  };
+  
+  window.saveWIGPeriod_BOS = function(){
+    var label = document.getElementById('wig-period-label').value.trim();
+    if(!label){ alert('기간 이름을 입력하세요'); return; }
+    
+    if(_editingPeriodId){
+      // 수정
+      var p = wigData.periods.find(function(x){ return x.id === _editingPeriodId; });
+      if(p) p.label = label;
+    } else {
+      // 직접 입력 추가
+      var id = 'p' + Date.now();
+      wigData.periods.push({id:id, label:label, wigs:[]});
+      wigData.currentPeriodId = id;
+    }
+    if(typeof sv === 'function') sv('가중목 기간 저장');
+    closeWIGPeriodModal_BOS();
+    if(typeof buildWIG === 'function') buildWIG();
+  };
+  
+  window.deleteWIGPeriod_BOS = function(){
+    if(!_editingPeriodId) return;
+    if(wigData.periods.length <= 1){ alert('최소 1개의 기간은 있어야 합니다'); return; }
+    var p = wigData.periods.find(function(x){ return x.id === _editingPeriodId; });
+    if(!confirm('"' + (p?p.label:'') + '" 기간을 삭제하시겠습니까?\n이 기간의 가중목도 함께 삭제됩니다.')) return;
+    wigData.periods = wigData.periods.filter(function(x){ return x.id !== _editingPeriodId; });
+    if(wigData.currentPeriodId === _editingPeriodId){
+      wigData.currentPeriodId = wigData.periods[0] ? wigData.periods[0].id : null;
+    }
+    if(typeof sv === 'function') sv('가중목 기간 삭제');
+    closeWIGPeriodModal_BOS();
+    if(typeof buildWIG === 'function') buildWIG();
+  };
+  
+  // 배경 클릭 + ESC 닫기
+  var modal = document.getElementById('wig-period-modal');
+  if(modal) modal.addEventListener('click', function(e){ if(e.target === modal) closeWIGPeriodModal_BOS(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && !e.isComposing){
+      var m = document.getElementById('wig-period-modal');
+      if(m && m.style.display === 'flex'){ closeWIGPeriodModal_BOS(); e.preventDefault(); e.stopPropagation(); }
+    }
+  }, true);
+  
+  console.log('[WIG] 가중목 기간 관리 모달 준비됨');
+})();
+</script>
+
+<!-- ━━━ 📋 샘플 업체 선정 평가 ━━━ -->
+<div id="sample-eval-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9350;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:22px;max-width:560px;width:94%;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;padding-bottom:12px;border-bottom:1px solid var(--bd)">
+      <div>
+        <div style="font-size:15px;font-weight:700">📋 업체 선정 평가</div>
+        <div id="seval-subtitle" style="font-size:11px;color:var(--mu);margin-top:3px"></div>
+      </div>
+      <button onclick="closeSampleEval_BOS()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu);line-height:1;padding:0">×</button>
+    </div>
+    
+    <div style="font-size:11px;color:var(--mu);margin-bottom:14px;line-height:1.6">각 항목을 <b>1~10점</b>으로 평가하세요. 어느 업체로 최종 결정할지 비교하는 데 사용됩니다.</div>
+    
+    <div id="seval-items"></div>
+    
+    <!-- 종합 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;background:#F7F5F0;border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-top:14px">
+      <div style="font-size:12px;font-weight:700">종합 점수 <span style="font-size:10px;color:var(--mu);font-weight:400">(7개 항목 × 10점)</span></div>
+      <div id="seval-total" style="font-size:18px;font-weight:700;font-family:var(--mn);color:#1A6B4A">— / 70</div>
+    </div>
+    
+    <!-- 최종 선정 -->
+    <label style="display:flex;align-items:center;gap:10px;margin-top:14px;padding:12px 14px;border:2px solid #E0E0E0;border-radius:8px;cursor:pointer" id="seval-final-label">
+      <input type="checkbox" id="seval-final" onchange="toggleSampleFinal_BOS()" style="width:18px;height:18px;cursor:pointer">
+      <div>
+        <div style="font-size:13px;font-weight:700">⭐ 이 업체로 최종 결정</div>
+        <div style="font-size:10px;color:var(--mu)">체크하면 표에 ⭐로 표시됩니다 (다른 업체는 자동 해제)</div>
+      </div>
+    </label>
+    
+    <div style="display:flex;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--bd)">
+      <button onclick="closeSampleEval_BOS()" style="background:#1A6B4A;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:12px;font-weight:600;cursor:pointer">완료</button>
+    </div>
+  </div>
+</div>
+
+<script id="sample-eval-script">
+(function(){
+  // 평가 항목 정의
+  // type: 'manual'(직접점수) | 'auto'(입력값→상대점수)
+  // auto 항목: field(입력저장키), unit, lowerBetter(낮을수록 만점) 기준으로 전체 업체 비교
+  window.SAMPLE_EVAL_ITEMS = [
+    {key:'response', label:'담당자 응대 속도', icon:'💬', desc:'문의에 얼마나 빠르고 성실하게 응대하는가', type:'manual', max:10},
+    {key:'reflect', label:'샘플 요청사항 반영', icon:'🎯', desc:'요청한 사양·컨셉을 얼마나 정확히 반영하는가', type:'manual', max:10},
+    {key:'quality', label:'퀄리티', icon:'✨', desc:'샘플·제품의 완성도와 품질', type:'manual', max:10},
+    {key:'speed', label:'샘플 제작 속도', icon:'⚡', desc:'의뢰일~도착일 소요가 가장 짧은 업체를 만점', type:'auto', max:10, field:'_speedDays', unit:'일', lowerBetter:true, auto:'speed'},
+    {key:'price', label:'제품 단가', icon:'💰', desc:'원료+제조공임 단가가 가장 저렴한 업체를 만점', type:'auto', max:10, field:'evalPrice', unit:'원', lowerBetter:true},
+    {key:'leadtime', label:'양산 기간', icon:'🏭', desc:'공정 탭의 양산 기간 입력값에서 자동 — 가장 짧은 업체를 만점', type:'auto', max:10, unit:'일', lowerBetter:true, auto:'leadtime'},
+    {key:'material', label:'부자재 컨트롤', icon:'📦', desc:'부자재 수급·관리 능력 (5점 만점)', type:'manual', max:5}
+  ];
+  
+  var _evalId = null;
+  
+  // 자동 항목 입력값 추출 (속도=도착일-의뢰일, 단가/양산기간=직접 입력)
+  function getAutoRawValue_BOS(s, it){
+    if(it.auto === 'speed'){
+      if(!s.requestDate || !s.arrivalDate) return null;
+      var rd = new Date(s.requestDate + 'T00:00:00');
+      var ad = new Date(s.arrivalDate + 'T00:00:00');
+      if(isNaN(rd.getTime()) || isNaN(ad.getTime())) return null;
+      var days = Math.round((ad - rd) / 86400000);
+      return days >= 0 ? days : null;
+    }
+    if(it.auto === 'leadtime'){
+      // 공정 탭의 양산 기간(prodDur) + 단위(prodUnit) → 일수 환산
+      var n = parseInt(s.prodDur) || 0;
+      if(n <= 0) return null;
+      return n * (s.prodUnit === 'w' ? 7 : 1);
+    }
+    var v = parseFloat((s.eval && s.eval[it.field]) || '');
+    return (!isNaN(v) && v > 0) ? v : null;
+  }
+  
+  // 자동 점수: 전체 업체 비교 → 최저(또는 최고)를 만점으로 상대 점수
+  function getAutoScore_BOS(s, it, allData){
+    var raw = getAutoRawValue_BOS(s, it);
+    if(raw === null) return null;  // 입력 없으면 점수 없음
+    // 입력값이 있는 전체 업체의 raw 모으기
+    var vals = (allData || []).map(function(x){ return getAutoRawValue_BOS(x, it); }).filter(function(v){ return v !== null; });
+    if(vals.length === 0) return null;
+    var best = it.lowerBetter ? Math.min.apply(null, vals) : Math.max.apply(null, vals);
+    var worst = it.lowerBetter ? Math.max.apply(null, vals) : Math.min.apply(null, vals);
+    if(best === worst) return it.max;  // 모두 같으면 전원 만점
+    // 선형 보간: best=만점, worst=만점의 40% (너무 0에 가깝지 않게)
+    var ratio;
+    if(it.lowerBetter) ratio = (worst - raw) / (worst - best);
+    else ratio = (raw - worst) / (best - worst);
+    var score = it.max * (0.4 + 0.6 * ratio);
+    return Math.round(score * 10) / 10;  // 소수점 1자리
+  }
+  
+  // 항목 점수 (manual=저장값, auto=계산값)
+  function getItemScore_BOS(s, it, allData){
+    if(it.type === 'auto'){
+      var sc = getAutoScore_BOS(s, it, allData);
+      return sc === null ? 0 : sc;
+    }
+    return parseInt((s.eval && s.eval[it.key]) || 0) || 0;
+  }
+  
+  function getSampleData(){
+    try { var raw = localStorage.getItem('bos_sample_data_v1'); return raw ? JSON.parse(raw) : []; }
+    catch(e){ return []; }
+  }
+  function saveSampleData(data){
+    try { localStorage.setItem('bos_sample_data_v1', JSON.stringify(data)); if(typeof updateSaveTime==='function') updateSaveTime(); } catch(e){}
+  }
+  
+  // ━━ 표 셀 빌더 (종합점수 + 선정 마크 + 버튼) ━━
+  window.buildSampleEvalCell_BOS = function(s){
+    var allData = getSampleData();
+    var scores = SAMPLE_EVAL_ITEMS.map(function(it){ return getItemScore_BOS(s, it, allData); });
+    var sum = Math.round(scores.reduce(function(a,b){ return a+b; }, 0) * 10) / 10;
+    var maxScore = SAMPLE_EVAL_ITEMS.reduce(function(a, it){ return a + (it.max||10); }, 0);
+    var hasScore = scores.some(function(v){ return v > 0; });
+    var isFinal = !!s.finalPick;
+    
+    var badge = '';
+    if(isFinal){
+      badge = '<div style="font-size:11px;font-weight:700;color:#E65100">⭐ 선정</div>';
+    } else if(hasScore){
+      var color = sum >= maxScore*0.8 ? '#1A6B4A' : (sum >= maxScore*0.5 ? '#F57F17' : '#C0392B');
+      badge = '<div style="font-size:12px;font-weight:700;font-family:var(--mn);color:' + color + '">' + sum + '/' + maxScore + '</div>';
+    } else {
+      badge = '<div style="font-size:10px;color:var(--mu)">미평가</div>';
+    }
+    
+    return '<div style="display:flex;flex-direction:column;align-items:center;gap:3px">'
+      + badge
+      + '<button onclick="openSampleEval_BOS(\'' + s.id + '\')" style="background:' + (isFinal?'#FFF3E0':(hasScore?'#EAF3EE':'none')) + ';border:1px solid ' + (isFinal?'#FFB74D':'var(--bd)') + ';border-radius:4px;padding:2px 8px;font-size:10px;cursor:pointer;color:' + (isFinal?'#E65100':'var(--tx)') + '">📋 평가</button>'
+      + '</div>';
+  };
+  
+  // ━━ 모달 열기 ━━
+  window.openSampleEval_BOS = function(id){
+    var data = getSampleData();
+    var s = data.find(function(x){ return x.id === id; });
+    if(!s){ alert('항목을 찾을 수 없습니다'); return; }
+    _evalId = id;
+    
+    document.getElementById('seval-subtitle').textContent = (s.vendor || '(업체명 없음)') + (s.sampleName ? ' · ' + s.sampleName : '');
+    
+    var ev = s.eval || {};
+    var allData = getSampleData();
+    var itemsEl = document.getElementById('seval-items');
+    itemsEl.innerHTML = SAMPLE_EVAL_ITEMS.map(function(it){
+      // ━━ 자동 계산 항목 (단가/양산기간/속도) ━━
+      if(it.type === 'auto'){
+        var autoScore = getAutoScore_BOS(s, it, allData);
+        var raw = getAutoRawValue_BOS(s, it);
+        var scoreDisp = (autoScore === null) ? '<span style="color:var(--mu);font-size:12px">입력 대기</span>' : autoScore + ' / ' + it.max;
+        var inputHtml;
+        if(it.auto === 'speed'){
+          // 속도는 의뢰일/도착일에서 자동 → 입력 불가, 안내만
+          inputHtml = '<div style="font-size:11px;color:var(--mu);background:#F7F5F0;padding:7px 10px;border-radius:5px">'
+            + (raw !== null ? '의뢰~도착 <b>' + raw + '일</b> 소요 (표에서 의뢰일·도착일 입력 시 자동)' : '⚠ 표에서 의뢰일·도착일을 입력하면 자동 계산됩니다')
+            + '</div>';
+        } else if(it.auto === 'leadtime'){
+          // 양산기간은 공정 탭에서 자동 → 입력 불가, 안내만
+          inputHtml = '<div style="font-size:11px;color:var(--mu);background:#F7F5F0;padding:7px 10px;border-radius:5px">'
+            + (raw !== null ? '공정 탭 양산 기간 <b>' + raw + '일</b> (⚙ 공정에서 입력한 값 자동 반영)' : '⚠ ⚙ 공정 패널에서 양산 기간을 입력하면 자동 계산됩니다')
+            + '</div>';
+        } else {
+          var cur = (s.eval && s.eval[it.field]) || '';
+          inputHtml = '<input type="number" value="' + cur + '" placeholder="' + (it.field==='evalPrice'?'예: 3500 (원료+공임 단가)':'예: 30 (양산 소요일)') + '" '
+            + 'oninput="setSampleAutoInput_BOS(\'' + it.field + '\',this.value)" '
+            + 'style="width:100%;padding:7px 10px;border:1px solid #90CAF9;border-radius:5px;font-size:12.5px;font-family:var(--mn);background:#F5FAFF;text-align:right"> '
+            + '<div style="font-size:9px;color:var(--mu);margin-top:3px;text-align:right">단위: ' + it.unit + ' · 전체 업체 중 가장 ' + (it.lowerBetter?'낮은':'높은') + ' 값이 만점</div>';
+        }
+        return '<div style="margin-bottom:16px;padding:10px 12px;background:#FBFCFE;border:1px solid #E3F2FD;border-radius:8px">'
+          + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">'
+            + '<div><span style="font-size:13px;font-weight:700">' + it.icon + ' ' + it.label + ' <span style="font-size:9px;color:#1565C0;background:#E3F2FD;padding:1px 6px;border-radius:8px;font-weight:600">자동</span></span>'
+            + '<div style="font-size:10px;color:var(--mu);margin-top:1px">' + it.desc + '</div></div>'
+            + '<div style="font-size:16px;font-weight:700;font-family:var(--mn);color:#1565C0;min-width:60px;text-align:right" id="seval-score-' + it.key + '">' + scoreDisp + '</div>'
+          + '</div>'
+          + inputHtml
+        + '</div>';
+      }
+      // ━━ 수동 항목 (응대/반영/퀄리티=10점, 부자재=5점) ━━
+      var val = parseInt(ev[it.key]) || 0;
+      var maxN = it.max || 10;
+      var nums = [];
+      for(var k=1;k<=maxN;k++) nums.push(k);
+      return '<div style="margin-bottom:16px">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+          + '<div><span style="font-size:13px;font-weight:700">' + it.icon + ' ' + it.label + (maxN!==10?' <span style="font-size:9px;color:#E65100;background:#FFF3E0;padding:1px 6px;border-radius:8px;font-weight:600">' + maxN + '점 만점</span>':'') + '</span>'
+          + '<div style="font-size:10px;color:var(--mu);margin-top:1px">' + it.desc + '</div></div>'
+          + '<div style="font-size:16px;font-weight:700;font-family:var(--mn);color:#1A6B4A;min-width:42px;text-align:right" id="seval-score-' + it.key + '">' + (val||'-') + '</div>'
+        + '</div>'
+        + '<div style="display:flex;gap:3px">'
+          + nums.map(function(n){
+              var active = n <= val;
+              return '<button onclick="setSampleScore_BOS(\'' + it.key + '\',' + n + ')" '
+                + 'style="flex:1;padding:6px 0;border:1px solid ' + (active?'#1A6B4A':'var(--bd)') + ';background:' + (active?'#1A6B4A':'#fff') + ';color:' + (active?'#fff':'var(--mu)') + ';border-radius:4px;font-size:11px;cursor:pointer;font-weight:' + (n===val?'700':'400') + '" '
+                + 'data-evalkey="' + it.key + '" data-evaln="' + n + '">' + n + '</button>';
+            }).join('')
+        + '</div>'
+      + '</div>';
+    }).join('');
+    
+    // 최종 선정 체크
+    document.getElementById('seval-final').checked = !!s.finalPick;
+    updateSevalFinalStyle(!!s.finalPick);
+    
+    updateSampleEvalTotal();
+    document.getElementById('sample-eval-modal').style.display = 'flex';
+  };
+  
+  window.closeSampleEval_BOS = function(){
+    document.getElementById('sample-eval-modal').style.display = 'none';
+    _evalId = null;
+    if(typeof renderSampleTable_BOS === 'function') renderSampleTable_BOS();
+  };
+  
+  // ━━ 자동 항목 입력 저장 ━━
+  window.setSampleAutoInput_BOS = function(field, val){
+    if(!_evalId) return;
+    var data = getSampleData();
+    var s = data.find(function(x){ return x.id === _evalId; });
+    if(!s) return;
+    if(!s.eval) s.eval = {};
+    s.eval[field] = val;
+    saveSampleData(data);
+    refreshSampleEvalAutoScores();
+    updateSampleEvalTotal();
+  };
+  
+  function refreshSampleEvalAutoScores(){
+    var data = getSampleData();
+    var s = data.find(function(x){ return x.id === _evalId; });
+    if(!s) return;
+    SAMPLE_EVAL_ITEMS.forEach(function(it){
+      if(it.type !== 'auto') return;
+      var sc = getAutoScore_BOS(s, it, data);
+      var el = document.getElementById('seval-score-' + it.key);
+      if(el) el.innerHTML = (sc === null) ? '<span style="color:var(--mu);font-size:12px">입력 대기</span>' : sc + ' / ' + it.max;
+    });
+  }
+  
+  // ━━ 점수 설정 ━━
+  window.setSampleScore_BOS = function(key, n){
+    if(!_evalId) return;
+    var data = getSampleData();
+    var s = data.find(function(x){ return x.id === _evalId; });
+    if(!s) return;
+    if(!s.eval) s.eval = {};
+    // 같은 점수 다시 누르면 해제(0)
+    s.eval[key] = (parseInt(s.eval[key]) === n) ? 0 : n;
+    saveSampleData(data);
+    
+    // 버튼 UI 갱신
+    var val = s.eval[key];
+    document.querySelectorAll('[data-evalkey="' + key + '"]').forEach(function(btn){
+      var bn = parseInt(btn.getAttribute('data-evaln'));
+      var active = bn <= val;
+      btn.style.background = active ? '#1A6B4A' : '#fff';
+      btn.style.color = active ? '#fff' : 'var(--mu)';
+      btn.style.borderColor = active ? '#1A6B4A' : 'var(--bd)';
+      btn.style.fontWeight = (bn === val) ? '700' : '400';
+    });
+    var scoreEl = document.getElementById('seval-score-' + key);
+    if(scoreEl) scoreEl.textContent = val || '-';
+    updateSampleEvalTotal();
+  };
+  
+  function updateSampleEvalTotal(){
+    var data = getSampleData();
+    var s = data.find(function(x){ return x.id === _evalId; });
+    if(!s) return;
+    var ev = s.eval || {};
+    var allData = getSampleData();
+    var sCur = allData.find(function(x){ return x.id === _evalId; }) || s;
+    var sum = Math.round(SAMPLE_EVAL_ITEMS.reduce(function(a, it){ return a + getItemScore_BOS(sCur, it, allData); }, 0) * 10) / 10;
+    var maxScore = SAMPLE_EVAL_ITEMS.reduce(function(a, it){ return a + (it.max||10); }, 0);
+    var el = document.getElementById('seval-total');
+    if(el){
+      el.textContent = sum + ' / ' + maxScore;
+      el.style.color = sum >= maxScore*0.8 ? '#1A6B4A' : (sum >= maxScore*0.5 ? '#F57F17' : '#C0392B');
+    }
+  }
+  
+  function updateSevalFinalStyle(checked){
+    var label = document.getElementById('seval-final-label');
+    if(label){
+      label.style.borderColor = checked ? '#FFB74D' : '#E0E0E0';
+      label.style.background = checked ? '#FFF8E1' : 'transparent';
+    }
+  }
+  
+  // ━━ 최종 선정 (단일 선택) ━━
+  window.toggleSampleFinal_BOS = function(){
+    if(!_evalId) return;
+    var checked = document.getElementById('seval-final').checked;
+    var data = getSampleData();
+    if(checked){
+      // 다른 업체 선정 해제 (단일 선택)
+      data.forEach(function(x){ x.finalPick = (x.id === _evalId); });
+    } else {
+      var s = data.find(function(x){ return x.id === _evalId; });
+      if(s) s.finalPick = false;
+    }
+    saveSampleData(data);
+    updateSevalFinalStyle(checked);
+  };
+  
+  // 배경 클릭 + ESC
+  var modal = document.getElementById('sample-eval-modal');
+  if(modal) modal.addEventListener('click', function(e){ if(e.target === modal) closeSampleEval_BOS(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && !e.isComposing){
+      var m = document.getElementById('sample-eval-modal');
+      if(m && m.style.display === 'flex'){ closeSampleEval_BOS(); e.preventDefault(); e.stopPropagation(); }
+    }
+  }, true);
+  
+  console.log('[SampleEval] 업체 선정 평가 준비됨');
+})();
+</script>
+
+<!-- ━━━ 💬 광고 메시지 반응 기록 ━━━ -->
+<script id="ad-message-script">
+(function(){
+  var MSG_KEY = 'bos_ad_messages_v1';
+  
+  function loadMsgs(){
+    try { var raw = localStorage.getItem(MSG_KEY); return raw ? JSON.parse(raw) : []; }
+    catch(e){ return []; }
+  }
+  function saveMsgs(data){
+    try { localStorage.setItem(MSG_KEY, JSON.stringify(data)); if(typeof updateSaveTime==='function') updateSaveTime(); } catch(e){}
+  }
+  function escA(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+  function escH(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  
+  var REACT_OPTS = [
+    {key:'great', label:'🔥 폭발', color:'#C0392B', bg:'#FFEBEE'},
+    {key:'good', label:'👍 좋음', color:'#1A6B4A', bg:'#E8F5E9'},
+    {key:'soso', label:'😐 보통', color:'#F57F17', bg:'#FFF8E1'},
+    {key:'bad', label:'👎 별로', color:'#757575', bg:'#F5F5F5'}
+  ];
+  var CHANNEL_OPTS = ['메타', '구글', '네이버DA', '네이버SA', '틱톡', '유튜브', '블로그', '협찬', '기타'];
+  
+  window.renderAdMessages_BOS = function(){
+    var listEl = document.getElementById('ad-message-list');
+    if(!listEl) return;
+    var data = loadMsgs();
+    
+    if(data.length === 0){
+      listEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--mu);font-size:12px;background:#FAFAF8;border-radius:8px;border:1px dashed var(--bd)">'
+        + '기록된 메시지가 없습니다.<br><br><button class="btn btn-grn-bos" onclick="addAdMessage_BOS()">＋ 첫 메시지 기록 추가</button></div>';
+      return;
+    }
+    
+    // 날짜 내림차순 정렬
+    var sorted = data.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+    
+    listEl.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:760px">'
+      + '<thead><tr style="border-bottom:2px solid var(--bd)">'
+        + '<th style="padding:8px 6px;text-align:left;font-size:10.5px;color:var(--mu);width:110px">📅 일자</th>'
+        + '<th style="padding:8px 6px;text-align:left;font-size:10.5px;color:var(--mu)">💬 주요 메시지 / 카피</th>'
+        + '<th style="padding:8px 6px;text-align:center;font-size:10.5px;color:var(--mu);width:90px">📡 채널</th>'
+        + '<th style="padding:8px 6px;text-align:center;font-size:10.5px;color:var(--mu);width:100px">📊 반응</th>'
+        + '<th style="padding:8px 6px;text-align:left;font-size:10.5px;color:var(--mu)">💭 반응 상세 / 수치</th>'
+        + '<th style="width:30px"></th>'
+      + '</tr></thead><tbody>'
+      + sorted.map(function(m){
+          var react = REACT_OPTS.find(function(r){ return r.key === m.reaction; }) || REACT_OPTS[2];
+          var reactOpts = REACT_OPTS.map(function(r){ return '<option value="'+r.key+'"'+(m.reaction===r.key?' selected':'')+'>'+r.label+'</option>'; }).join('');
+          var chanOpts = '<option value="">—</option>' + CHANNEL_OPTS.map(function(c){ return '<option value="'+c+'"'+(m.channel===c?' selected':'')+'>'+c+'</option>'; }).join('');
+          return '<tr style="border-bottom:1px solid #F0F0F0">'
+            + '<td style="padding:5px 6px"><input type="date" value="'+escA(m.date)+'" onchange="updateAdMessage_BOS(\''+m.id+'\',\'date\',this.value)" style="width:100%;border:1px solid transparent;background:transparent;font-size:11px;padding:3px;border-radius:4px" onfocus="this.style.borderColor=\'var(--bd)\'" onblur="this.style.borderColor=\'transparent\'"></td>'
+            + '<td style="padding:5px 6px"><textarea rows="2" placeholder="이 시기 주력 메시지/카피" oninput="updateAdMessage_BOS(\''+m.id+'\',\'message\',this.value)" style="width:100%;border:1px solid transparent;background:transparent;font-size:11.5px;padding:3px;border-radius:4px;resize:vertical;font-family:inherit" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">'+escH(m.message)+'</textarea></td>'
+            + '<td style="padding:5px 4px;text-align:center"><select onchange="updateAdMessage_BOS(\''+m.id+'\',\'channel\',this.value)" style="padding:4px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff">'+chanOpts+'</select></td>'
+            + '<td style="padding:5px 4px;text-align:center"><select onchange="updateAdMessage_BOS(\''+m.id+'\',\'reaction\',this.value);renderAdMessages_BOS()" style="padding:4px 6px;border:1px solid '+react.color+';border-radius:4px;font-size:11px;font-weight:600;background:'+react.bg+';color:'+react.color+'">'+reactOpts+'</select></td>'
+            + '<td style="padding:5px 6px"><textarea rows="2" placeholder="클릭률·전환·댓글 반응 등 구체적 수치/관찰" oninput="updateAdMessage_BOS(\''+m.id+'\',\'detail\',this.value)" style="width:100%;border:1px solid transparent;background:transparent;font-size:11px;color:var(--mu);padding:3px;border-radius:4px;resize:vertical;font-family:inherit" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">'+escH(m.detail)+'</textarea></td>'
+            + '<td style="text-align:center"><button onclick="delAdMessage_BOS(\''+m.id+'\')" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:12px">✕</button></td>'
+          + '</tr>';
+        }).join('')
+      + '</tbody></table>';
+  };
+  
+  window.addAdMessage_BOS = function(){
+    var data = loadMsgs();
+    var today = new Date();
+    data.push({
+      id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
+      date: today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0'),
+      message: '', channel: '', reaction: 'soso', detail: ''
+    });
+    saveMsgs(data);
+    renderAdMessages_BOS();
+  };
+  
+  window.updateAdMessage_BOS = function(id, key, val){
+    var data = loadMsgs();
+    var m = data.find(function(x){ return x.id === id; });
+    if(!m) return;
+    m[key] = val;
+    saveMsgs(data);
+  };
+  
+  window.delAdMessage_BOS = function(id){
+    if(!confirm('이 메시지 기록을 삭제하시겠습니까?')) return;
+    var data = loadMsgs().filter(function(x){ return x.id !== id; });
+    saveMsgs(data);
+    renderAdMessages_BOS();
+  };
+  
+  // SYNC_KEYS 등록
+  if(typeof SYNC_KEYS !== 'undefined' && SYNC_KEYS.indexOf && SYNC_KEYS.indexOf(MSG_KEY) < 0){
+    SYNC_KEYS.push(MSG_KEY);
+  }
+  
+  console.log('[AdMessages] 광고 메시지 반응 기록 준비됨');
+})();
+</script>
+
+<!-- ━━━ ⑨ 데드라인 → 타임라인 표기 ━━━ -->
+<script id="deadline-cal-script">
+(function(){
+  // 데드라인 항목을 타임라인 캘린더 항목 형식으로 변환
+  window.getDeadlineCalItems_BOS = function(){
+    if(typeof deadlineData === 'undefined' || !deadlineData || !deadlineData.targetDate || !deadlineData.categories){
+      return [];
+    }
+    var target = new Date(deadlineData.targetDate + 'T00:00:00');
+    if(isNaN(target.getTime())) return [];
+    
+    var items = [];
+    var catLabels = {prod:'생산', photo:'촬영/상세', web:'웹', mkt:'마케팅', launch:'런칭'};
+    
+    Object.keys(deadlineData.categories).forEach(function(catKey){
+      var arr = deadlineData.categories[catKey] || [];
+      arr.forEach(function(d){
+        if(typeof d.offsetDays !== 'number') return;
+        // 시작일 = target + offsetDays
+        var start = new Date(target);
+        start.setDate(start.getDate() + d.offsetDays);
+        var dur = d.durationDays || 1;
+        var end = new Date(start);
+        end.setDate(end.getDate() + dur - 1);
+        
+        function iso(dt){ return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0'); }
+        
+        items.push({
+          id: 'dl_' + (d.id || Math.random().toString(36).substr(2,5)),
+          title: '⑨ ' + (d.name || ''),
+          startDate: iso(start),
+          endDate: iso(end),
+          color: d.color || '#888',
+          category: '데드라인',
+          _isDeadline: true,
+          _done: !!d.done
+        });
+      });
+    });
+    return items;
+  };
+  
+  // 데드라인 렌더 시 타임라인도 갱신 (데드라인 날짜 변경 → 타임라인 반영)
+  setTimeout(function(){
+    if(typeof window.renderDeadlines === 'function' && !window.renderDeadlines._calWrapped){
+      var _orig = window.renderDeadlines;
+      window.renderDeadlines = function(){
+        _orig.apply(this, arguments);
+        try {
+          if(typeof renderCalendarItems_BOS === 'function') renderCalendarItems_BOS();
+        } catch(e){}
+      };
+      window.renderDeadlines._calWrapped = true;
+    }
+  }, 800);
+  
+  console.log('[DeadlineCal] 데드라인 → 타임라인 연동 준비됨');
 })();
 </script>
 </body>
