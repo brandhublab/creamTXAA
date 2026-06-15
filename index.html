@@ -12425,9 +12425,15 @@ function forceIsolationReset(){
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
         <div>
           <div style="font-size:14px;font-weight:700">🤝 아웃소싱 관리</div>
-          <div style="font-size:11px;color:var(--mu);margin-top:3px">부자재 · 생산 · 발주 · 디자인 · 영상 · 마케팅 등 외부 의뢰 건 추적</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:3px" id="outsource-stage-desc-bos">견적을 받아 업체를 비교·결정하고, 의뢰 후 일정을 추적합니다</div>
         </div>
         <button class="btn btn-grn-bos" onclick="addOutsourceEntry_BOS()">＋ 아웃소싱 추가</button>
+      </div>
+      
+      <!-- 단계 토글: 견적 검토 / 의뢰 후 -->
+      <div style="display:flex;gap:0;margin-bottom:14px;border:1px solid var(--bd);border-radius:8px;overflow:hidden;width:fit-content">
+        <button id="outsource-stage-quote-btn" onclick="setOutsourceStage_BOS('quote')" style="padding:8px 18px;font-size:12px;border:none;cursor:pointer;background:#1A6B4A;color:#fff;font-weight:700">🔍 견적 검토</button>
+        <button id="outsource-stage-ordered-btn" onclick="setOutsourceStage_BOS('ordered')" style="padding:8px 18px;font-size:12px;border:none;cursor:pointer;background:#fff;color:var(--tx);font-weight:500;border-left:1px solid var(--bd)">📅 의뢰 후 (일정)</button>
       </div>
       
       <!-- 카테고리 필터 -->
@@ -17764,6 +17770,56 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
   function saveOutsource(arr){
     try { localStorage.setItem(LS_OUTSRC, JSON.stringify(arr)); if(typeof updateSaveTime==='function') updateSaveTime(); } catch(e){}
   }
+  // ━━ 아웃소싱 단계 (quote=견적검토 / ordered=의뢰후) ━━
+  var LS_OUTSRC_STAGE = 'bos_outsource_stage_v1';
+  function loadOutsourceStage(){
+    try { return localStorage.getItem(LS_OUTSRC_STAGE) || 'quote'; } catch(e){ return 'quote'; }
+  }
+  function saveOutsourceStage(v){
+    try { localStorage.setItem(LS_OUTSRC_STAGE, v); } catch(e){}
+  }
+  window.setOutsourceStage_BOS = function(stage){
+    saveOutsourceStage(stage);
+    // 토글 버튼 스타일
+    var qBtn = document.getElementById('outsource-stage-quote-btn');
+    var oBtn = document.getElementById('outsource-stage-ordered-btn');
+    if(qBtn && oBtn){
+      qBtn.style.background = stage==='quote'?'#1A6B4A':'#fff';
+      qBtn.style.color = stage==='quote'?'#fff':'var(--tx)';
+      qBtn.style.fontWeight = stage==='quote'?'700':'500';
+      oBtn.style.background = stage==='ordered'?'#1A6B4A':'#fff';
+      oBtn.style.color = stage==='ordered'?'#fff':'var(--tx)';
+      oBtn.style.fontWeight = stage==='ordered'?'700':'500';
+    }
+    var desc = document.getElementById('outsource-stage-desc-bos');
+    if(desc) desc.textContent = stage==='quote'
+      ? '여러 업체의 견적을 비교하고 의뢰할 업체를 결정합니다'
+      : '의뢰한 건의 일정(의뢰일·납기·결과)을 추적합니다';
+    renderOutsourceTable_BOS();
+  };
+  
+  // 견적 검토 → 의뢰 후로 이동 (업체 선정)
+  window.moveOutsourceToOrdered_BOS = function(id){
+    var data = loadOutsource();
+    var item = data.find(function(o){ return o.id === id; });
+    if(!item) return;
+    item.stage = 'ordered';
+    if(!item.requestDate) item.requestDate = new Date().toISOString().slice(0,10);
+    saveOutsource(data);
+    renderOutsourceTable_BOS();
+    if(typeof renderOutsourceMiniCal_BOS === 'function') renderOutsourceMiniCal_BOS();
+  };
+  
+  // 의뢰 후 → 견적 검토로 되돌리기
+  window.moveOutsourceToQuote_BOS = function(id){
+    var data = loadOutsource();
+    var item = data.find(function(o){ return o.id === id; });
+    if(!item) return;
+    item.stage = 'quote';
+    saveOutsource(data);
+    renderOutsourceTable_BOS();
+  };
+  
   function loadOutsourceFilter(){
     try { return localStorage.getItem(LS_OUTSRC_FILTER) || '전체'; } catch(e){ return '전체'; }
   }
@@ -17848,7 +17904,7 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
         }
       }
       
-      return '<tr style="border-bottom:1px solid var(--bd);background:' + statusBg + '" data-sample-id="' + s.id + '">'
+      return '<tr style="border-bottom:1px solid var(--bd);background:' + statusBg + '" data-sample-id="' + s.id + '" onmouseenter="highlightSampleInCal_BOS(\'' + s.id + '\')" onmouseleave="clearSampleCalHighlight_BOS()">'
         // 1) 업체명
         + '<td style="padding:5px 6px"><input value="' + escAttr(s.vendor) + '" placeholder="업체명" oninput="updateSampleField_BOS(\'' + s.id + '\',\'vendor\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;font-weight:500;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
         // 2) 거래처 담당자 (📇 연락처 카드 버튼 포함)
@@ -18005,6 +18061,24 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
   // 🤝 아웃소싱
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   window.renderOutsourceTable_BOS = function(){
+    // 단계 토글 버튼 상태 동기화
+    (function(){
+      var stage = (typeof loadOutsourceStage==='function')?loadOutsourceStage():'quote';
+      var qBtn = document.getElementById('outsource-stage-quote-btn');
+      var oBtn = document.getElementById('outsource-stage-ordered-btn');
+      if(qBtn && oBtn){
+        qBtn.style.background = stage==='quote'?'#1A6B4A':'#fff';
+        qBtn.style.color = stage==='quote'?'#fff':'var(--tx)';
+        qBtn.style.fontWeight = stage==='quote'?'700':'500';
+        oBtn.style.background = stage==='ordered'?'#1A6B4A':'#fff';
+        oBtn.style.color = stage==='ordered'?'#fff':'var(--tx)';
+        oBtn.style.fontWeight = stage==='ordered'?'700':'500';
+      }
+      var desc = document.getElementById('outsource-stage-desc-bos');
+      if(desc) desc.textContent = stage==='quote'
+        ? '여러 업체의 견적을 비교하고 의뢰할 업체를 결정합니다'
+        : '의뢰한 건의 일정(의뢰일·납기·결과)을 추적합니다';
+    })();
     var tbody = document.getElementById('outsource-tbody-bos');
     if(!tbody) return;
     var data = loadOutsource();
@@ -18013,15 +18087,20 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
     // 필터 칩 렌더
     var filterEl = document.getElementById('outsource-cat-filter-bos');
     if(filterEl){
+      var stageForChip = (typeof loadOutsourceStage === 'function') ? loadOutsourceStage() : 'quote';
+      var stageData = data.filter(function(d){ return (d.stage || 'ordered') === stageForChip; });
       filterEl.innerHTML = OUTSOURCE_CATS.map(function(c){
-        var count = c.key === '전체' ? data.length : data.filter(function(d){ return d.category === c.key; }).length;
+        var count = c.key === '전체' ? stageData.length : stageData.filter(function(d){ return d.category === c.key; }).length;
         var active = filter === c.key;
         return '<button onclick="setOutsourceFilter_BOS(\'' + c.key + '\')" style="background:' + (active?c.color:'#fff') + ';color:' + (active?'#fff':'var(--tx)') + ';border:1px solid ' + c.color + ';border-radius:14px;padding:3px 10px;font-size:10.5px;cursor:pointer;font-weight:' + (active?'700':'500') + '">'
           + c.emoji + ' ' + c.key + ' <span style="opacity:.8">(' + count + ')</span></button>';
       }).join('');
     }
     
-    var filtered = filter === '전체' ? data : data.filter(function(d){ return d.category === filter; });
+    var stage = (typeof loadOutsourceStage === 'function') ? loadOutsourceStage() : 'quote';
+    // 단계 필터: stage 없는 기존 항목은 'ordered'(의뢰 후)로 간주
+    var stageFiltered = data.filter(function(d){ return (d.stage || 'ordered') === stage; });
+    var filtered = filter === '전체' ? stageFiltered : stageFiltered.filter(function(d){ return d.category === filter; });
     
     if(filtered.length === 0){
       var msg = data.length === 0 
@@ -18041,7 +18120,7 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
       var catInfo = OUTSOURCE_CATS.find(function(c){ return c.key === o.category; }) || OUTSOURCE_CATS[0];
       var rowBg = o.deliveryDate ? '#F0F9F4' : '#FFFBF0';
       
-      return '<tr style="border-bottom:1px solid var(--bd);background:' + rowBg + ';border-left:3px solid ' + catInfo.color + '" data-outsource-id="' + o.id + '">'
+      return '<tr style="border-bottom:1px solid var(--bd);background:' + rowBg + ';border-left:3px solid ' + catInfo.color + '" data-outsource-id="' + o.id + '" onmouseenter="highlightOutsourceInCal_BOS(\'' + o.id + '\')" onmouseleave="clearOutsourceCalHighlight_BOS()">'
         + '<td style="padding:5px 6px"><select onchange="updateOutsourceField_BOS(\'' + o.id + '\',\'category\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff;cursor:pointer">' + catOptions + '</select></td>'
         + '<td style="padding:5px 6px"><input value="' + escAttr(o.vendor) + '" placeholder="업체명" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'vendor\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;font-weight:500;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
         + '<td style="padding:5px 6px"><div style="display:flex;align-items:center;gap:3px">'
@@ -18053,7 +18132,11 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
         + '<td style="padding:5px 6px"><input type="date" value="' + escAttr(o.deliveryDate) + '" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'deliveryDate\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff"></td>'
         + '<td style="padding:5px 6px;text-align:right"><input type="number" value="' + escAttr(o.cost) + '" placeholder="0" min="0" step="1000" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'cost\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11px;background:transparent;text-align:right;font-family:\'Roboto Mono\',monospace" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
         + '<td style="padding:5px 6px"><textarea placeholder="실제 받은 결과물 / 링크 / 코멘트" oninput="updateOutsourceField_BOS(\'' + o.id + '\',\'result\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11px;background:transparent;resize:vertical;min-height:28px;font-family:inherit" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">' + escHtml(o.result) + '</textarea></td>'
-        + '<td style="padding:5px 4px;text-align:center"><button onclick="deleteOutsourceEntry_BOS(\'' + o.id + '\')" title="삭제" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:13px;padding:4px 6px">✕</button></td>'
+        + '<td style="padding:5px 4px;text-align:center;white-space:nowrap">'
+        + ((o.stage||'ordered')==='quote'
+            ? '<button onclick="moveOutsourceToOrdered_BOS(\'' + o.id + '\')" title="이 업체로 의뢰 확정 (의뢰 후 단계로 이동)" style="background:#EAF3EE;border:1px solid #1A6B4A;color:#1A6B4A;border-radius:4px;font-size:10px;cursor:pointer;padding:3px 7px;margin-right:3px;font-weight:600">✅ 의뢰확정</button>'
+            : '<button onclick="moveOutsourceToQuote_BOS(\'' + o.id + '\')" title="견적 검토 단계로 되돌리기" style="background:none;border:1px solid var(--bd);color:var(--mu);border-radius:4px;font-size:10px;cursor:pointer;padding:3px 7px;margin-right:3px">↩ 견적</button>')
+        + '<button onclick="deleteOutsourceEntry_BOS(\'' + o.id + '\')" title="삭제" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:13px;padding:4px 6px">✕</button></td>'
         + '</tr>';
     }).join('');
     
@@ -18086,9 +18169,11 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
     // 현재 선택된 탭(필터)이 '전체'/'기타'가 아니면 그 카테고리로 자동 설정
     var curFilter = (typeof loadOutsourceFilter === 'function') ? loadOutsourceFilter() : '전체';
     var defCat = (curFilter !== '전체' && curFilter !== '기타') ? curFilter : '제품생산';
+    var curStage = (typeof loadOutsourceStage === 'function') ? loadOutsourceStage() : 'quote';
     data.unshift({
       id: 'out_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
       category: defCat,
+      stage: curStage,
       vendor: '',
       contact: '',
       requestDate: new Date().toISOString().slice(0,10),
@@ -19369,8 +19454,11 @@ body.cal-highlighting .cal-item-card-bos:hover{
       var isToday = iso === todayIso;
       var cls = 'minical-cell-bos' + (evs.length ? ' has-ev' : '') + (isToday ? ' today' : '');
       var tipData = evs.map(function(e){ return e.color + '::' + String(e.label||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }).join('||');
+      // 업체 식별자 수집 (샘플/아웃소싱 호버 강조용)
+      var sids = evs.map(function(e){ return e.sid || ''; }).filter(function(x){ return x; });
+      var sidAttr = sids.length ? ' data-sids="' + sids.join(',') + '"' : '';
       var hover = evs.length ? ' data-ev="' + tipData + '" onmouseenter="miniCalHover_BOS(this,event)" onmousemove="miniCalHover_BOS(this,event)" onmouseleave="miniCalLeave_BOS()"' : '';
-      h += '<div class="' + cls + '"' + hover + '>';
+      h += '<div class="' + cls + '"' + hover + sidAttr + '>';
       h += '<span class="minical-day-bos">' + d + '</span>';
       if(evs.length){
         h += '<span class="minical-dots-bos">';
@@ -19453,14 +19541,14 @@ body.cal-highlighting .cal-item-card-bos:hover{
     var events = [];
     data.forEach(function(s){
       var name = (s.vendor||'업체') + ' · ' + (s.sampleName||'샘플');
-      if(s.requestDate) events.push({date: s.requestDate, color:'#E67E22', label:'[의뢰] ' + name});
+      if(s.requestDate) events.push({date: s.requestDate, color:'#E67E22', label:'[의뢰] ' + name, sid:s.id});
       // 예상 도착일 = 의뢰일 + 예상소요
       if(s.requestDate && parseInt(s.expectedDays) > 0 && !s.arrivalDate){
         var d = new Date(s.requestDate + 'T00:00:00');
         if(!isNaN(d.getTime())){
           d.setDate(d.getDate() + parseInt(s.expectedDays));
           var iso = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-          events.push({date: iso, color:'#1976D2', label:'[예상 도착] ' + name});
+          events.push({date: iso, color:'#1976D2', label:'[예상 도착] ' + name, sid:s.id});
         }
       }
       if(s.arrivalDate) events.push({date: s.arrivalDate, color:'#27AE60', label:'[도착 완료] ' + name});
@@ -19469,9 +19557,9 @@ body.cal-highlighting .cal-item-card-bos:hover{
         SAMPLE_PHASES_BOS.forEach(function(ph){
           var st = s[ph.startKey];
           if(!st) return;
-          events.push({date: st, color: ph.startColor || ph.color, label:'[' + ph.startLabel + '] ' + name});
+          events.push({date: st, color: ph.startColor || ph.color, label:'[' + ph.startLabel + '] ' + name, sid:s.id});
           var end = (typeof calcPhaseEnd_BOS === 'function') ? calcPhaseEnd_BOS(st, s[ph.durKey], s[ph.unitKey]) : '';
-          if(end && end !== st) events.push({date: end, color: ph.color, label:'[' + ph.endLabel + '] ' + name});
+          if(end && end !== st) events.push({date: end, color: ph.color, label:'[' + ph.endLabel + '] ' + name, sid:s.id});
         });
       }
     });
@@ -19488,8 +19576,8 @@ body.cal-highlighting .cal-item-card-bos:hover{
     var events = [];
     data.forEach(function(o){
       var name = (o.category||'') + ' · ' + (o.vendor||'업체');
-      if(o.requestDate) events.push({date: o.requestDate, color:'#E67E22', label:'[의뢰] ' + name});
-      if(o.deliveryDate) events.push({date: o.deliveryDate, color:'#27AE60', label:'[결과물 도착] ' + name});
+      if(o.requestDate) events.push({date: o.requestDate, color:'#E67E22', label:'[의뢰] ' + name, sid:o.id});
+      if(o.deliveryDate) events.push({date: o.deliveryDate, color:'#27AE60', label:'[결과물 도착] ' + name, sid:o.id});
     });
     renderMiniCal('outsource-minical-bos', events, 'outsource');
   };
@@ -20930,6 +21018,50 @@ setTimeout(function(){
   }, 800);
   
   console.log('[DeadlineCal] 데드라인 → 타임라인 연동 준비됨');
+})();
+</script>
+
+<!-- ━━━ 샘플/아웃소싱 행 → 미니캘린더 강조 ━━━ -->
+<style>
+.minical-cell-bos.sid-dimmed{ opacity:.25; transition:opacity .15s; }
+.minical-cell-bos.sid-active{ background:#FFF8E1 !important; outline:2px solid #FFB300; outline-offset:-2px; border-radius:4px; transition:all .15s; z-index:2; position:relative; }
+.minical-cell-bos.sid-active .minical-day-bos{ font-weight:700; color:#E65100; }
+</style>
+<script id="sample-cal-hover-script">
+(function(){
+  function highlightCal(containerId, sampleId){
+    var container = document.getElementById(containerId);
+    if(!container) return;
+    var cells = container.querySelectorAll('.minical-cell-bos');
+    cells.forEach(function(cell){
+      cell.classList.remove('sid-active', 'sid-dimmed');
+      var sids = cell.getAttribute('data-sids');
+      if(sids){
+        var list = sids.split(',');
+        if(list.indexOf(sampleId) >= 0){
+          cell.classList.add('sid-active');
+        } else {
+          cell.classList.add('sid-dimmed');
+        }
+      } else if(cell.classList.contains('has-ev')){
+        cell.classList.add('sid-dimmed');
+      }
+    });
+  }
+  function clearHighlight(containerId){
+    var container = document.getElementById(containerId);
+    if(!container) return;
+    container.querySelectorAll('.minical-cell-bos').forEach(function(cell){
+      cell.classList.remove('sid-active', 'sid-dimmed');
+    });
+  }
+  
+  window.highlightSampleInCal_BOS = function(sampleId){ highlightCal('sample-minical-bos', sampleId); };
+  window.clearSampleCalHighlight_BOS = function(){ clearHighlight('sample-minical-bos'); };
+  window.highlightOutsourceInCal_BOS = function(id){ highlightCal('outsource-minical-bos', id); };
+  window.clearOutsourceCalHighlight_BOS = function(){ clearHighlight('outsource-minical-bos'); };
+  
+  console.log('[SampleCalHover] 행→캘린더 강조 준비됨');
 })();
 </script>
 </body>
