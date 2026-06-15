@@ -19425,10 +19425,12 @@ body.cal-highlighting .cal-item-card-bos:hover{
     var r = tip.getBoundingClientRect();
     if(x + r.width > window.innerWidth - 8) tip.style.left = (event.clientX - r.width - 12) + 'px';
     if(y + r.height > window.innerHeight - 8) tip.style.top = (event.clientY - r.height - 12) + 'px';
+    highlightRowsFromCell_BOS(el);
   };
   window.miniCalLeave_BOS = function(){
     var tip = document.getElementById('minical-tip-bos');
     if(tip) tip.style.display = 'none';
+    clearRowHighlightFromCell_BOS();
   };
   
   // events: [{date:'YYYY-MM-DD', color, label}]
@@ -19551,7 +19553,7 @@ body.cal-highlighting .cal-item-card-bos:hover{
           events.push({date: iso, color:'#1976D2', label:'[예상 도착] ' + name, sid:s.id});
         }
       }
-      if(s.arrivalDate) events.push({date: s.arrivalDate, color:'#27AE60', label:'[도착 완료] ' + name});
+      if(s.arrivalDate) events.push({date: s.arrivalDate, color:'#27AE60', label:'[도착 완료] ' + name, sid:s.id});
       // ━━ 공정 일정 (문안검수 / CT Test / 부자재·양산) ━━
       if(typeof SAMPLE_PHASES_BOS !== 'undefined'){
         SAMPLE_PHASES_BOS.forEach(function(ph){
@@ -21062,6 +21064,56 @@ setTimeout(function(){
   window.clearOutsourceCalHighlight_BOS = function(){ clearHighlight('outsource-minical-bos'); };
   
   console.log('[SampleCalHover] 행→캘린더 강조 준비됨');
+})();
+</script>
+
+<!-- ━━━ 미니캘린더 셀 → 위 표 행 역방향 강조 ━━━ -->
+<style>
+tr.row-cal-highlight{ background:#FFF8E1 !important; outline:2px solid #FFB300; outline-offset:-2px; transition:all .12s; }
+tr.row-cal-highlight td{ background:transparent !important; }
+</style>
+<script id="cal-to-row-hover-script">
+(function(){
+  var _lastHoverSids = null;
+  window.highlightRowsFromCell_BOS = function(cell){
+    if(!cell) return;
+    var sids = cell.getAttribute('data-sids');
+    if(!sids) return;
+    if(sids === _lastHoverSids) return;  // 같은 셀 재호출 방지 (onmousemove)
+    _lastHoverSids = sids;
+    var idList = sids.split(',').filter(function(x){ return x; });
+    if(idList.length === 0) return;
+    // 어느 미니캘린더인지 판별 (sample / outsource)
+    var inSample = !!cell.closest('#sample-minical-bos');
+    var inOutsource = !!cell.closest('#outsource-minical-bos');
+    var attr = inSample ? 'data-sample-id' : (inOutsource ? 'data-outsource-id' : null);
+    if(!attr) return;
+    clearRowHighlightFromCell_BOS();
+    var firstRow = null;
+    idList.forEach(function(id){
+      var row = document.querySelector('tr[' + attr + '="' + id + '"]');
+      if(row){
+        row.classList.add('row-cal-highlight');
+        if(!firstRow) firstRow = row;
+      }
+    });
+    // 강조된 행이 화면 밖이면 스크롤
+    if(firstRow){
+      var rect = firstRow.getBoundingClientRect();
+      if(rect.top < 60 || rect.bottom > window.innerHeight){
+        firstRow.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+    }
+  };
+  
+  window.clearRowHighlightFromCell_BOS = function(){
+    _lastHoverSids = null;
+    document.querySelectorAll('tr.row-cal-highlight').forEach(function(r){
+      r.classList.remove('row-cal-highlight');
+    });
+  };
+  
+  console.log('[CalToRow] 캘린더 셀 → 행 역방향 강조 준비됨');
 })();
 </script>
 </body>
