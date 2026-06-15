@@ -12684,10 +12684,17 @@ function forceIsolationReset(){
         <!-- CAL_CATEGORIES_BOS 기반 동적 생성 (fillCalCategoryOptions_BOS) -->
       </select>
     </div>
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">🔗 선행 일정 (먼저 끝나야 하는 작업)</label>
+      <select id="bos-cal-item-prereq" onchange="onPrereqChange_BOS(this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit;background:#fff">
+        <option value="">— 없음 (시작일 직접 입력) —</option>
+      </select>
+      <div id="bos-cal-prereq-hint" style="font-size:10.5px;color:#1565C0;margin-top:4px;display:none"></div>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
       <div>
-        <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">시작일</label>
-        <input type="date" id="bos-cal-item-start" onchange="calcLeadtimeEnd_BOS()" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit">
+        <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">시작일 <span id="bos-cal-start-auto" style="font-size:9px;color:#1565C0;display:none">(선행 따라 자동)</span></label>
+        <input type="date" id="bos-cal-item-start" onchange="onStartManualEdit_BOS();calcLeadtimeEnd_BOS()" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit">
       </div>
       <div>
         <label style="display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px">종료일 (선택)</label>
@@ -13097,9 +13104,26 @@ function forceIsolationReset(){
           + '</div>'
           + (item.note ? '<div class="cal-item-note-bos">' + escapeHtml_BOS(item.note) + '</div>' : '')
           + buildActualRow_BOS(item)
+          + buildDepsRow_BOS(item)
         + '</div>'
         + '</div>';
     }).join('');
+  }
+  
+  // ━━ 🔗 선행 표시 + 후속 추가 버튼 ━━
+  function buildDepsRow_BOS(item){
+    if(item._isDeadline) return '';
+    var prereqLabel = '';
+    if(item.prereqId){
+      var prereq = (calData_BOS.items||[]).find(function(i){ return i.id === item.prereqId; });
+      if(prereq){
+        prereqLabel = '<span style="font-size:10px;color:#1565C0;background:#E8F1FB;padding:2px 8px;border-radius:8px;white-space:nowrap">🔗 선행: ' + (prereq.title||'').replace(/</g,'&lt;') + '</span>';
+      }
+    }
+    return '<div onclick="event.stopPropagation()" style="margin-top:7px;padding-top:7px;border-top:1px dashed var(--bd);display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+      + prereqLabel
+      + '<button onclick="addFollowupItem_BOS(\'' + item.id + '\')" style="font-size:10px;background:#EAF3EE;border:1px solid #1A6B4A;color:#1A6B4A;border-radius:5px;padding:3px 10px;cursor:pointer;font-weight:600;margin-left:auto">＋ 후속 일정</button>'
+      + '</div>';
   }
   
   // ━━ ✅ 실제 완료 행 (예상 vs 실제 차이) ━━
@@ -13293,6 +13317,7 @@ function forceIsolationReset(){
     document.getElementById('bos-cal-item-id').value = '';
     document.getElementById('bos-cal-item-title').value = '';
     if(typeof fillCalCategoryOptions_BOS==='function') fillCalCategoryOptions_BOS('');
+    if(typeof fillPrereqOptions_BOS==='function') fillPrereqOptions_BOS('', null);
     var _catEl = document.getElementById('bos-cal-item-category');
     if(_catEl) _catEl.value = '';
     var todayStr = new Date().toISOString().slice(0,10);
@@ -13322,6 +13347,7 @@ function forceIsolationReset(){
     document.getElementById('bos-cal-item-id').value = itemId;
     document.getElementById('bos-cal-item-title').value = item.title || '';
     if(typeof fillCalCategoryOptions_BOS==='function') fillCalCategoryOptions_BOS(item.category || '');
+    if(typeof fillPrereqOptions_BOS==='function') fillPrereqOptions_BOS(item.prereqId || '', item.id);
     var _catEl2 = document.getElementById('bos-cal-item-category');
     if(_catEl2) _catEl2.value = item.category || '';
     document.getElementById('bos-cal-item-start').value = item.startDate || '';
@@ -13366,7 +13392,8 @@ function forceIsolationReset(){
       color: document.getElementById('bos-cal-item-color').value,
       note: document.getElementById('bos-cal-item-note').value.trim(),
       leadtimeValue: parseInt(document.getElementById('bos-cal-item-leadtime-value')?.value) || 0,
-      leadtimeUnit: document.getElementById('bos-cal-item-leadtime-unit')?.value || 'week'
+      leadtimeUnit: document.getElementById('bos-cal-item-leadtime-unit')?.value || 'week',
+      prereqId: (document.getElementById('bos-cal-item-prereq')?.value || '')
     };
     
     if(calEditingItemId_BOS){
@@ -19419,7 +19446,8 @@ body.cal-highlighting .cal-item-card-bos:hover{
   // 🗓 공용 미니 캘린더
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   var miniCalState = {
-    sample: null,     // {y, m} - null이면 현재 월
+    sample: null,     // {y, m}
+    deadline: null,   // 데드라인 캘린더 - null이면 현재 월
     outsource: null
   };
   
@@ -19541,6 +19569,9 @@ body.cal-highlighting .cal-item-card-bos:hover{
     
     container.innerHTML = h;
   }
+  window.renderMiniCal = renderMiniCal;
+  if(typeof renderOneMiniMonth==='function') window.renderOneMiniMonth = renderOneMiniMonth;
+  if(typeof miniCalState!=='undefined') window.miniCalState = miniCalState;
   
   window.miniCalNav_BOS = function(stateKey, delta){
     var now = new Date();
@@ -21350,6 +21381,182 @@ tr.row-cal-highlight td{ background:transparent !important; }
   }, 1100);
   
   console.log('[DeadlineMiniCal] 데드라인 캘린더 준비됨');
+})();
+</script>
+
+<!-- ━━━ 타임라인 선행/후속 일정 의존 관계 ━━━ -->
+<script id="cal-deps-script">
+(function(){
+  // 다음 영업일 (주말 건너뜀)
+  function nextBusinessDay(dateStr){
+    var d = new Date(dateStr + 'T00:00:00');
+    if(isNaN(d.getTime())) return '';
+    d.setDate(d.getDate() + 1);
+    while(d.getDay() === 0 || d.getDay() === 6){ d.setDate(d.getDate() + 1); }
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  
+  // 항목의 종료일 (endDate 없으면 startDate + 리드타임)
+  function getItemEnd_BOS(item){
+    if(!item) return '';
+    if(item.endDate) return item.endDate;
+    if(item.startDate && item.leadtimeValue){
+      var days = item.leadtimeValue * (item.leadtimeUnit === 'week' ? 7 : (item.leadtimeUnit === 'month' ? 30 : 1));
+      var d = new Date(item.startDate + 'T00:00:00');
+      d.setDate(d.getDate() + days - 1);
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+    return item.startDate || '';
+  }
+  
+  // 선행 드롭다운 채우기 (자기 자신·자신의 후속은 제외 — 순환 방지)
+  window.fillPrereqOptions_BOS = function(selectedId, currentItemId){
+    var sel = document.getElementById('bos-cal-item-prereq');
+    if(!sel) return;
+    var items = (typeof calData_BOS !== 'undefined' && calData_BOS.items) ? calData_BOS.items : [];
+    // 순환 방지: 현재 항목을 선행으로 갖는(=후속) 항목들 수집
+    var descendants = {};
+    if(currentItemId){
+      var changed = true;
+      descendants[currentItemId] = true;
+      while(changed){
+        changed = false;
+        items.forEach(function(it){
+          if(it.prereqId && descendants[it.prereqId] && !descendants[it.id]){
+            descendants[it.id] = true; changed = true;
+          }
+        });
+      }
+    }
+    var h = '<option value="">— 없음 (시작일 직접 입력) —</option>';
+    items.forEach(function(it){
+      if(currentItemId && descendants[it.id]) return;  // 자기 자신/후속 제외
+      var end = getItemEnd_BOS(it);
+      var endTxt = end ? (' (종료 ' + end + ')') : '';
+      h += '<option value="' + it.id + '"' + (it.id === selectedId ? ' selected' : '') + '>' 
+        + (it.title || '제목없음').replace(/</g,'&lt;') + endTxt + '</option>';
+    });
+    sel.innerHTML = h;
+    // 힌트 갱신
+    onPrereqChange_BOS(selectedId || '', true);
+  };
+  
+  // 선행 선택 시 → 시작일 자동 (종료일 다음 영업일)
+  window.onPrereqChange_BOS = function(prereqId, skipFill){
+    var hint = document.getElementById('bos-cal-prereq-hint');
+    var autoTag = document.getElementById('bos-cal-start-auto');
+    var startEl = document.getElementById('bos-cal-item-start');
+    if(!prereqId){
+      if(hint) hint.style.display = 'none';
+      if(autoTag) autoTag.style.display = 'none';
+      if(startEl) startEl.readOnly = false, startEl.style.background = '';
+      return;
+    }
+    var items = (typeof calData_BOS !== 'undefined' && calData_BOS.items) ? calData_BOS.items : [];
+    var prereq = items.find(function(i){ return i.id === prereqId; });
+    if(!prereq) return;
+    var end = getItemEnd_BOS(prereq);
+    var autoStart = end ? nextBusinessDay(end) : '';
+    if(startEl && autoStart){
+      startEl.value = autoStart;
+      startEl.style.background = '#F0F6FF';
+      if(typeof calcLeadtimeEnd_BOS === 'function') calcLeadtimeEnd_BOS();
+    }
+    if(autoTag) autoTag.style.display = '';
+    if(hint){
+      hint.style.display = '';
+      hint.innerHTML = '🔗 <b>' + (prereq.title||'') + '</b> 종료(' + end + ') 다음 영업일 <b>' + autoStart + '</b>에 시작 — 선행이 밀리면 자동으로 따라 이동합니다. (시작일을 직접 바꾸면 연결 해제)';
+    }
+  };
+  
+  // 시작일 수동 편집 → 선행 연결 해제
+  window.onStartManualEdit_BOS = function(){
+    var sel = document.getElementById('bos-cal-item-prereq');
+    var autoTag = document.getElementById('bos-cal-start-auto');
+    var hint = document.getElementById('bos-cal-prereq-hint');
+    var startEl = document.getElementById('bos-cal-item-start');
+    // 이 함수는 사용자가 날짜를 직접 바꿀 때만 호출됨 (자동설정은 .value 직접 대입이라 onchange 안 탐)
+    if(sel && sel.value){
+      sel.value = '';
+      if(autoTag) autoTag.style.display = 'none';
+      if(hint) hint.style.display = 'none';
+      if(startEl) startEl.style.background = '';
+    }
+  };
+  
+  // 후속 일정 바로 추가 (이 항목을 선행으로)
+  window.addFollowupItem_BOS = function(prereqId){
+    var items = (typeof calData_BOS !== 'undefined' && calData_BOS.items) ? calData_BOS.items : [];
+    var prereq = items.find(function(i){ return i.id === prereqId; });
+    if(!prereq) return;
+    var end = getItemEnd_BOS(prereq);
+    var autoStart = end ? nextBusinessDay(end) : (prereq.startDate || '');
+    var newItem = {
+      id: 'cal_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
+      title: '',
+      category: prereq.category || '',
+      startDate: autoStart,
+      endDate: '',
+      color: prereq.color || '#1976D2',
+      note: '',
+      leadtimeValue: 0,
+      leadtimeUnit: 'week',
+      prereqId: prereqId
+    };
+    calData_BOS.items.push(newItem);
+    if(typeof saveCalData_BOS === 'function') saveCalData_BOS();
+    if(typeof renderCalendarItems_BOS === 'function') renderCalendarItems_BOS();
+    // 바로 편집 모달 열기
+    if(typeof editCalendarItem_BOS === 'function') editCalendarItem_BOS(newItem.id);
+  };
+  
+  // 선행 의존 항목들 시작일 자동 재계산 (렌더 전 호출)
+  window.recalcDependentDates_BOS = function(){
+    var items = (typeof calData_BOS !== 'undefined' && calData_BOS.items) ? calData_BOS.items : [];
+    if(!items.length) return;
+    var byId = {};
+    items.forEach(function(i){ byId[i.id] = i; });
+    // 위상정렬 없이 반복 수렴 (최대 항목수만큼 반복)
+    var changed = true, guard = 0;
+    while(changed && guard < items.length + 2){
+      changed = false; guard++;
+      items.forEach(function(it){
+        if(!it.prereqId) return;
+        var prereq = byId[it.prereqId];
+        if(!prereq){ return; }
+        var end = getItemEnd_BOS(prereq);
+        if(!end) return;
+        var want = nextBusinessDay(end);
+        if(want && it.startDate !== want){
+          it.startDate = want;
+          // 리드타임 있으면 종료일도 갱신
+          if(it.leadtimeValue){
+            var days = it.leadtimeValue * (it.leadtimeUnit==='week'?7:(it.leadtimeUnit==='month'?30:1));
+            var d = new Date(want + 'T00:00:00');
+            d.setDate(d.getDate() + days - 1);
+            it.endDate = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+          }
+          changed = true;
+        }
+      });
+    }
+  };
+  
+  // renderCalendarItems_BOS 래핑: 렌더 전 의존 재계산
+  setTimeout(function(){
+    if(typeof window.renderCalendarItems_BOS === 'function' && !window.renderCalendarItems_BOS._depsWrapped){
+      var _orig = window.renderCalendarItems_BOS;
+      var wrapped = function(){
+        try { recalcDependentDates_BOS(); } catch(e){}
+        return _orig.apply(this, arguments);
+      };
+      wrapped._depsWrapped = true;
+      window.renderCalendarItems_BOS = wrapped;
+    }
+  }, 1200);
+  
+  window._getItemEnd_BOS = getItemEnd_BOS;
+  console.log('[CalDeps] 선행/후속 의존 관계 준비됨');
 })();
 </script>
 </body>
