@@ -9493,124 +9493,142 @@ var clinicalItems=[
 ];
 
 var clinicalInstitutions=[
- {id:'inst01',name:'P&K 피부임상연구소',url:'https://selfcos.com/portfolio/detail/32226',specialty:'색소침착·미백·VISIA',note:'기미 케어 A+D 임상 1순위',prime:true},
- {id:'inst02',name:'한국피부과학연구원',url:'https://selfcos.com/portfolio/detail/32226',specialty:'미백·무자극·기능성',note:'PRIME+BEST',prime:true},
- {id:'inst03',name:'(주)큐티스의생명연구센터',url:'https://selfcos.com/portfolio/detail/32471',specialty:'안전성·자극성',note:'PRIME',prime:true},
- {id:'inst04',name:'(주)코어덤 피부과학연구소',url:'https://selfcos.com/portfolio/detail/31539',specialty:'더마·피부과학',note:'PRIME',prime:true},
- {id:'inst05',name:'더마클 피부임상시험센터',url:'https://selfcos.com/portfolio/detail/33050',specialty:'색소·여드름·VISIA',note:'PRIME',prime:true},
- {id:'inst06',name:'(주)에이스피부임상연구소',url:'https://selfcos.com/portfolio/detail/33006',specialty:'논코메도제닉·무자극',note:'PRIME',prime:true},
- {id:'inst07',name:'세명대학교 화장품·건강기능식품 임상시험센터',url:'https://selfcos.com/portfolio/detail/32679',specialty:'수분·장벽·기능성',note:'PRIME',prime:true},
- {id:'inst08',name:'글로벌의생명연구원',url:'https://selfcos.com/portfolio/detail/33304',specialty:'안전성·일반',note:'PRIME',prime:true},
- {id:'inst09',name:'더케이컴퍼니',url:'https://selfcos.com/portfolio/detail/33055',specialty:'기능성·미백',note:'PRIME',prime:true},
- {id:'inst10',name:'(주) OATC (오에이티씨)',url:'https://selfcos.com/portfolio/detail/32498',specialty:'기능성화장품 심사',note:'PRIME',prime:true},
- {id:'inst11',name:'프로브엠 피부임상연구센터',url:'https://selfcos.com/portfolio/detail/32469',specialty:'무자극·안전성',note:'BEST',prime:false},
- {id:'inst12',name:'스킨메드 임상시험센터',url:'https://selfcos.com/portfolio/detail/32473',specialty:'논코메도제닉·여드름',note:'',prime:false},
- {id:'inst13',name:'바닷',url:'https://selfcos.com/portfolio/detail/33303',specialty:'일반·안전성',note:'',prime:false}
+ {id:'inst01',name:'P&K 피부임상연구소',url:'https://selfcos.com/portfolio/detail/32226',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''},
+ {id:'inst02',name:'한국피부과학연구원',url:'https://selfcos.com/portfolio/detail/32226',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''},
+ {id:'inst03',name:'(주)큐티스의생명연구센터',url:'https://selfcos.com/portfolio/detail/32471',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''},
+ {id:'inst04',name:'(주)코어덤 피부과학연구소',url:'https://selfcos.com/portfolio/detail/31539',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''},
+ {id:'inst05',name:'더마클 피부임상시험센터',url:'https://selfcos.com/portfolio/detail/33050',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''},
+ {id:'inst06',name:'(주)에이스피부임상연구소',url:'https://selfcos.com/portfolio/detail/33006',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''},
+ {id:'inst07',name:'세명대학교 화장품·건강기능식품 임상시험센터',url:'https://selfcos.com/portfolio/detail/32679',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''},
+ {id:'inst08',name:'글로벌의생명연구원',url:'https://selfcos.com/portfolio/detail/33304',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''},
+ {id:'inst09',name:'더케이컴퍼니',url:'https://selfcos.com/portfolio/detail/33055',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''},
+ {id:'inst10',name:'(주) OATC (오에이티씨)',url:'https://selfcos.com/portfolio/detail/32498',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''},
+ {id:'inst11',name:'프로브엠 피부임상연구센터',url:'https://selfcos.com/portfolio/detail/32469',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''},
+ {id:'inst12',name:'스킨메드 임상시험센터',url:'https://selfcos.com/portfolio/detail/32473',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''},
+ {id:'inst13',name:'바닷',url:'https://selfcos.com/portfolio/detail/33303',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''}
 ];
 
 function renderClinicalItems(){
  var wrap=document.getElementById('clinical-items-wrap');if(!wrap)return;
- var N=function(n){return n.toLocaleString('ko-KR');};
- var total=clinicalItems.length,done=0,inp=0,costSum=0;
- clinicalItems.forEach(function(it){
-  if(it.status==='완료'){done++;costSum+=(it.cost||0);}
-  else if(it.status==='진행중'){inp++;costSum+=(it.cost||0);}
- });
+ var N=function(n){return (n||0).toLocaleString('ko-KR');};
+ var total=clinicalItems.length, budgetSum=0;
+ clinicalItems.forEach(function(it){ budgetSum+=(parseInt(it.budget)||0); });
  var te=document.getElementById('cl-total');if(te)te.textContent=total;
- var de=document.getElementById('cl-done');if(de)de.textContent=done;
- var ie=document.getElementById('cl-inprog');if(ie)ie.textContent=inp;
- var oe=document.getElementById('cl-todo');if(oe)oe.textContent=total-done-inp;
- var ce=document.getElementById('cl-cost');if(ce)ce.textContent=N(costSum)+'원';
+ var de=document.getElementById('cl-done');if(de)de.textContent='';
+ var ie=document.getElementById('cl-inprog');if(ie)ie.textContent='';
+ var oe=document.getElementById('cl-todo');if(oe)oe.textContent='';
+ var ce=document.getElementById('cl-cost');if(ce)ce.textContent=N(budgetSum)+'원';
+
+ if(clinicalItems.length===0){
+  wrap.innerHTML='<div style="padding:24px;text-align:center;color:var(--mu);font-size:12px">예정 임상 항목이 없습니다.<br><button class="btn" onclick="addClinicalItem()" style="margin-top:10px">+ 항목 추가</button></div>';
+  return;
+ }
 
  wrap.innerHTML=clinicalItems.map(function(it,i){
-  var sc=it.status==='완료'?'var(--green)':it.status==='진행중'?'var(--amber)':'var(--red)';
-  var bg=it.status==='완료'?'#F0FBF4':it.status==='진행중'?'#FFFDE7':'var(--sur)';
-  var bl=it.required?'var(--red)':'var(--bd)';
-  return '<div style="border:1px solid var(--bd);border-radius:8px;margin-bottom:10px;overflow:hidden">'
-   +'<div style="padding:10px 12px;border-left:4px solid '+bl+';background:'+bg+'">'
-   // 헤더 행
-   +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">'
-   +'<div style="flex:1">'
-   +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'
-   +(it.required?'<span style="font-size:9px;background:#FFEBEE;color:#C62828;padding:1px 5px;border-radius:3px;font-weight:600;flex-shrink:0">필수</span>':'<span style="font-size:9px;background:#F5F5F5;color:var(--mu);padding:1px 5px;border-radius:3px;flex-shrink:0">권장</span>')
-   +'<input value="'+(it.name||'').replace(/"/g,'&quot;')+'" onchange="clinicalItems['+i+'].name=this.value;sv()" style="flex:1;border:none;background:transparent;font-size:12px;font-weight:500;color:var(--tx);outline:none">'
+  return '<div style="border:1px solid var(--bd);border-radius:8px;margin-bottom:10px;padding:12px;background:var(--sur)">'
+   // 항목명 + 삭제
+   +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">'
+   +'<span style="font-size:10px;color:var(--mu);flex-shrink:0">예정 항목</span>'
+   +'<input value="'+(it.name||'').replace(/"/g,'&quot;')+'" placeholder="예: 색소침착지수(MI) 개선 시험" onchange="clinicalItems['+i+'].name=this.value;sv()" style="flex:1;min-width:0;border:1px solid var(--bd);border-radius:4px;padding:5px 8px;font-size:12px;font-weight:500;color:var(--tx);outline:none;background:var(--bg)">'
+   +'<button onclick="removeClinicalItem('+i+')" style="font-size:11px;background:none;border:none;color:var(--hi);cursor:pointer;flex-shrink:0">✕</button>'
    +'</div>'
-   +'<div style="font-size:11px;color:var(--mu)">기간: <b>'+it.period+'</b> &nbsp;|&nbsp; 목표: <span style="color:var(--green)">'+it.target+'</span></div>'
-   +'</div>'
-   // 상태 선택 + 삭제
-   +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
-   +'<select onchange="clinicalItems['+i+'].status=this.value;renderClinicalItems();sv()" style="border:1px solid var(--bd);border-radius:4px;padding:3px 6px;font-size:11px;color:'+sc+';font-weight:600;cursor:pointer;background:var(--bg)">'
-   +['미시작','진행중','완료'].map(function(s){return '<option'+(it.status===s?' selected':'')+'>'+s+'</option>';}).join('')
-   +'</select>'
-   +'<button onclick="removeClinicalItem('+i+')" style="font-size:10px;background:none;border:none;color:var(--hi);cursor:pointer">✕ 삭제</button>'
-   +'</div>'
-   +'</div>'
-   // 비용 + 결과 + 메모
-   +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px">'
+   // 예산 + 데드라인
+   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
    +'<div>'
-   +'<div style="font-size:10px;color:var(--mu);margin-bottom:2px">예상 비용 (원)</div>'
-   +'<input type="number" value="'+(it.cost||0)+'" onchange="clinicalItems['+i+'].cost=parseInt(this.value)||0;renderClinicalItems();sv()" style="width:100%;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:11px;font-family:var(--mn);background:var(--bg);color:#6A1B9A;font-weight:500;outline:none">'
-   +'<div style="font-size:10px;color:#9C27B0;margin-top:2px">≈ '+(it.cost?N(it.cost)+'원':'미입력')+'</div>'
+   +'<div style="font-size:10px;color:var(--mu);margin-bottom:3px">💰 예산 (원)</div>'
+   +'<input type="number" value="'+(it.budget||'')+'" placeholder="0" onchange="clinicalItems['+i+'].budget=parseInt(this.value)||0;renderClinicalItems();sv()" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11px;font-family:var(--mn);background:var(--bg);color:#6A1B9A;font-weight:500;outline:none">'
+   +(it.budget?'<div style="font-size:10px;color:#9C27B0;margin-top:2px">≈ '+N(it.budget)+'원</div>':'')
    +'</div>'
    +'<div>'
-   +'<div style="font-size:10px;color:var(--mu);margin-bottom:2px">결과 / 수치 기록</div>'
-   +'<input value="'+(it.result||'')+'" placeholder="예: 색소침착 38.2% 개선" onchange="clinicalItems['+i+'].result=this.value;sv()" style="width:100%;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:var(--bg);color:var(--green);font-weight:500;outline:none">'
+   +'<div style="font-size:10px;color:var(--mu);margin-bottom:3px">📅 데드라인</div>'
+   +'<input type="date" value="'+(it.deadline||'')+'" onchange="clinicalItems['+i+'].deadline=this.value;sv()" style="width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11px;font-family:var(--mn);background:var(--bg);color:var(--tx);outline:none">'
    +'</div>'
+   +'</div>'
+   // 문의글 (메모, 복붙)
    +'<div>'
-   +'<div style="font-size:10px;color:var(--mu);margin-bottom:2px">메모</div>'
-   +'<input value="'+(it.note||'')+'" onchange="clinicalItems['+i+'].note=this.value;sv()" style="width:100%;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:var(--bg);color:var(--tx);outline:none">'
-   +'</div>'
-   +'</div>'
-   // 추천 기관
-   +'<div style="font-size:10px;color:var(--mu)">추천 기관: '
-   +(it.institutions||[]).map(function(inst){
-    var f=(clinicalInstitutions||[]).find(function(x){return x.name===inst;});
-    return f?'<a href="'+f.url+'" target="_blank" style="color:var(--blue);text-decoration:none">'+inst+'</a>':inst;
-   }).join(' · ')
-   +'</div>'
+   +'<div style="font-size:10px;color:var(--mu);margin-bottom:3px">📝 문의글 (복사·붙여넣기용)</div>'
+   +'<textarea placeholder="기관에 보낼 문의 내용을 적어두세요. 복사해서 그대로 붙여넣을 수 있습니다." onchange="clinicalItems['+i+'].inquiry=this.value;sv()" style="width:100%;padding:6px 8px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:var(--bg);color:var(--tx);outline:none;min-height:60px;resize:vertical;font-family:inherit;line-height:1.5">'+(it.inquiry||'').replace(/</g,'&lt;')+'</textarea>'
    +'</div>'
    +'</div>';
- }).join('');
+ }).join('')
+ // 예산 합계 줄
+ +'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;margin-bottom:10px;background:#EDE7F6;border:1px solid #CE93D8;border-radius:8px">'
+ +'<span style="font-size:11px;font-weight:600;color:#4A148C">💰 임상 예산 합계</span>'
+ +'<span style="font-size:14px;font-weight:700;color:#6A1B9A;font-family:var(--mn)">'+N(budgetSum)+'원</span>'
+ +'</div>'
+ // 항목 추가 버튼
+ +'<button onclick="addClinicalItem()" style="width:100%;padding:10px;background:var(--bg);border:1px dashed var(--bd);color:var(--mu);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">＋ 예정 임상 항목 추가</button>';
 }
 function renderClinicalInstitutions(){
  var wrap=document.getElementById('clinical-institutions-wrap');if(!wrap)return;
+ var ice=document.getElementById('cl-inst-count');if(ice)ice.textContent=(clinicalInstitutions||[]).length;
  wrap.innerHTML='<div style="margin-bottom:10px">'
   +'<a href="https://selfcos.com/category/index/303/1" target="_blank" style="font-size:11px;color:var(--blue);text-decoration:none;display:inline-flex;align-items:center;gap:4px">🔗 셀프코스 임상시험기관 전체 목록 보기</a></div>'
   +(clinicalInstitutions||[]).map(function(inst,i){
-   return '<div style="border:1px solid var(--bd);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--sur)">'
-    // 기관명 행
-    +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
-    +(inst.prime?'<span style="font-size:9px;background:#1A1916;color:#FFF;padding:1px 5px;border-radius:3px;flex-shrink:0">PRIME</span>':'<span style="font-size:9px;background:#F5F5F5;color:var(--mu);padding:1px 5px;border-radius:3px;flex-shrink:0">일반</span>')
-    +'<input value="'+(inst.name||'').replace(/"/g,'&quot;')+'" onchange="clinicalInstitutions['+i+'].name=this.value;sv()" placeholder="기관명" style="flex:1;border:1px solid var(--bd);border-radius:4px;padding:4px 7px;font-size:12px;font-weight:500;color:var(--tx);outline:none;background:var(--bg)">'
+   var dm=inst.decMode||{};
+   function chk(field,label){
+    var on=!!dm[field];
+    return '<label style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:'+(on?'var(--tx)':'var(--mu)')+';cursor:pointer;background:'+(on?'#EAF3EE':'var(--bg)')+';border:1px solid '+(on?'#16A085':'var(--bd)')+';border-radius:4px;padding:2px 7px">'
+     +'<input type="checkbox" '+(on?'checked':'')+' onchange="toggleInstDecMode('+i+',\''+field+'\')" style="width:12px;height:12px;cursor:pointer;margin:0">'+label+'</label>';
+   }
+   return '<div style="border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:8px;background:var(--sur)">'
+    // 업체명 행 + 삭제
+    +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:7px">'
+    +'<span style="font-size:10px;color:var(--mu);flex-shrink:0;width:52px">업체명</span>'
+    +'<input value="'+(inst.name||'').replace(/"/g,'&quot;')+'" onchange="clinicalInstitutions['+i+'].name=this.value;sv()" placeholder="업체명" style="flex:1;min-width:0;border:1px solid var(--bd);border-radius:4px;padding:5px 8px;font-size:12px;font-weight:500;color:var(--tx);outline:none;background:var(--bg)">'
     +'<button onclick="removeClinicalInstitution('+i+')" style="font-size:11px;background:none;border:none;color:var(--hi);cursor:pointer;flex-shrink:0">✕</button>'
     +'</div>'
-    // 링크 행
-    +'<div style="display:flex;gap:6px;align-items:center;margin-bottom:5px">'
-    +'<span style="font-size:10px;color:var(--mu);flex-shrink:0;width:36px">링크</span>'
-    +'<input value="'+(inst.url||'')+'" onchange="clinicalInstitutions['+i+'].url=this.value;sv()" placeholder="https://..." style="flex:1;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:10px;background:var(--bg);color:var(--blue);outline:none">'
-    +'<a href="'+(inst.url||'')+'" target="_blank" style="font-size:10px;color:var(--blue);text-decoration:none;padding:3px 8px;border:1px solid var(--blue);border-radius:4px;white-space:nowrap;flex-shrink:0">열기 →</a>'
+    // 링크
+    +'<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">'
+    +'<span style="font-size:10px;color:var(--mu);flex-shrink:0;width:52px">링크</span>'
+    +'<input value="'+(inst.url||'')+'" onchange="clinicalInstitutions['+i+'].url=this.value;sv()" placeholder="https://..." style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:10px;background:var(--bg);color:var(--blue);outline:none">'
+    +(inst.url?'<a href="'+inst.url+'" target="_blank" style="font-size:10px;color:var(--blue);text-decoration:none;padding:4px 8px;border:1px solid var(--blue);border-radius:4px;white-space:nowrap;flex-shrink:0">열기 →</a>':'')
     +'</div>'
-    // 전문분야 + 메모 행
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'
+    // 감소 표기방식 (체크)
+    +'<div style="display:flex;gap:5px;align-items:center;margin-bottom:6px;flex-wrap:wrap">'
+    +'<span style="font-size:10px;color:var(--mu);flex-shrink:0;width:52px">감소표기</span>'
+    +chk('d2','2자리수')+chk('d3','3자리수')+chk('neg','-감소')+chk('pos','감소')
+    +'</div>'
+    // 사용업체
+    +'<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">'
+    +'<span style="font-size:10px;color:var(--mu);flex-shrink:0;width:52px">사용업체</span>'
+    +'<input value="'+(inst.usedBy||'').replace(/"/g,'&quot;')+'" onchange="clinicalInstitutions['+i+'].usedBy=this.value;sv()" placeholder="이 기관을 쓴 브랜드/업체" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:10.5px;background:var(--bg);color:var(--tx);outline:none">'
+    +'</div>'
+    // 평균 견적
+    +'<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">'
+    +'<span style="font-size:10px;color:var(--mu);flex-shrink:0;width:52px">평균 견적</span>'
+    +'<input value="'+(inst.avgQuote||'').replace(/"/g,'&quot;')+'" onchange="clinicalInstitutions['+i+'].avgQuote=this.value;sv()" placeholder="예: 350만원" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:10.5px;background:var(--bg);color:#6A1B9A;font-weight:500;outline:none">'
+    +'</div>'
+    // 담당자 이메일
+    +'<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">'
+    +'<span style="font-size:10px;color:var(--mu);flex-shrink:0;width:52px">담당 이메일</span>'
+    +'<input value="'+(inst.email||'').replace(/"/g,'&quot;')+'" onchange="clinicalInstitutions['+i+'].email=this.value;sv()" placeholder="contact@example.com" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:10.5px;background:var(--bg);color:var(--tx);outline:none">'
+    +'</div>'
+    // 테스트리스트 (링크)
     +'<div style="display:flex;gap:6px;align-items:center">'
-    +'<span style="font-size:10px;color:var(--mu);flex-shrink:0;width:36px">전문</span>'
-    +'<input value="'+(inst.specialty||'')+'" onchange="clinicalInstitutions['+i+'].specialty=this.value;sv()" placeholder="색소침착·미백 등" style="flex:1;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:10px;background:var(--bg);color:var(--tx);outline:none">'
-    +'</div>'
-    +'<div style="display:flex;gap:6px;align-items:center">'
-    +'<span style="font-size:10px;color:var(--mu);flex-shrink:0;width:36px">메모</span>'
-    +'<input value="'+(inst.note||'')+'" onchange="clinicalInstitutions['+i+'].note=this.value;sv()" placeholder="PRIME, BEST 등" style="flex:1;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:10px;background:var(--bg);color:var(--mu);outline:none">'
-    +'</div>'
+    +'<span style="font-size:10px;color:var(--mu);flex-shrink:0;width:52px">테스트<br>리스트</span>'
+    +'<input value="'+(inst.testListUrl||'')+'" onchange="clinicalInstitutions['+i+'].testListUrl=this.value;sv()" placeholder="테스트 항목 리스트 링크" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;font-size:10px;background:var(--bg);color:var(--blue);outline:none">'
+    +(inst.testListUrl?'<a href="'+inst.testListUrl+'" target="_blank" style="font-size:10px;color:var(--blue);text-decoration:none;padding:4px 8px;border:1px solid var(--blue);border-radius:4px;white-space:nowrap;flex-shrink:0">열기 →</a>':'')
     +'</div>'
     +'</div>';
-  }).join('');
+  }).join('')
+  +'<button onclick="addClinicalInstitution()" style="width:100%;padding:10px;margin-top:4px;background:#EAF3EE;border:1px dashed #16A085;color:#16A085;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">＋ 임상기관 추가</button>';
+}
+
+// 감소 표기방식 토글
+function toggleInstDecMode(i, field){
+ if(!clinicalInstitutions[i].decMode) clinicalInstitutions[i].decMode={};
+ clinicalInstitutions[i].decMode[field]=!clinicalInstitutions[i].decMode[field];
+ renderClinicalInstitutions();
+ if(typeof sv==='function')sv('임상기관 감소표기 변경');
 }
 function addClinicalItem(){
- clinicalItems.push({id:'ci'+Date.now(),name:'새 임상 항목',status:'미시작',target:'목표 수치 입력',result:'',period:'4주',note:'',required:false,institutions:[]});
+ clinicalItems.push({id:'ci'+Date.now(),name:'',budget:0,deadline:'',inquiry:''});
  renderClinicalItems();sv();
 }
 function removeClinicalItem(i){if(confirm('삭제?')){clinicalItems.splice(i,1);renderClinicalItems();sv();}}
 function addClinicalInstitution(){
- clinicalInstitutions.push({id:'inst'+Date.now(),name:'새 기관명',url:'https://selfcos.com/category/index/303/1',specialty:'',note:'',prime:false});
+ clinicalInstitutions.push({id:'inst'+Date.now(),name:'',url:'',decMode:{},usedBy:'',avgQuote:'',email:'',testListUrl:''});
  renderClinicalInstitutions();sv();
 }
 function removeClinicalInstitution(i){if(confirm('삭제?')){clinicalInstitutions.splice(i,1);renderClinicalInstitutions();sv();}}
@@ -12267,7 +12285,7 @@ function forceIsolationReset(){
 
 <div id="t18" class="tab-pane">
   <div class="hbar">
-    <div style="font-size:12px;font-weight:500">🔬 임상시험 체크리스트</div>
+    <div style="font-size:12px;font-weight:500">🔬 임상시험 관리</div>
     <div style="display:flex;gap:6px">
       <button class="btn" onclick="addClinicalItem()">+ 항목 추가</button>
       <button class="btn" onclick="addClinicalInstitution()">+ 기관 추가</button>
@@ -12275,33 +12293,24 @@ function forceIsolationReset(){
     </div>
   </div>
   <div style="padding:12px 18px">
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px">
-      <div style="background:var(--sur);border:1px solid var(--bd);border-radius:8px;padding:12px;text-align:center">
-        <div style="font-size:10px;color:var(--mu);text-transform:uppercase;margin-bottom:4px">전체</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">
+      <div style="background:var(--sur);border:1px solid var(--bd);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:10px;color:var(--mu);text-transform:uppercase;margin-bottom:4px">예정 임상 항목</div>
         <div style="font-size:22px;font-weight:500;font-family:var(--mn)" id="cl-total">0</div>
       </div>
-      <div style="background:#E8F5E9;border:1px solid #A5D6A7;border-radius:8px;padding:12px;text-align:center">
-        <div style="font-size:10px;color:#2E7D32;text-transform:uppercase;margin-bottom:4px">완료</div>
-        <div style="font-size:22px;font-weight:500;font-family:var(--mn);color:var(--green)" id="cl-done">0</div>
+      <div style="background:#EDE7F6;border:1px solid #CE93D8;border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:10px;color:#4A148C;text-transform:uppercase;margin-bottom:4px">예산 합계</div>
+        <div style="font-size:18px;font-weight:500;font-family:var(--mn);color:#6A1B9A" id="cl-cost">0원</div>
       </div>
-      <div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:12px;text-align:center">
-        <div style="font-size:10px;color:#8B5E00;text-transform:uppercase;margin-bottom:4px">진행중</div>
-        <div style="font-size:22px;font-weight:500;font-family:var(--mn);color:var(--amber)" id="cl-inprog">0</div>
-      </div>
-      <div style="background:#FFEBEE;border:1px solid #FFCDD2;border-radius:8px;padding:12px;text-align:center">
-        <div style="font-size:10px;color:#C62828;text-transform:uppercase;margin-bottom:4px">미시작</div>
-        <div style="font-size:22px;font-weight:500;font-family:var(--mn);color:var(--red)" id="cl-todo">0</div>
-      </div>
-      <div style="background:#EDE7F6;border:1px solid #CE93D8;border-radius:8px;padding:12px;text-align:center">
-        <div style="font-size:10px;color:#4A148C;text-transform:uppercase;margin-bottom:4px">진행 비용 합계</div>
-        <div style="font-size:16px;font-weight:500;font-family:var(--mn);color:#6A1B9A" id="cl-cost">0원</div>
-        <div style="font-size:10px;color:#9C27B0;margin-top:2px">(완료+진행중)</div>
+      <div style="background:var(--sur);border:1px solid var(--bd);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:10px;color:var(--mu);text-transform:uppercase;margin-bottom:4px">등록 기관</div>
+        <div style="font-size:22px;font-weight:500;font-family:var(--mn)" id="cl-inst-count">0</div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <div class="section" style="margin:0">
-        <div class="sec-head"><h3>📋 임상 항목</h3>
-          <span style="font-size:10px;color:var(--mu)">목표 수치·결과 기록 가능</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px">
+      <div class="section" style="margin:0;min-width:0">
+        <div class="sec-head"><h3>📋 예정 임상 항목</h3>
+          <span style="font-size:10px;color:var(--mu)">예정 항목·예산·데드라인 관리</span></div>
         <div id="clinical-items-wrap" style="padding:10px 14px"></div>
       </div>
       <div class="section" style="margin:0">
@@ -12588,14 +12597,36 @@ function forceIsolationReset(){
   <!-- ━━━ 서브탭: 🔬 임상시험 (견적 검토) ━━━ -->
   <div id="t20-sub-clinical" style="display:none">
     <div class="card" style="padding:20px;margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
         <div>
           <div style="font-size:14px;font-weight:700">🔬 임상시험 견적 검토</div>
-          <div style="font-size:11px;color:var(--mu);margin-top:3px">여러 기관 견적을 비교하고 선정 — 항목·소요기간·금액·결과 표기방식까지 한눈에</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:3px">여러 기관 견적을 비교하고 선정 — 항목·임상기간·금액·결과 표기방식까지 한눈에</div>
         </div>
-        <button class="btn pri" onclick="addClinicalEntry_BOS()" style="font-size:12px">+ 기관 추가</button>
+        <button class="btn pri" onclick="addClinicalEntry_BOS()" style="font-size:12px">＋ 기관 추가</button>
       </div>
-      <div id="clinical-table-wrap-bos" style="overflow-x:auto;margin-top:12px"></div>
+      <div style="overflow-x:auto">
+        <table id="clinical-table-bos" style="width:100%;border-collapse:collapse;font-size:12px;min-width:1480px">
+          <thead style="background:#FAFAF8;border-bottom:2px solid var(--bd)">
+            <tr>
+              <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;width:34px" title="선정"></th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:130px">업체명 · 링크</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:90px">담당자</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;width:120px">유효성 검사 항목</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;width:110px">진행한 브랜드</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;width:175px">견적 항목</th>
+              <th style="padding:9px 8px;text-align:right;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:105px">견적 금액</th>
+              <th style="padding:9px 8px;text-align:right;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:95px" title="견적 금액 ÷ 항목 수">1개당 비용</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:80px">임상 기간</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;width:120px">필요 시료수</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;width:190px">임상 결과 표기</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;width:110px">메모</th>
+              <th style="padding:9px 8px;width:32px"></th>
+            </tr>
+          </thead>
+          <tbody id="clinical-tbody-bos"></tbody>
+        </table>
+      </div>
+      <div id="clinical-summary-bos"></div>
     </div>
   </div>
   
@@ -21922,115 +21953,113 @@ tr.row-cal-highlight td{ background:transparent !important; }
   }
   
   window.renderClinicalTable_BOS = function(){
-    var wrap = document.getElementById('clinical-table-wrap-bos');
-    if(!wrap) return;
+    var tbody = document.getElementById('clinical-tbody-bos');
+    if(!tbody) return;
     var arr = loadClinicalData_BOS();
     
     if(arr.length===0){
-      wrap.innerHTML = '<div style="padding:40px;text-align:center;color:var(--mu);font-size:13px">아직 등록된 임상시험 기관이 없습니다.<br><button class="btn pri" onclick="addClinicalEntry_BOS()" style="margin-top:12px">+ 첫 기관 추가</button></div>';
+      tbody.innerHTML = '<tr><td colspan="13" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">등록된 임상시험 기관이 없습니다. <b>＋ 기관 추가</b> 를 눌러 시작하세요.</td></tr>';
+      var sm0 = document.getElementById('clinical-summary-bos'); if(sm0) sm0.innerHTML='';
       return;
     }
     
-    var h = '<table style="width:100%;border-collapse:collapse;font-size:11.5px;min-width:1360px">';
-    h += '<thead><tr style="background:var(--bg);border-bottom:2px solid var(--bd)">';
-    var cols = ['','업체명 · 링크','담당자','유효성 검사 항목','진행한 브랜드','견적 항목','견적 금액','1개당 비용','임상 기간','필요 시료수','임상 결과 표기','메모',''];
-    var widths = ['32px','130px','80px','115px','105px','160px','105px','90px','85px','115px','175px','100px','28px'];
-    cols.forEach(function(c,i){
-      h += '<th style="padding:7px 8px;text-align:left;width:'+widths[i]+';font-weight:600;color:var(--mu)">'+c+'</th>';
-    });
-    h += '</tr></thead><tbody>';
+    // 샘플 표와 동일한 인라인 입력 스타일
+    function inp(val, ph, onch, extra){
+      return '<input value="'+esc(val)+'" placeholder="'+ph+'" onchange="'+onch+'" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent;'+(extra||'')+'" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">';
+    }
     
-    arr.forEach(function(e){
+    tbody.innerHTML = arr.map(function(e){
       var picked = e.picked;
-      h += '<tr style="border-bottom:.5px solid var(--bd);background:'+(picked?'rgba(0,151,167,.07)':'transparent')+'">';
-      // 선정 체크
-      h += '<td style="padding:6px 8px;text-align:center;vertical-align:top"><input type="checkbox" '+(picked?'checked':'')+' onchange="togglePickClinical_BOS(\''+e.id+'\')" title="선정" style="width:16px;height:16px;cursor:pointer"></td>';
-      // 업체명 + 링크(이동)
-      var linkBtn = e.link ? '<a href="'+esc(e.link)+'" target="_blank" style="font-size:10px;color:#1976D2;text-decoration:none">🔗 이동</a>' : '';
-      h += '<td style="padding:6px 8px;vertical-align:top">';
-      h += '<input value="'+esc(e.vendor)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'vendor\',this.value)" placeholder="업체명" style="width:100%;border:none;border-bottom:1px solid var(--bd);background:transparent;font-size:11.5px;font-weight:600;outline:none;padding:2px 0'+(picked?';color:#00838F':'')+'">';
-      h += '<div style="display:flex;align-items:center;gap:4px;margin-top:2px">';
-      h += '<input value="'+esc(e.link)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'link\',this.value)" placeholder="https://" style="flex:1;min-width:0;border:none;border-bottom:1px dashed var(--bd);background:transparent;font-size:9.5px;outline:none;padding:1px 0">'+linkBtn;
-      h += '</div></td>';
-      // 담당자
-      h += '<td style="padding:6px 8px;vertical-align:top"><input value="'+esc(e.contact)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'contact\',this.value)" placeholder="이름/연락처" style="width:100%;border:none;border-bottom:1px solid var(--bd);background:transparent;font-size:11px;outline:none;padding:2px 0"></td>';
-      // 유효성 검사 항목 (링크)
-      var validBtn = e.validLink ? '<a href="'+esc(e.validLink)+'" target="_blank" style="font-size:10px;color:#1976D2;text-decoration:none">🔗 보기</a>' : '';
-      h += '<td style="padding:6px 8px;vertical-align:top">'+validBtn+'<input value="'+esc(e.validLink)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'validLink\',this.value)" placeholder="검사항목 링크" style="width:100%;border:none;border-bottom:1px solid var(--bd);background:transparent;font-size:9.5px;outline:none;padding:2px 0;margin-top:2px"></td>';
-      // 진행한 브랜드
-      h += '<td style="padding:6px 8px;vertical-align:top"><textarea onchange="updateClinical_BOS(\''+e.id+'\',\'brands\',this.value)" placeholder="진행 브랜드" style="width:100%;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:3px 4px;min-height:40px;resize:vertical;font-family:inherit">'+esc(e.brands)+'</textarea></td>';
-      // 견적 항목 (여러 줄, 항목명만) → 항목수 카운트
+      var rowBg = picked ? '#F0F9F7' : '#fff';
+      var costN = num(e.cost);
       var itemCount = (e.items||[]).filter(function(it){return (it.name||'').trim();}).length;
-      h += '<td style="padding:6px 8px;vertical-align:top">';
+      
+      var h = '<tr style="border-bottom:1px solid var(--bd);background:'+rowBg+'">';
+      // 선정 체크
+      h += '<td style="padding:5px 6px;text-align:center;vertical-align:top"><input type="checkbox" '+(picked?'checked':'')+' onchange="togglePickClinical_BOS(\''+e.id+'\')" title="선정" style="width:15px;height:15px;cursor:pointer;margin-top:5px"></td>';
+      // 업체명 + 링크
+      var linkBtn = e.link ? '<a href="'+esc(e.link)+'" target="_blank" style="font-size:9.5px;color:#1976D2;text-decoration:none;white-space:nowrap">🔗 이동</a>' : '';
+      h += '<td style="padding:5px 6px;vertical-align:top">'
+        + inp(e.vendor, '업체명', "updateClinical_BOS(\''+e.id+'\',\'vendor\',this.value)", 'font-weight:600;'+(picked?'color:#00838F;':''))
+        + '<div style="display:flex;align-items:center;gap:3px;margin-top:2px">'
+        + inp(e.link, 'https://', "updateClinical_BOS(\''+e.id+'\',\'link\',this.value)", 'font-size:9.5px;')
+        + linkBtn + '</div></td>';
+      // 담당자
+      h += '<td style="padding:5px 6px;vertical-align:top">'+inp(e.contact, '담당자', "updateClinical_BOS(\''+e.id+'\',\'contact\',this.value)")+'</td>';
+      // 유효성 검사 항목 (링크)
+      var validBtn = e.validLink ? '<a href="'+esc(e.validLink)+'" target="_blank" style="font-size:9.5px;color:#1976D2;text-decoration:none">🔗 보기</a>' : '';
+      h += '<td style="padding:5px 6px;vertical-align:top">'+validBtn+inp(e.validLink, '검사항목 링크', "updateClinical_BOS(\''+e.id+'\',\'validLink\',this.value)", 'font-size:10px;margin-top:2px;')+'</td>';
+      // 진행한 브랜드
+      h += '<td style="padding:5px 6px;vertical-align:top">'+inp(e.brands, '진행 브랜드', "updateClinical_BOS(\''+e.id+'\',\'brands\',this.value)", 'font-size:11px;')+'</td>';
+      // 견적 항목
+      h += '<td style="padding:5px 6px;vertical-align:top">';
       (e.items||[]).forEach(function(it,idx){
-        h += '<div style="display:flex;gap:3px;align-items:center;margin-bottom:3px">';
-        h += '<input value="'+esc(it.name)+'" onchange="updateClinicalItem_BOS(\''+e.id+'\','+idx+',\'name\',this.value)" placeholder="항목(예: 미백 4주)" style="flex:1;min-width:0;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:2px 4px">';
-        h += '<button onclick="delClinicalItem_BOS(\''+e.id+'\','+idx+')" style="background:none;border:none;color:var(--hi);cursor:pointer;font-size:11px;padding:0 2px">✕</button>';
+        h += '<div style="display:flex;gap:2px;align-items:center;margin-bottom:2px">';
+        h += inp(it.name, '항목(예: 미백 4주)', "updateClinicalItem_BOS(\''+e.id+'\','+idx+',\'name\',this.value)", 'font-size:10.5px;');
+        h += '<button onclick="delClinicalItem_BOS(\''+e.id+'\','+idx+')" style="background:none;border:none;color:var(--hi);cursor:pointer;font-size:11px;padding:0 1px;flex-shrink:0">✕</button>';
         h += '</div>';
       });
       h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px">';
-      h += '<button onclick="addClinicalItem_BOS(\''+e.id+'\')" style="font-size:10px;background:#EAF3EE;border:1px solid #16A085;color:#16A085;border-radius:4px;padding:2px 8px;cursor:pointer">+ 항목</button>';
+      h += '<button onclick="addClinicalItem_BOS(\''+e.id+'\')" style="font-size:10px;background:#EAF3EE;border:1px solid #16A085;color:#16A085;border-radius:4px;padding:2px 8px;cursor:pointer">＋ 항목</button>';
       if(itemCount) h += '<span style="font-size:9.5px;color:var(--mu)">총 '+itemCount+'개</span>';
       h += '</div></td>';
       // 견적 금액
-      var costN = num(e.cost);
-      h += '<td style="padding:6px 8px;vertical-align:top">';
-      h += '<input value="'+esc(e.cost)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'cost\',this.value)" placeholder="금액" style="width:100%;border:none;border-bottom:1px solid var(--bd);background:transparent;font-size:11.5px;font-weight:600;outline:none;padding:2px 0;text-align:right">';
+      h += '<td style="padding:5px 6px;text-align:right;vertical-align:top">'
+        + inp(e.cost, '금액', "updateClinical_BOS(\''+e.id+'\',\'cost\',this.value)", 'font-weight:600;text-align:right;');
       if(costN) h += '<div style="font-size:9px;color:var(--mu);text-align:right;margin-top:2px">VAT+ '+fmtWon(Math.round(costN*1.1))+'</div>';
       h += '</td>';
-      // 1개당 비용 (견적 ÷ 항목수, 자동)
-      h += '<td style="padding:6px 8px;vertical-align:top;text-align:right">';
+      // 1개당 비용 (자동)
+      h += '<td style="padding:5px 8px;text-align:right;vertical-align:top">';
       if(costN && itemCount){
         var per = Math.round(costN/itemCount);
         h += '<div style="font-size:11.5px;font-weight:700;color:#00838F">'+fmtWon(per)+'</div>';
-        h += '<div style="font-size:9px;color:var(--mu);margin-top:2px">'+fmtWon(costN)+' ÷ '+itemCount+'개</div>';
-      } else {
-        h += '<div style="font-size:10px;color:var(--mu)">—</div>';
-      }
+        h += '<div style="font-size:8.5px;color:var(--mu);margin-top:2px">'+fmtWon(costN)+' ÷ '+itemCount+'</div>';
+      } else { h += '<span style="font-size:10px;color:var(--mu)">—</span>'; }
       h += '</td>';
       // 임상 기간
-      h += '<td style="padding:6px 8px;vertical-align:top"><input value="'+esc(e.period)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'period\',this.value)" placeholder="예: 4주" style="width:100%;border:none;border-bottom:1px solid var(--bd);background:transparent;font-size:11px;outline:none;padding:2px 0"></td>';
-      // 필요 시료수 (용량, 시료수)
-      h += '<td style="padding:6px 8px;vertical-align:top">';
-      h += '<div style="display:flex;align-items:center;gap:3px;margin-bottom:3px"><span style="font-size:9px;color:var(--mu);width:26px">용량</span><input value="'+esc(e.sampleVol)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'sampleVol\',this.value)" placeholder="예: 50ml" style="flex:1;min-width:0;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:2px 4px"></div>';
-      h += '<div style="display:flex;align-items:center;gap:3px"><span style="font-size:9px;color:var(--mu);width:26px">개수</span><input value="'+esc(e.sampleCount)+'" onchange="updateClinical_BOS(\''+e.id+'\',\'sampleCount\',this.value)" placeholder="예: 30개" style="flex:1;min-width:0;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:2px 4px"></div>';
+      h += '<td style="padding:5px 6px;vertical-align:top">'+inp(e.period, '예: 4주', "updateClinical_BOS(\''+e.id+'\',\'period\',this.value)")+'</td>';
+      // 필요 시료수 (용량 + 개수)
+      h += '<td style="padding:5px 6px;vertical-align:top">';
+      h += '<div style="display:flex;align-items:center;gap:3px;margin-bottom:2px"><span style="font-size:9px;color:var(--mu);width:24px;flex-shrink:0">용량</span>'+inp(e.sampleVol, '50ml', "updateClinical_BOS(\''+e.id+'\',\'sampleVol\',this.value)", 'font-size:10px;')+'</div>';
+      h += '<div style="display:flex;align-items:center;gap:3px"><span style="font-size:9px;color:var(--mu);width:24px;flex-shrink:0">개수</span>'+inp(e.sampleCount, '30개', "updateClinical_BOS(\''+e.id+'\',\'sampleCount\',this.value)", 'font-size:10px;')+'</div>';
       h += '</td>';
-      // 임상 결과 표기 (지표명 + 수치 → 자릿수/부호 자동 색)
-      h += '<td style="padding:6px 8px;vertical-align:top">';
+      // 임상 결과 표기 (지표 + 수치 → 자동 색)
+      h += '<td style="padding:5px 6px;vertical-align:top">';
       (e.results||[]).forEach(function(r,idx){
         var st = resultStyle_BOS(r.value);
-        h += '<div style="display:flex;gap:3px;align-items:center;margin-bottom:3px">';
-        h += '<input value="'+esc(r.metric)+'" onchange="updateClinicalResult_BOS(\''+e.id+'\','+idx+',\'metric\',this.value)" placeholder="지표(예: 미백)" style="flex:1;min-width:0;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:2px 4px">';
-        h += '<input value="'+esc(r.value)+'" onchange="updateClinicalResult_BOS(\''+e.id+'\','+idx+',\'value\',this.value)" placeholder="%" style="width:42px;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:2px 3px;text-align:right">';
-        h += '<button onclick="delClinicalResult_BOS(\''+e.id+'\','+idx+')" style="background:none;border:none;color:var(--hi);cursor:pointer;font-size:11px;padding:0 1px">✕</button>';
+        h += '<div style="display:flex;gap:2px;align-items:center;margin-bottom:2px">';
+        h += inp(r.metric, '지표(미백)', "updateClinicalResult_BOS(\''+e.id+'\','+idx+',\'metric\',this.value)", 'font-size:10px;');
+        h += '<input value="'+esc(r.value)+'" placeholder="%" onchange="updateClinicalResult_BOS(\''+e.id+'\','+idx+',\'value\',this.value)" style="width:40px;flex-shrink:0;padding:4px 4px;border:1px solid transparent;border-radius:4px;font-size:10px;background:transparent;text-align:right" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">';
+        h += '<button onclick="delClinicalResult_BOS(\''+e.id+'\','+idx+')" style="background:none;border:none;color:var(--hi);cursor:pointer;font-size:11px;padding:0 1px;flex-shrink:0">✕</button>';
         h += '</div>';
-        // 자동 표기 배지
         if(st && st.label){
-          h += '<div style="margin:0 0 5px 2px"><span style="display:inline-block;background:'+st.bg+';color:'+st.color+';font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:9px">'+(r.metric?esc(r.metric)+' ':'')+st.text+'</span> <span style="font-size:8.5px;color:var(--mu)">'+st.label+'</span></div>';
+          h += '<div style="margin:0 0 4px 2px"><span style="display:inline-block;background:'+st.bg+';color:'+st.color+';font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:9px">'+(r.metric?esc(r.metric)+' ':'')+st.text+'</span></div>';
         }
       });
-      h += '<button onclick="addClinicalResult_BOS(\''+e.id+'\')" style="font-size:10px;background:#E9F7EF;border:1px solid #52B788;color:#1E8449;border-radius:4px;padding:2px 8px;cursor:pointer;margin-top:1px">+ 결과</button>';
+      h += '<button onclick="addClinicalResult_BOS(\''+e.id+'\')" style="font-size:10px;background:#E9F7EF;border:1px solid #52B788;color:#1E8449;border-radius:4px;padding:2px 8px;cursor:pointer;margin-top:1px">＋ 결과</button>';
       h += '</td>';
       // 메모
-      h += '<td style="padding:6px 8px;vertical-align:top"><textarea onchange="updateClinical_BOS(\''+e.id+'\',\'note\',this.value)" placeholder="비고" style="width:100%;border:1px solid var(--bd);border-radius:4px;background:transparent;font-size:10px;outline:none;padding:3px 4px;min-height:40px;resize:vertical;font-family:inherit">'+esc(e.note)+'</textarea></td>';
+      h += '<td style="padding:5px 6px;vertical-align:top">'+inp(e.note, '비고', "updateClinical_BOS(\''+e.id+'\',\'note\',this.value)", 'font-size:10.5px;')+'</td>';
       // 삭제
-      h += '<td style="padding:6px 4px;vertical-align:top"><button onclick="delClinicalEntry_BOS(\''+e.id+'\')" style="background:none;border:none;color:var(--hi);cursor:pointer;font-size:12px">✕</button></td>';
+      h += '<td style="padding:5px 4px;text-align:center;vertical-align:top"><button onclick="delClinicalEntry_BOS(\''+e.id+'\')" style="background:none;border:none;color:var(--hi);cursor:pointer;font-size:12px;margin-top:3px">✕</button></td>';
       h += '</tr>';
-    });
-    h += '</tbody></table>';
+      return h;
+    }).join('');
     
     // 선정 요약
-    var picked = arr.filter(function(x){return x.picked;});
-    if(picked.length){
-      var totalN = picked.reduce(function(s,x){return s+num(x.cost);},0);
-      h += '<div style="margin-top:12px;padding:10px 14px;background:rgba(0,151,167,.08);border-radius:8px;font-size:12px">';
-      h += '✅ 선정: <b>'+picked.map(function(x){return esc(x.vendor)||'(업체명 미입력)';}).join(', ')+'</b>';
-      if(totalN) h += ' · 견적 합계 <b>'+fmtWon(totalN)+'</b> / VAT포함 '+fmtWon(Math.round(totalN*1.1));
-      h += '</div>';
+    var sm = document.getElementById('clinical-summary-bos');
+    if(sm){
+      var picked = arr.filter(function(x){return x.picked;});
+      if(picked.length){
+        var totalN = picked.reduce(function(s,x){return s+num(x.cost);},0);
+        var sh = '<div style="margin-top:14px;padding:10px 14px;background:rgba(0,151,167,.08);border-radius:8px;font-size:12px">';
+        sh += '✅ 선정: <b>'+picked.map(function(x){return esc(x.vendor)||'(업체명 미입력)';}).join(', ')+'</b>';
+        if(totalN) sh += ' · 견적 합계 <b>'+fmtWon(totalN)+'</b> / VAT포함 '+fmtWon(Math.round(totalN*1.1));
+        sh += '</div>';
+        sm.innerHTML = sh;
+      } else { sm.innerHTML=''; }
     }
-    
-    wrap.innerHTML = h;
-  };;
+  };;;
   
   console.log('[Clinical] 임상시험 견적 검토 준비됨');
 })();
