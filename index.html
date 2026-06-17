@@ -12876,6 +12876,21 @@ function forceIsolationReset(){
       <select id="bos-cal-item-prereq" onchange="onPrereqChange_BOS(this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit;background:#fff">
         <option value="">— 없음 (시작일 직접 입력) —</option>
       </select>
+      <!-- 선행 기준 + 오프셋 (선행 선택 시 표시) -->
+      <div id="bos-cal-prereq-opts" style="display:none;margin-top:8px;padding:8px 10px;background:#F0F6FF;border:1px solid #BBDEFB;border-radius:6px">
+        <div style="font-size:10.5px;color:#1565C0;margin-bottom:6px;font-weight:600">시작일 자동 계산 기준</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px">
+          <span>선행의</span>
+          <select id="bos-cal-prereq-base" onchange="onPrereqChange_BOS(document.getElementById('bos-cal-item-prereq').value)" style="padding:5px 8px;border:1px solid var(--bd);border-radius:5px;font-size:12px;background:#fff">
+            <option value="end">종료일</option>
+            <option value="start">시작일</option>
+          </select>
+          <span>기준</span>
+          <span style="color:#1565C0;font-weight:600">+</span>
+          <input type="number" id="bos-cal-prereq-offset" value="1" onchange="onPrereqChange_BOS(document.getElementById('bos-cal-item-prereq').value)" style="width:56px;padding:5px 6px;border:1px solid var(--bd);border-radius:5px;font-size:12px;text-align:center">
+          <span>일 뒤 <span style="color:var(--mu)">(주말이면 다음 영업일)</span></span>
+        </div>
+      </div>
       <div id="bos-cal-prereq-hint" style="font-size:10.5px;color:#1565C0;margin-top:4px;display:none"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
@@ -13002,7 +13017,7 @@ function forceIsolationReset(){
   var STORAGE_KEY_BOS = 'bos_calendar_v1';
   var calCurrentView_BOS = 'single';
   var calEditingItemId_BOS = null;
-  var calData_BOS = {items: [], settings: {}};
+  var calData_BOS = {items: [], settings: {}}; window.calData_BOS = calData_BOS;
   var CAL_COLORS_BOS = ['#C8A45A','#1A6B4A','#2563EB','#D2691E','#C0392B','#7A4AA8','#3a8a8a','#A87C4A','#8A5A3A','#5A8A4A'];
   
   function loadCalData_BOS(){
@@ -13012,6 +13027,7 @@ function forceIsolationReset(){
     } catch(e){}
     if(!calData_BOS.items) calData_BOS.items = [];
     if(!calData_BOS.settings) calData_BOS.settings = {};
+    window.calData_BOS = calData_BOS;
   }
   
   function saveCalData_BOS(){
@@ -13506,6 +13522,8 @@ function forceIsolationReset(){
     var _preItems = (typeof calData_BOS!=='undefined' && calData_BOS.items) ? calData_BOS.items : [];
     var _preObj = presetPrereqId ? _preItems.find(function(i){return i.id===presetPrereqId;}) : null;
     if(typeof fillCalCategoryOptions_BOS==='function') fillCalCategoryOptions_BOS(_preObj ? (_preObj.category||'') : '');
+    var _be0=document.getElementById('bos-cal-prereq-base'); if(_be0)_be0.value='end';
+    var _of0=document.getElementById('bos-cal-prereq-offset'); if(_of0)_of0.value='1';
     if(typeof window.fillPrereqOptions_BOS==='function') window.fillPrereqOptions_BOS(presetPrereqId || '', null);
     var _catEl = document.getElementById('bos-cal-item-category');
     if(_catEl) _catEl.value = _preObj ? (_preObj.category||'') : '';
@@ -13538,6 +13556,11 @@ function forceIsolationReset(){
     document.getElementById('bos-cal-item-id').value = itemId;
     document.getElementById('bos-cal-item-title').value = item.title || '';
     if(typeof fillCalCategoryOptions_BOS==='function') fillCalCategoryOptions_BOS(item.category || '');
+    // 기준/오프셋 복원 (fillPrereq 전에 값 세팅)
+    var _baseEl = document.getElementById('bos-cal-prereq-base');
+    var _offEl = document.getElementById('bos-cal-prereq-offset');
+    if(_baseEl) _baseEl.value = item.prereqBase || 'end';
+    if(_offEl) _offEl.value = (typeof item.prereqOffset==='number') ? item.prereqOffset : 1;
     if(typeof window.fillPrereqOptions_BOS==='function') window.fillPrereqOptions_BOS(item.prereqId || '', item.id);
     // 수동 고정 상태 복원
     var _startEl = document.getElementById('bos-cal-item-start');
@@ -13597,7 +13620,9 @@ function forceIsolationReset(){
       leadtimeValue: parseInt(document.getElementById('bos-cal-item-leadtime-value')?.value) || 0,
       leadtimeUnit: document.getElementById('bos-cal-item-leadtime-unit')?.value || 'week',
       prereqId: (document.getElementById('bos-cal-item-prereq')?.value || ''),
-      prereqManual: (document.getElementById('bos-cal-item-start')?.dataset.manualEdited === '1')
+      prereqManual: (document.getElementById('bos-cal-item-start')?.dataset.manualEdited === '1'),
+      prereqBase: (document.getElementById('bos-cal-prereq-base')?.value || 'end'),
+      prereqOffset: (parseInt(document.getElementById('bos-cal-prereq-offset')?.value) || 1)
     };
     
     if(calEditingItemId_BOS){
@@ -19796,28 +19821,18 @@ body.cal-highlighting .cal-item-card-bos:hover{
     var events = [];
     data.forEach(function(s){
       var name = (s.vendor||'업체') + ' · ' + (s.sampleName||'샘플');
-      if(s.requestDate) events.push({date: s.requestDate, color:'#E67E22', label:'[의뢰] ' + name, sid:s.id});
-      // 예상 도착일 = 의뢰일 + 예상소요
-      if(s.requestDate && parseInt(s.expectedDays) > 0 && !s.arrivalDate){
-        var d = new Date(s.requestDate + 'T00:00:00');
-        if(!isNaN(d.getTime())){
-          d.setDate(d.getDate() + parseInt(s.expectedDays));
-          var iso = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-          events.push({date: iso, color:'#1976D2', label:'[예상 도착] ' + name, sid:s.id});
-        }
-      }
-      if(s.arrivalDate) events.push({date: s.arrivalDate, color:'#27AE60', label:'[도착 완료] ' + name, sid:s.id});
-      // ━━ 샘플의뢰 차수별 (1차/2차/3차…) ━━
+      // ━━ 샘플의뢰 차수별 (1차/2차/3차…) — 1차는 표 데이터 자동 연동 ━━
+      // (표 기반 단일 이벤트는 차수 로직으로 일원화하여 중복 방지)
       if(typeof getSampleRequests_BOS === 'function'){
         var reqs = getSampleRequests_BOS(s);
         reqs.forEach(function(r, ri){
           var lbl = (ri+1) + '차 ';
-          if(r.reqDate) events.push({date: r.reqDate, color:'#E67E22', label:'[' + lbl + '샘플의뢰] ' + name, sid:s.id});
-          // 예상 도착 = 의뢰일 + 소요
+          // 차수별 샘플명이 있으면 그걸, 없으면 업체·샘플명
+          var rname = (s.vendor||'업체') + ' · ' + (r.name || s.sampleName || '샘플');
+          if(r.reqDate) events.push({date: r.reqDate, color:'#E67E22', label:'[' + lbl + '샘플의뢰] ' + rname, sid:s.id});
           var endIso = (typeof calcPhaseEnd_BOS==='function') ? calcPhaseEnd_BOS(r.reqDate, r.dur, r.unit) : '';
-          if(endIso && !r.arrival) events.push({date: endIso, color:'#1976D2', label:'[' + lbl + '예상 도착] ' + name, sid:s.id});
-          // 실제 도착
-          if(r.arrival) events.push({date: r.arrival, color:'#27AE60', label:'[' + lbl + '실제 도착] ' + name, sid:s.id});
+          if(endIso && !r.arrival) events.push({date: endIso, color:'#1976D2', label:'[' + lbl + '예상 도착] ' + rname, sid:s.id});
+          if(r.arrival) events.push({date: r.arrival, color:'#27AE60', label:'[' + lbl + '실제 도착] ' + rname, sid:s.id});
         });
       }
       // ━━ 공정 일정 (샘플의뢰 제외 — 차수로 별도 처리) ━━
@@ -20099,66 +20114,85 @@ body.cal-highlighting .cal-item-card-bos:hover{
   // ━━ 샘플의뢰 차수별 렌더 (1차/2차/3차…) ━━
   function getSampleRequests_BOS(s){
     if(!s.sampleRequests || !Array.isArray(s.sampleRequests) || s.sampleRequests.length === 0){
+      // 1차 의뢰는 표(샘플 행)의 의뢰 데이터에서 자동 연동
       s.sampleRequests = [{
-        reqDate: s.sreqStart || '',
-        dur: s.sreqDur || '',
+        reqDate: s.sreqStart || s.requestDate || '',
+        dur: s.sreqDur || s.expectedDays || '',
         unit: s.sreqUnit || 'd',
-        arrival: s.sreqArrival || ''
+        arrival: s.sreqArrival || s.arrivalDate || '',
+        name: s.sampleName || ''
       }];
+    } else {
+      // 1차가 비어있으면 표 데이터로 채움 (자동 연동)
+      var r0 = s.sampleRequests[0];
+      if(r0){
+        if(!r0.reqDate && s.requestDate) r0.reqDate = s.requestDate;
+        if(!r0.dur && s.expectedDays) r0.dur = s.expectedDays;
+        if(!r0.arrival && s.arrivalDate) r0.arrival = s.arrivalDate;
+        if(!r0.name && s.sampleName) r0.name = s.sampleName;
+      }
     }
     return s.sampleRequests;
   }
+  window.getSampleRequests_BOS = getSampleRequests_BOS;
   
   function buildSampleRequestRounds_BOS(s, ph){
     var rounds = getSampleRequests_BOS(s);
     var roundsHtml = rounds.map(function(r, idx){
       var unitVal = r.unit || 'd';
       var endIso = calcPhaseEnd_BOS(r.reqDate, r.dur, r.unit);
-      var endTxt = endIso ? ('예상 ' + endIso) : '<span style="color:var(--mu)">의뢰일·소요 입력</span>';
-      var diffTxt = '';
-      if(r.arrival && endIso){
-        var diff = Math.round((new Date(r.arrival+'T00:00:00') - new Date(endIso+'T00:00:00'))/86400000);
-        if(diff === 0) diffTxt = '<span style="color:#1A6B4A;font-weight:600">🎯 예정대로</span>';
-        else if(diff > 0) diffTxt = '<span style="color:#C0392B;font-weight:600">⏰ ' + diff + '일 늦음</span>';
-        else diffTxt = '<span style="color:#1565C0;font-weight:600">⚡ ' + Math.abs(diff) + '일 빠름</span>';
+      var endTxt = endIso ? ('예상 ' + endIso) : '<span style="color:var(--mu)">날짜·소요 입력</span>';
+      // 실제 도착 시: 며칠 소요 + 예상 대비 차이
+      var arrInfo = '';
+      if(r.arrival){
+        var actualDays = '';
+        if(r.reqDate){
+          var ad = Math.round((new Date(r.arrival+'T00:00:00') - new Date(r.reqDate+'T00:00:00'))/86400000);
+          if(!isNaN(ad) && ad>=0) actualDays = '<span style="color:#1A6B4A;font-weight:700">실 ' + ad + '일 소요</span>';
+        }
+        var diffTxt = '';
+        if(endIso){
+          var diff = Math.round((new Date(r.arrival+'T00:00:00') - new Date(endIso+'T00:00:00'))/86400000);
+          if(diff === 0) diffTxt = '<span style="color:#1A6B4A;font-weight:600">🎯 예정대로</span>';
+          else if(diff > 0) diffTxt = '<span style="color:#C0392B;font-weight:600">⏰ ' + diff + '일 늦음</span>';
+          else diffTxt = '<span style="color:#1565C0;font-weight:600">⚡ ' + Math.abs(diff) + '일 빠름</span>';
+        }
+        arrInfo = (actualDays?actualDays:'') + (actualDays&&diffTxt?' · ':'') + (diffTxt?diffTxt:'');
       }
       var delBtn = rounds.length > 1
-        ? '<button onclick="delSampleRequest_BOS(\'' + s.id + '\',' + idx + ')" title="이 차수 삭제" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:11px;padding:0 2px;margin-left:auto">✕</button>'
+        ? '<button onclick="delSampleRequest_BOS(\'' + s.id + '\',' + idx + ')" title="이 차수 삭제" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:11px;padding:0 2px">✕</button>'
         : '';
-      return '<div style="border:1px dashed ' + ph.color + ';border-radius:5px;padding:7px 9px;background:#FFFCF9;margin-bottom:6px">'
-        + '<div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">'
-          + '<span style="font-size:10px;font-weight:700;color:' + ph.color + ';background:#FFF3E8;padding:1px 7px;border-radius:8px">' + (idx+1) + '차 의뢰</span>'
+      // 컴팩트 한 줄 레이아웃: [N차] [샘플명] | 의뢰일 소요 → 예상 | 실제도착 (소요/차이)
+      return '<div style="border:1px dashed ' + ph.color + ';border-radius:5px;padding:6px 8px;background:#FFFCF9;margin-bottom:5px">'
+        // 1줄: 차수 배지 + 샘플명 + 삭제
+        + '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px">'
+          + '<span style="font-size:9.5px;font-weight:700;color:' + ph.color + ';background:#FFF3E8;padding:1px 6px;border-radius:8px;white-space:nowrap;flex-shrink:0">' + (idx+1) + '차</span>'
+          + '<input value="' + esc(r.name||'') + '" placeholder="의뢰 샘플명 (예: 트라마카C_v' + (idx+1) + ')" onchange="updateSampleRequest_BOS(\'' + s.id + '\',' + idx + ',\'name\',this.value)" style="flex:1;min-width:0;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-size:10.5px;font-weight:600;color:var(--tx);background:#fff">'
           + delBtn
         + '</div>'
-        + '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">'
-          + '<div style="display:flex;flex-direction:column;gap:2px">'
-            + '<span style="font-size:9px;color:var(--mu);font-weight:600">의뢰일</span>'
-            + '<input type="date" value="' + esc(r.reqDate) + '" onchange="updateSampleRequest_BOS(\'' + s.id + '\',' + idx + ',\'reqDate\',this.value)" style="padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff">'
-          + '</div>'
-          + '<div style="display:flex;flex-direction:column;gap:2px">'
-            + '<span style="font-size:9px;color:var(--mu);font-weight:600">예상 소요</span>'
-            + '<div style="display:flex;align-items:center;gap:3px">'
-              + '<input type="number" value="' + esc(r.dur) + '" min="0" placeholder="0" oninput="updateSampleRequest_BOS(\'' + s.id + '\',' + idx + ',\'dur\',this.value)" style="width:48px;padding:4px;border:1px solid var(--bd);border-radius:4px;font-size:11px;text-align:center">'
-              + '<select onchange="updateSampleRequest_BOS(\'' + s.id + '\',' + idx + ',\'unit\',this.value)" style="padding:4px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff;cursor:pointer">'
-                + '<option value="d"' + (unitVal==='d'?' selected':'') + '>일</option>'
-                + '<option value="w"' + (unitVal==='w'?' selected':'') + '>주</option>'
-              + '</select>'
-            + '</div>'
-          + '</div>'
-          + '<span style="font-size:10.5px;color:' + ph.color + ';font-weight:700;font-family:\'Roboto Mono\',monospace;align-self:flex-end;padding-bottom:5px;white-space:nowrap">' + endTxt + '</span>'
+        // 2줄: 의뢰일 + 소요 + 예상 (가로)
+        + '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:10px">'
+          + '<span style="color:var(--mu);flex-shrink:0">의뢰</span>'
+          + '<input type="date" value="' + esc(r.reqDate) + '" onchange="updateSampleRequest_BOS(\'' + s.id + '\',' + idx + ',\'reqDate\',this.value)" style="padding:3px 5px;border:1px solid var(--bd);border-radius:4px;font-size:10px;background:#fff">'
+          + '<span style="color:var(--mu);flex-shrink:0">소요</span>'
+          + '<input type="number" value="' + esc(r.dur) + '" min="0" placeholder="0" oninput="updateSampleRequest_BOS(\'' + s.id + '\',' + idx + ',\'dur\',this.value)" style="width:42px;padding:3px;border:1px solid var(--bd);border-radius:4px;font-size:10px;text-align:center">'
+          + '<select onchange="updateSampleRequest_BOS(\'' + s.id + '\',' + idx + ',\'unit\',this.value)" style="padding:3px;border:1px solid var(--bd);border-radius:4px;font-size:10px;background:#fff;cursor:pointer">'
+            + '<option value="d"' + (unitVal==='d'?' selected':'') + '>일</option>'
+            + '<option value="w"' + (unitVal==='w'?' selected':'') + '>주</option>'
+          + '</select>'
+          + '<span style="color:' + ph.color + ';font-weight:700;font-family:\'Roboto Mono\',monospace;white-space:nowrap">→ ' + endTxt + '</span>'
         + '</div>'
-        + '<div style="display:flex;align-items:center;gap:8px;margin-top:6px;padding-top:6px;border-top:1px dashed #EEE">'
-          + '<div style="display:flex;flex-direction:column;gap:2px">'
-            + '<span style="font-size:9px;color:#1A6B4A;font-weight:600">✅ 실제 도착일</span>'
-            + '<input type="date" value="' + esc(r.arrival) + '" onchange="updateSampleRequest_BOS(\'' + s.id + '\',' + idx + ',\'arrival\',this.value)" style="padding:4px 6px;border:1px solid #B8DCC8;border-radius:4px;font-size:11px;background:#F4FBF7">'
-          + '</div>'
-          + (diffTxt ? '<span style="font-size:10.5px;align-self:flex-end;padding-bottom:5px">' + diffTxt + '</span>' : '')
+        // 3줄: 실제 도착 + 소요/차이 (가로)
+        + '<div style="display:flex;align-items:center;gap:5px;margin-top:5px;flex-wrap:wrap;font-size:10px">'
+          + '<span style="color:#1A6B4A;font-weight:600;flex-shrink:0">✅ 실제</span>'
+          + '<input type="date" value="' + esc(r.arrival) + '" onchange="updateSampleRequest_BOS(\'' + s.id + '\',' + idx + ',\'arrival\',this.value)" style="padding:3px 5px;border:1px solid #B8DCC8;border-radius:4px;font-size:10px;background:#F4FBF7">'
+          + (arrInfo ? '<span style="white-space:nowrap">' + arrInfo + '</span>' : '')
         + '</div>'
       + '</div>';
     }).join('');
     
-    return '<div style="border:1px solid var(--bd);border-left:3px solid ' + ph.color + ';border-radius:6px;padding:9px 11px;background:#fff">'
-      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">'
+    return '<div style="border:1px solid var(--bd);border-left:3px solid ' + ph.color + ';border-radius:6px;padding:8px 10px;background:#fff">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
         + '<span style="font-size:11px;font-weight:700;color:' + ph.color + '">' + ph.icon + ' 샘플의뢰 (차수별)</span>'
         + '<button onclick="addSampleRequest_BOS(\'' + s.id + '\')" style="background:#FFF3E8;border:1px solid ' + ph.color + ';color:' + ph.color + ';border-radius:4px;font-size:10px;cursor:pointer;padding:3px 8px;font-weight:600">＋ 차수 추가</button>'
       + '</div>'
@@ -21643,10 +21677,11 @@ tr.row-cal-highlight td{ background:transparent !important; }
 <script id="cal-deps-script">
 (function(){
   // 다음 영업일 (주말 건너뜀)
-  function nextBusinessDay(dateStr){
+  function nextBusinessDay(dateStr, offsetDays){
     var d = new Date(dateStr + 'T00:00:00');
     if(isNaN(d.getTime())) return '';
-    d.setDate(d.getDate() + 1);
+    var off = (typeof offsetDays === 'number') ? offsetDays : 1;
+    d.setDate(d.getDate() + off);
     while(d.getDay() === 0 || d.getDay() === 6){ d.setDate(d.getDate() + 1); }
     return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
   }
@@ -21668,7 +21703,7 @@ tr.row-cal-highlight td{ background:transparent !important; }
   window.fillPrereqOptions_BOS = function(selectedId, currentItemId){
     var sel = document.getElementById('bos-cal-item-prereq');
     if(!sel) return;
-    var items = (typeof calData_BOS !== 'undefined' && calData_BOS.items) ? calData_BOS.items : [];
+    var items = (window.calData_BOS && window.calData_BOS.items) ? window.calData_BOS.items : ((typeof calData_BOS !== 'undefined' && calData_BOS.items) ? calData_BOS.items : []);
     // 순환 방지: 현재 항목을 선행으로 갖는(=후속) 항목들 수집
     var descendants = {};
     if(currentItemId){
@@ -21705,17 +21740,27 @@ tr.row-cal-highlight td{ background:transparent !important; }
     if(startEl && !skipFill){ startEl.dataset.manualEdited = ''; }
     if(autoTag){ autoTag.style.color = '#1565C0'; autoTag.textContent = '(선행 따라 자동)'; }
     if(hint){ hint.style.color = '#1565C0'; }
+    var optsBox = document.getElementById('bos-cal-prereq-opts');
     if(!prereqId){
       if(hint) hint.style.display = 'none';
       if(autoTag) autoTag.style.display = 'none';
+      if(optsBox) optsBox.style.display = 'none';
       if(startEl) startEl.readOnly = false, startEl.style.background = '';
       return;
     }
-    var items = (typeof calData_BOS !== 'undefined' && calData_BOS.items) ? calData_BOS.items : [];
+    if(optsBox) optsBox.style.display = '';
+    var items = (window.calData_BOS && window.calData_BOS.items) ? window.calData_BOS.items : ((typeof calData_BOS !== 'undefined' && calData_BOS.items) ? calData_BOS.items : []);
     var prereq = items.find(function(i){ return i.id === prereqId; });
     if(!prereq) return;
-    var end = getItemEnd_BOS(prereq);
-    var autoStart = end ? nextBusinessDay(end) : '';
+    // 기준(시작/종료) + 오프셋
+    var baseEl = document.getElementById('bos-cal-prereq-base');
+    var offEl = document.getElementById('bos-cal-prereq-offset');
+    var base = baseEl ? baseEl.value : 'end';
+    var off = offEl ? (parseInt(offEl.value)) : 1;
+    if(isNaN(off)) off = 1;
+    var baseDate = (base === 'start') ? (prereq.startDate || '') : getItemEnd_BOS(prereq);
+    var baseLabel = (base === 'start') ? '시작일' : '종료일';
+    var autoStart = baseDate ? nextBusinessDay(baseDate, off) : '';
     if(startEl && autoStart){
       startEl.value = autoStart;
       startEl.style.background = '#F0F6FF';
@@ -21724,7 +21769,7 @@ tr.row-cal-highlight td{ background:transparent !important; }
     if(autoTag) autoTag.style.display = '';
     if(hint){
       hint.style.display = '';
-      hint.innerHTML = '🔗 <b>' + (prereq.title||'') + '</b> 종료(' + end + ') 다음 영업일 <b>' + autoStart + '</b>에 시작 — 선행이 밀리면 자동으로 따라 이동합니다. (시작일을 직접 바꾸면 연결 해제)';
+      hint.innerHTML = '🔗 <b>' + (prereq.title||'') + '</b> ' + baseLabel + '(' + baseDate + ') +' + off + '일(영업일) → <b>' + autoStart + '</b> 시작. 선행이 밀리면 자동 이동. (시작일 직접 변경 시 고정)';
     }
   };
   
@@ -21756,7 +21801,7 @@ tr.row-cal-highlight td{ background:transparent !important; }
   
   // 선행 의존 항목들 시작일 자동 재계산 (렌더 전 호출)
   window.recalcDependentDates_BOS = function(){
-    var items = (typeof calData_BOS !== 'undefined' && calData_BOS.items) ? calData_BOS.items : [];
+    var items = (window.calData_BOS && window.calData_BOS.items) ? window.calData_BOS.items : ((typeof calData_BOS !== 'undefined' && calData_BOS.items) ? calData_BOS.items : []);
     if(!items.length) return;
     var byId = {};
     items.forEach(function(i){ byId[i.id] = i; });
@@ -21769,9 +21814,10 @@ tr.row-cal-highlight td{ background:transparent !important; }
         if(it.prereqManual) return;  // 시작일 직접 수정한 항목은 자동 이동 제외
         var prereq = byId[it.prereqId];
         if(!prereq){ return; }
-        var end = getItemEnd_BOS(prereq);
-        if(!end) return;
-        var want = nextBusinessDay(end);
+        var base = (it.prereqBase === 'start') ? (prereq.startDate || '') : getItemEnd_BOS(prereq);
+        if(!base) return;
+        var off = (typeof it.prereqOffset === 'number') ? it.prereqOffset : 1;
+        var want = nextBusinessDay(base, off);
         if(want && it.startDate !== want){
           it.startDate = want;
           // 리드타임 있으면 종료일도 갱신
