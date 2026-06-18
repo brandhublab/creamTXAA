@@ -18184,7 +18184,7 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
         }
       }
       
-      return '<tr style="border-bottom:1px solid var(--bd);background:' + statusBg + '" data-sample-id="' + s.id + '" onmouseenter="highlightSampleInCal_BOS(\'' + s.id + '\')" onmouseleave="clearSampleCalHighlight_BOS()">'
+      return '<tr style="border-bottom:1px solid var(--bd);background:' + statusBg + '" data-sample-id="' + s.id + '">'
         // 1) 업체명
         + '<td style="padding:5px 6px"><input value="' + escAttr(s.vendor) + '" placeholder="업체명" oninput="updateSampleField_BOS(\'' + s.id + '\',\'vendor\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;font-weight:500;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
         // 2) 거래처 담당자 (📇 연락처 카드 버튼 포함)
@@ -18195,7 +18195,7 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
         // 3) 우리 담당자 (신규)
         + '<td style="padding:5px 6px"><input value="' + escAttr(s.contactOurs || '') + '" placeholder="우리 담당자" oninput="updateSampleField_BOS(\'' + s.id + '\',\'contactOurs\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
         // 4) 의뢰 샘플
-        + '<td style="padding:5px 6px"><input value="' + escAttr(s.sampleName) + '" placeholder="제품명 / 사양" oninput="updateSampleField_BOS(\'' + s.id + '\',\'sampleName\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        + '<td style="padding:5px 6px"><input value="' + escAttr(s.sampleName) + '" placeholder="제품명 / 사양" oninput="updateSampleField_BOS(\'' + s.id + '\',\'sampleName\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">' + '<div class="sample-round-badge" data-round-for="'+s.id+'" style="margin-top:3px">' + ((typeof buildRoundBadgeHtml_BOS==='function')?buildRoundBadgeHtml_BOS(s):'') + '</div>' + '</td>'
         // 5) 의뢰일
         + '<td style="padding:5px 6px"><input type="date" value="' + escAttr(s.requestDate) + '" oninput="updateSampleField_BOS(\'' + s.id + '\',\'requestDate\',this.value)" style="width:100%;padding:4px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff"></td>'
         // 6) 예상소요 + 예상 도착일 자동 표시
@@ -18279,6 +18279,10 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
     if(!item) return;
     item[key] = val;
     saveSample(data);
+    // 차수 상태 배지 갱신 (의뢰일/도착일 변경 시)
+    if((key==='requestDate' || key==='arrivalDate') && typeof refreshRoundBadge_BOS==='function'){
+      refreshRoundBadge_BOS(id);
+    }
     
     // ━━ 의뢰일/예상소요 변경 시 → 예상 도착일 셀 부분 갱신 ━━
     if(key === 'requestDate' || key === 'expectedDays'){
@@ -20136,6 +20140,39 @@ body.cal-highlighting .cal-item-card-bos:hover{
   }
   window.getSampleRequests_BOS = getSampleRequests_BOS;
   
+  // 샘플의 현재 차수 진행 상태 (최신 차수 기준)
+  window.getSampleRoundStatus_BOS = function(s){
+    var reqs = getSampleRequests_BOS(s);
+    if(!reqs || !reqs.length) return null;
+    var lastIdx = -1;
+    reqs.forEach(function(r, i){ if(r.reqDate) lastIdx = i; });
+    if(lastIdx < 0) return null;
+    var last = reqs[lastIdx];
+    var n = lastIdx + 1;
+    if(last.arrival){
+      return { n:n, state:'arrived', label: n+'차 도착', color:'#1E8449', bg:'#EAF7EF', border:'#A9DFBF' };
+    } else {
+      return { n:n, state:'ongoing', label: n+'차 의뢰중', color:'#B9610E', bg:'#FDF2E8', border:'#F5CBA0' };
+    }
+  };
+  
+  // 차수 배지 HTML 생성 (재사용)
+  window.buildRoundBadgeHtml_BOS = function(s){
+    var rs = getSampleRoundStatus_BOS(s);
+    if(!rs) return '';
+    var icon = rs.state==='arrived' ? '📦' : '🚚';
+    return '<span style="display:inline-block;font-size:9.5px;font-weight:700;color:'+rs.color+';background:'+rs.bg+';border:1px solid '+rs.border+';padding:1px 7px;border-radius:8px">'+icon+' '+rs.label+'</span>';
+  };
+  // 특정 샘플의 배지만 부분 갱신
+  window.refreshRoundBadge_BOS = function(id){
+    var el = document.querySelector('.sample-round-badge[data-round-for="'+id+'"]');
+    if(!el) return;
+    var data = (typeof loadSample==='function') ? loadSample() : [];
+    var s = data.find(function(x){ return x.id===id; });
+    if(!s) return;
+    el.innerHTML = buildRoundBadgeHtml_BOS(s);
+  };
+  
   function buildSampleRequestRounds_BOS(s, ph){
     var rounds = getSampleRequests_BOS(s);
     var roundsHtml = rounds.map(function(r, idx){
@@ -20289,6 +20326,12 @@ body.cal-highlighting .cal-item-card-bos:hover{
     var open = row.style.display === 'none';
     row.style.display = open ? 'table-row' : 'none';
     window._sampleExpanded_BOS[id] = open;
+    // 펼친 샘플을 캘린더에서 강조 (접으면 해제) — 자동 스크롤 없음
+    if(open){
+      if(typeof highlightSampleInCal_BOS === 'function') highlightSampleInCal_BOS(id);
+    } else {
+      if(typeof clearSampleCalHighlight_BOS === 'function') clearSampleCalHighlight_BOS();
+    }
   };
   
   // ━━ updateSampleField 래핑: 공정 키 변경 시 종료일 표시 + 미니캘 갱신 ━━
@@ -21480,13 +21523,8 @@ setTimeout(function(){
         cell.classList.add('sid-dimmed');
       }
     });
-    // ★ 강조된 첫 셀이 화면 밖이면 캘린더 영역을 보이도록 스크롤
-    if(firstActive){
-      var rect = firstActive.getBoundingClientRect();
-      if(rect.top < 0 || rect.bottom > window.innerHeight || rect.top > window.innerHeight - 80){
-        firstActive.scrollIntoView({behavior:'smooth', block:'center'});
-      }
-    }
+    // (자동 스크롤 제거: 행 위에서 마우스를 움직일 때 화면이 캘린더로 끌려 내려가는 문제 방지)
+    // 강조만 적용하고, 캘린더가 화면 밖이어도 강제로 스크롤하지 않음
   }
   function clearHighlight(containerId){
     var container = document.getElementById(containerId);
@@ -21618,10 +21656,7 @@ tr.row-cal-highlight td{ background:transparent !important; }
         else cell.classList.add('sid-dimmed');
       } else if(cell.classList.contains('has-ev')){ cell.classList.add('sid-dimmed'); }
     });
-    if(firstActive){
-      var r = firstActive.getBoundingClientRect();
-      if(r.top<0||r.top>window.innerHeight-80) firstActive.scrollIntoView({behavior:'smooth',block:'center'});
-    }
+    // (자동 스크롤 제거 — 강조만 적용)
   };
   window.clearDLCalHighlight_BOS = function(){
     var cal = document.getElementById('deadline-minical-bos');
@@ -21638,10 +21673,7 @@ tr.row-cal-highlight td{ background:transparent !important; }
       var card = document.querySelector('.dl-card-bos[data-dl-id="'+id+'"]');
       if(card){ card.classList.add('dl-card-hl'); if(!first) first=card; }
     });
-    if(first){
-      var r=first.getBoundingClientRect();
-      if(r.top<60||r.bottom>window.innerHeight) first.scrollIntoView({behavior:'smooth',block:'center'});
-    }
+    // (자동 스크롤 제거 — 강조만 적용)
   };
   window.clearDLCardHighlight_BOS = function(){
     document.querySelectorAll('.dl-card-bos.dl-card-hl').forEach(function(c){ c.classList.remove('dl-card-hl'); });
