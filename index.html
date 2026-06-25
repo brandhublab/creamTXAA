@@ -18184,7 +18184,7 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
         }
       }
       
-      return '<tr style="border-bottom:1px solid var(--bd);background:' + statusBg + '" data-sample-id="' + s.id + '">'
+      return '<tr style="border-bottom:1px solid var(--bd);background:' + statusBg + '" data-sample-id="' + s.id + '" onmouseenter="hoverSampleRow_BOS(\'' + s.id + '\')" onmouseleave="leaveSampleRow_BOS()">'
         // 1) 업체명
         + '<td style="padding:5px 6px"><input value="' + escAttr(s.vendor) + '" placeholder="업체명" oninput="updateSampleField_BOS(\'' + s.id + '\',\'vendor\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;font-weight:500;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
         // 2) 거래처 담당자 (📇 연락처 카드 버튼 포함)
@@ -20326,9 +20326,9 @@ body.cal-highlighting .cal-item-card-bos:hover{
     var open = row.style.display === 'none';
     row.style.display = open ? 'table-row' : 'none';
     window._sampleExpanded_BOS[id] = open;
-    // 펼친 샘플을 캘린더에서 강조 (접으면 해제) — 자동 스크롤 없음
+    // 펼친 샘플을 캘린더에서 강조 (접으면 해제) — 펼침은 hideMode=true: 다른 업체 일정 숨김
     if(open){
-      if(typeof highlightSampleInCal_BOS === 'function') highlightSampleInCal_BOS(id);
+      if(typeof highlightSampleInCal_BOS === 'function') highlightSampleInCal_BOS(id, true);
     } else {
       if(typeof clearSampleCalHighlight_BOS === 'function') clearSampleCalHighlight_BOS();
     }
@@ -21494,6 +21494,8 @@ setTimeout(function(){
 <!-- ━━━ 샘플/아웃소싱 행 → 미니캘린더 강조 ━━━ -->
 <style>
 .minical-cell-bos.sid-dimmed{ opacity:.2; transition:opacity .15s; }
+.minical-cell-bos.sid-hidden .minical-dot-bos{ visibility:hidden; }
+.minical-cell-bos.sid-hidden{ opacity:.35; transition:opacity .15s; }
 .minical-cell-bos.sid-active{ background:#FFF3CD !important; outline:2.5px solid #FF9800; outline-offset:-2px; border-radius:4px; transition:all .15s; z-index:3; position:relative; box-shadow:0 0 0 3px rgba(255,152,0,.25); animation:sidPulse 1s ease-in-out infinite; }
 .minical-cell-bos.sid-active .minical-day-bos{ font-weight:800; color:#E65100; }
 .minical-cell-bos.sid-active .minical-dot-bos{ transform:scale(1.6); }
@@ -21503,13 +21505,16 @@ setTimeout(function(){
 </style>
 <script id="sample-cal-hover-script">
 (function(){
-  function highlightCal(containerId, sampleId){
+  function highlightCal(containerId, sampleId, hideMode){
     var container = document.getElementById(containerId);
     if(!container) return;
     var cells = container.querySelectorAll('.minical-cell-bos');
     var firstActive = null;
+    // hideMode=true(펼침): 다른 업체 일정은 완전히 숨김(sid-hidden)
+    // hideMode=false(호버): 다른 업체 일정은 희미하게(sid-dimmed)
+    var offClass = hideMode ? 'sid-hidden' : 'sid-dimmed';
     cells.forEach(function(cell){
-      cell.classList.remove('sid-active', 'sid-dimmed');
+      cell.classList.remove('sid-active', 'sid-dimmed', 'sid-hidden');
       var sids = cell.getAttribute('data-sids');
       if(sids){
         var list = sids.split(',');
@@ -21517,24 +21522,37 @@ setTimeout(function(){
           cell.classList.add('sid-active');
           if(!firstActive) firstActive = cell;
         } else {
-          cell.classList.add('sid-dimmed');
+          cell.classList.add(offClass);
         }
       } else if(cell.classList.contains('has-ev')){
-        cell.classList.add('sid-dimmed');
+        cell.classList.add(offClass);
       }
     });
-    // (자동 스크롤 제거: 행 위에서 마우스를 움직일 때 화면이 캘린더로 끌려 내려가는 문제 방지)
-    // 강조만 적용하고, 캘린더가 화면 밖이어도 강제로 스크롤하지 않음
+    // (자동 스크롤 없음 — 강조만 적용)
   }
   function clearHighlight(containerId){
     var container = document.getElementById(containerId);
     if(!container) return;
     container.querySelectorAll('.minical-cell-bos').forEach(function(cell){
-      cell.classList.remove('sid-active', 'sid-dimmed');
+      cell.classList.remove('sid-active', 'sid-dimmed', 'sid-hidden');
     });
   }
   
-  window.highlightSampleInCal_BOS = function(sampleId){ highlightCal('sample-minical-bos', sampleId); };
+  window.highlightSampleInCal_BOS = function(sampleId, hideMode){ highlightCal('sample-minical-bos', sampleId, hideMode); }
+  
+  // 행 마우스 오버 강조: 펼친 샘플이 하나도 없을 때만 작동 (펼침이 우선)
+  window.hoverSampleRow_BOS = function(sampleId){
+    var exp = window._sampleExpanded_BOS || {};
+    var anyExpanded = Object.keys(exp).some(function(k){ return exp[k]; });
+    if(anyExpanded) return;  // 펼친 게 있으면 호버 무시
+    highlightCal('sample-minical-bos', sampleId, false);  // 호버는 흐림 모드
+  };
+  window.leaveSampleRow_BOS = function(){
+    var exp = window._sampleExpanded_BOS || {};
+    var anyExpanded = Object.keys(exp).some(function(k){ return exp[k]; });
+    if(anyExpanded) return;  // 펼친 게 있으면 그 강조 유지
+    clearSampleCalHighlight_BOS();
+  };;
   window.clearSampleCalHighlight_BOS = function(){ clearHighlight('sample-minical-bos'); };
   window.highlightOutsourceInCal_BOS = function(id){ highlightCal('outsource-minical-bos', id); };
   window.clearOutsourceCalHighlight_BOS = function(){ clearHighlight('outsource-minical-bos'); };
