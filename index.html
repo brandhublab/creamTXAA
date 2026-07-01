@@ -1860,6 +1860,31 @@ html, body{
           </div>
           <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">제품 3개 + 1박스 + 1배송비</div>
         </div>
+        <!-- 🎁 4개 세트 -->
+        <div style="background:#EAF7F7;border:1px solid #A8DADA;border-radius:8px;padding:12px">
+          <div style="font-size:12px;font-weight:700;color:#0E7C7B;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #A8DADA">🎁 4개 세트</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">개당 가격</span>
+            <input type="number" id="rs4-unit" placeholder="0" oninput="onSetUnitInput_BOS('rs4',4)"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu);font-weight:600">세트 판매가</span>
+            <input type="number" id="rs4-price" placeholder="0" oninput="onSetPriceInput_BOS('rs4',4)"
+              style="width:96px;padding:4px 8px;border:1px solid #A8DADA;border-radius:4px;font-family:var(--mn);font-size:12px;font-weight:700;text-align:right;background:#fff;outline:none">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">할인율 (%)</span>
+            <input type="number" id="rs4-disc" placeholder="0" oninput="onSetDiscInput_BOS('rs4',4)"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none;color:#8B5E00">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">무료배송비</span>
+            <input type="number" id="rs4-ship" placeholder="3000" oninput="saveRoasInput('rs4-ship');calcRoasSet()" value="3000"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">제품 4개 + 1박스 + 1배송비</div>
+        </div>
         <!-- 🎁 5개 세트 -->
         <div style="background:#F7F0FB;border:1px solid #D1B3E8;border-radius:8px;padding:12px">
           <div style="font-size:12px;font-weight:700;color:#7A4AA8;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #D1B3E8">🎁 5개 세트</div>
@@ -1885,6 +1910,57 @@ html, body{
           </div>
           <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">제품 5개 + 1박스 + 1배송비</div>
         </div>
+        <!-- 🎁 6개 세트 -->
+        <div style="background:#FDF3E8;border:1px solid #F5CBA0;border-radius:8px;padding:12px">
+          <div style="font-size:12px;font-weight:700;color:#B9610E;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #F5CBA0">🎁 6개 세트</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">개당 가격</span>
+            <input type="number" id="rs6-unit" placeholder="0" oninput="onSetUnitInput_BOS('rs6',6)"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu);font-weight:600">세트 판매가</span>
+            <input type="number" id="rs6-price" placeholder="0" oninput="onSetPriceInput_BOS('rs6',6)"
+              style="width:96px;padding:4px 8px;border:1px solid #F5CBA0;border-radius:4px;font-family:var(--mn);font-size:12px;font-weight:700;text-align:right;background:#fff;outline:none">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">할인율 (%)</span>
+            <input type="number" id="rs6-disc" placeholder="0" oninput="onSetDiscInput_BOS('rs6',6)"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none;color:#8B5E00">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">무료배송비</span>
+            <input type="number" id="rs6-ship" placeholder="3000" oninput="saveRoasInput('rs6-ship');calcRoasSet()" value="3000"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">제품 6개 + 1박스 + 1배송비</div>
+        </div>
+        <!-- 🎁 7개 세트 -->
+        <div style="background:#FDEDEC;border:1px solid #F5B7B1;border-radius:8px;padding:12px">
+          <div style="font-size:12px;font-weight:700;color:#C0392B;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #F5B7B1">🎁 7개 세트</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">개당 가격</span>
+            <input type="number" id="rs7-unit" placeholder="0" oninput="onSetUnitInput_BOS('rs7',7)"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu);font-weight:600">세트 판매가</span>
+            <input type="number" id="rs7-price" placeholder="0" oninput="onSetPriceInput_BOS('rs7',7)"
+              style="width:96px;padding:4px 8px;border:1px solid #F5B7B1;border-radius:4px;font-family:var(--mn);font-size:12px;font-weight:700;text-align:right;background:#fff;outline:none">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">할인율 (%)</span>
+            <input type="number" id="rs7-disc" placeholder="0" oninput="onSetDiscInput_BOS('rs7',7)"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none;color:#8B5E00">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">무료배송비</span>
+            <input type="number" id="rs7-ship" placeholder="3000" oninput="saveRoasInput('rs7-ship');calcRoasSet()" value="3000"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">제품 7개 + 1박스 + 1배송비</div>
+        </div>
+      </div>
       </div>
     </div>
   </div>
@@ -6449,7 +6525,10 @@ function calcRoasSet(){
  var sets = [
   {key:'rs2', qty:2, label:'🎁 2개 세트', color:'#1A3FAA', bg:'#F0F8FF', border:'#B5C9E8'},
   {key:'rs3', qty:3, label:'🎁 3개 세트', color:'#1A6B4A', bg:'#F0FBF4', border:'#A5D6A7'},
-  {key:'rs5', qty:5, label:'🎁 5개 세트', color:'#7A4AA8', bg:'#F7F0FB', border:'#D1B3E8'}
+  {key:'rs4', qty:4, label:'🎁 4개 세트', color:'#0E7C7B', bg:'#EAF7F7', border:'#A8DADA'},
+  {key:'rs5', qty:5, label:'🎁 5개 세트', color:'#7A4AA8', bg:'#F7F0FB', border:'#D1B3E8'},
+  {key:'rs6', qty:6, label:'🎁 6개 세트', color:'#B9610E', bg:'#FDF3E8', border:'#F5CBA0'},
+  {key:'rs7', qty:7, label:'🎁 7개 세트', color:'#C0392B', bg:'#FDEDEC', border:'#F5B7B1'}
  ];
  
  var wrap = document.getElementById('roasset-results');
@@ -6532,7 +6611,7 @@ function round10_BOS(n){ return Math.round(n/10)*10; }  // 10원 단위 반올�
 function loadUnitPriceToSet_BOS(){
   var base = getUnitBasePrice_BOS();
   if(base<=0){ alert('ROAS 탭에서 단품 판매가를 먼저 입력하세요.'); return; }
-  [['rs2',2],['rs3',3],['rs5',5]].forEach(function(pair){
+  [['rs2',2],['rs3',3],['rs4',4],['rs5',5],['rs6',6],['rs7',7]].forEach(function(pair){
     var key=pair[0], qty=pair[1];
     var unitEl=document.getElementById(key+'-unit');
     var priceEl=document.getElementById(key+'-price');
@@ -7488,7 +7567,10 @@ function saveIdea(){sv();buildIdea();buildIdeaIngredients();showToast('아이디
 var ROAS_INPUT_IDS = ['roas-price2','roas-payfee','roas-etcfee','roas-box','roas-wrapfee','roas-extramaterial','roas-shipfee',
   'rs2-price','rs2-ship','rs2-unit','rs2-disc',
   'rs3-price','rs3-ship','rs3-unit','rs3-disc',
-  'rs5-price','rs5-ship','rs5-unit','rs5-disc'];
+  'rs4-price','rs4-ship','rs4-unit','rs4-disc',
+  'rs5-price','rs5-ship','rs5-unit','rs5-disc',
+  'rs6-price','rs6-ship','rs6-unit','rs6-disc',
+  'rs7-price','rs7-ship','rs7-unit','rs7-disc'];
 function saveRoasInput(id){
   if(typeof roasInputs==='undefined'||!roasInputs) roasInputs={};
   var el=document.getElementById(id);
