@@ -1802,55 +1802,88 @@ html, body{
   
   <!-- 세트 가격/배송비 입력 -->
   <div class="section" style="margin-bottom:14px">
-    <div class="sec-head"><h3>🎁 세트 가격 + 배송비 설정</h3></div>
+    <div class="sec-head"><h3>🎁 세트 가격 + 배송비 설정</h3>
+      <button onclick="loadUnitPriceToSet_BOS()" style="background:#EAF3EE;border:1px solid #16A085;color:#16A085;border-radius:5px;font-size:11px;font-weight:600;padding:4px 10px;cursor:pointer">⬇ ROAS 단품가 불러오기</button>
+    </div>
     <div class="sec-body" style="padding:14px">
+      <div style="font-size:10.5px;color:var(--mu);margin-bottom:10px;line-height:1.6">
+        💡 <b>개당 가격</b> 입력 → 세트가·할인율 자동 / <b>세트가</b> 입력 → 개당가·할인율 자동 / <b>할인율</b> 입력 → 개당가·세트가 자동 (개당가는 10원 단위 반올림)
+      </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
-        <!-- 단품 (무료배송) -->
-        <div style="background:#FAFAF8;border:1px solid var(--bd);border-radius:8px;padding:12px">
-          <div style="font-size:12px;font-weight:700;color:var(--tx);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bd)">📦 단품 + 무료배송</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <span style="font-size:11px;color:var(--mu)">판매가 (원)</span>
-            <input type="number" id="rs1-price" placeholder="40000" oninput="saveRoasInput('rs1-price');calcRoasSet()" 
-              style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <span style="font-size:11px;color:var(--mu)">무료배송비 (원)</span>
-            <input type="number" id="rs1-ship" placeholder="3000" oninput="saveRoasInput('rs1-ship');calcRoasSet()" value="3000"
-              style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
-          </div>
-          <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">단품 가격 + 무료배송비를 우리가 부담</div>
-        </div>
-        
-        <!-- 2개 세트 -->
+        <!-- 🎁 2개 세트 -->
         <div style="background:#F0F8FF;border:1px solid #B5C9E8;border-radius:8px;padding:12px">
           <div style="font-size:12px;font-weight:700;color:#1A3FAA;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #B5C9E8">🎁 2개 세트</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <span style="font-size:11px;color:var(--mu)">세트 판매가 (원)</span>
-            <input type="number" id="rs2-price" placeholder="76000" oninput="saveRoasInput('rs2-price');calcRoasSet()" 
-              style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">개당 가격</span>
+            <input type="number" id="rs2-unit" placeholder="0" oninput="onSetUnitInput_BOS('rs2',2)"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <span style="font-size:11px;color:var(--mu)">무료배송비 (원)</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu);font-weight:600">세트 판매가</span>
+            <input type="number" id="rs2-price" placeholder="0" oninput="onSetPriceInput_BOS('rs2',2)"
+              style="width:96px;padding:4px 8px;border:1px solid #B5C9E8;border-radius:4px;font-family:var(--mn);font-size:12px;font-weight:700;text-align:right;background:#fff;outline:none">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">할인율 (%)</span>
+            <input type="number" id="rs2-disc" placeholder="0" oninput="onSetDiscInput_BOS('rs2',2)"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none;color:#8B5E00">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">무료배송비</span>
             <input type="number" id="rs2-ship" placeholder="3000" oninput="saveRoasInput('rs2-ship');calcRoasSet()" value="3000"
-              style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
           </div>
           <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">제품 2개 + 1박스 + 1배송비</div>
         </div>
-        
-        <!-- 3개 세트 -->
+        <!-- 🎁 3개 세트 -->
         <div style="background:#F0FBF4;border:1px solid #A5D6A7;border-radius:8px;padding:12px">
           <div style="font-size:12px;font-weight:700;color:#1A6B4A;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #A5D6A7">🎁 3개 세트</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <span style="font-size:11px;color:var(--mu)">세트 판매가 (원)</span>
-            <input type="number" id="rs3-price" placeholder="108000" oninput="saveRoasInput('rs3-price');calcRoasSet()" 
-              style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">개당 가격</span>
+            <input type="number" id="rs3-unit" placeholder="0" oninput="onSetUnitInput_BOS('rs3',3)"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <span style="font-size:11px;color:var(--mu)">무료배송비 (원)</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu);font-weight:600">세트 판매가</span>
+            <input type="number" id="rs3-price" placeholder="0" oninput="onSetPriceInput_BOS('rs3',3)"
+              style="width:96px;padding:4px 8px;border:1px solid #A5D6A7;border-radius:4px;font-family:var(--mn);font-size:12px;font-weight:700;text-align:right;background:#fff;outline:none">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">할인율 (%)</span>
+            <input type="number" id="rs3-disc" placeholder="0" oninput="onSetDiscInput_BOS('rs3',3)"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none;color:#8B5E00">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">무료배송비</span>
             <input type="number" id="rs3-ship" placeholder="3000" oninput="saveRoasInput('rs3-ship');calcRoasSet()" value="3000"
-              style="width:100px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
           </div>
           <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">제품 3개 + 1박스 + 1배송비</div>
+        </div>
+        <!-- 🎁 5개 세트 -->
+        <div style="background:#F7F0FB;border:1px solid #D1B3E8;border-radius:8px;padding:12px">
+          <div style="font-size:12px;font-weight:700;color:#7A4AA8;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #D1B3E8">🎁 5개 세트</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">개당 가격</span>
+            <input type="number" id="rs5-unit" placeholder="0" oninput="onSetUnitInput_BOS('rs5',5)"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu);font-weight:600">세트 판매가</span>
+            <input type="number" id="rs5-price" placeholder="0" oninput="onSetPriceInput_BOS('rs5',5)"
+              style="width:96px;padding:4px 8px;border:1px solid #D1B3E8;border-radius:4px;font-family:var(--mn);font-size:12px;font-weight:700;text-align:right;background:#fff;outline:none">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">할인율 (%)</span>
+            <input type="number" id="rs5-disc" placeholder="0" oninput="onSetDiscInput_BOS('rs5',5)"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none;color:#8B5E00">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:11px;color:var(--mu)">무료배송비</span>
+            <input type="number" id="rs5-ship" placeholder="3000" oninput="saveRoasInput('rs5-ship');calcRoasSet()" value="3000"
+              style="width:96px;padding:4px 8px;border:1px solid var(--bd);border-radius:4px;font-family:var(--mn);font-size:12px;text-align:right;background:var(--sur);outline:none">
+          </div>
+          <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5">제품 5개 + 1박스 + 1배송비</div>
         </div>
       </div>
     </div>
@@ -6414,9 +6447,9 @@ function calcRoasSet(){
  
  // 세트 1/2/3 값 읽기
  var sets = [
-  {key:'rs1', qty:1, label:'📦 단품 + 무료배송', color:'#7A7870', bg:'#FAFAF8', border:'var(--bd)'},
   {key:'rs2', qty:2, label:'🎁 2개 세트', color:'#1A3FAA', bg:'#F0F8FF', border:'#B5C9E8'},
-  {key:'rs3', qty:3, label:'🎁 3개 세트', color:'#1A6B4A', bg:'#F0FBF4', border:'#A5D6A7'}
+  {key:'rs3', qty:3, label:'🎁 3개 세트', color:'#1A6B4A', bg:'#F0FBF4', border:'#A5D6A7'},
+  {key:'rs5', qty:5, label:'🎁 5개 세트', color:'#7A4AA8', bg:'#F7F0FB', border:'#D1B3E8'}
  ];
  
  var wrap = document.getElementById('roasset-results');
@@ -6487,6 +6520,78 @@ function calcRoasSet(){
   return html;
  }).join('');
 }
+
+// ━━━ 세트 가격 3-way 연동 (개당가 ↔ 세트가 ↔ 할인율) ━━━
+function getUnitBasePrice_BOS(){
+  // 기준 단품가: ROAS 탭 판매가(roas-price2)
+  return parseFloat(document.getElementById('roas-price2')?.value) || 0;
+}
+function round10_BOS(n){ return Math.round(n/10)*10; }  // 10원 단위 반올림
+
+// ROAS 탭 단품가를 세트 기준값으로 불러오기 (개당가 = 단품가로 세팅 → 세트가 자동)
+function loadUnitPriceToSet_BOS(){
+  var base = getUnitBasePrice_BOS();
+  if(base<=0){ alert('ROAS 탭에서 단품 판매가를 먼저 입력하세요.'); return; }
+  [['rs2',2],['rs3',3],['rs5',5]].forEach(function(pair){
+    var key=pair[0], qty=pair[1];
+    var unitEl=document.getElementById(key+'-unit');
+    var priceEl=document.getElementById(key+'-price');
+    var discEl=document.getElementById(key+'-disc');
+    if(unitEl) unitEl.value = base;
+    if(priceEl) priceEl.value = base*qty;
+    if(discEl) discEl.value = 0;
+    saveRoasInput(key+'-unit'); saveRoasInput(key+'-price'); saveRoasInput(key+'-disc');
+  });
+  if(typeof calcRoasSet==='function') calcRoasSet();
+}
+
+// 개당 가격 입력 → 세트가 = 개당×수량, 할인율 자동
+function onSetUnitInput_BOS(key, qty){
+  var unit = parseFloat(document.getElementById(key+'-unit')?.value)||0;
+  var base = getUnitBasePrice_BOS();
+  var priceEl=document.getElementById(key+'-price');
+  var discEl=document.getElementById(key+'-disc');
+  if(priceEl) priceEl.value = unit>0 ? unit*qty : '';
+  if(discEl && base>0 && unit>0){
+    discEl.value = Math.round((1 - unit/base)*100*10)/10;
+  }
+  saveRoasInput(key+'-unit'); saveRoasInput(key+'-price'); saveRoasInput(key+'-disc');
+  if(typeof calcRoasSet==='function') calcRoasSet();
+}
+
+// 세트 판매가 입력 → 개당가 = 세트가/수량(10원반올림), 할인율 자동
+function onSetPriceInput_BOS(key, qty){
+  var price = parseFloat(document.getElementById(key+'-price')?.value)||0;
+  var base = getUnitBasePrice_BOS();
+  var unitEl=document.getElementById(key+'-unit');
+  var discEl=document.getElementById(key+'-disc');
+  var unit = price>0 ? round10_BOS(price/qty) : 0;
+  if(unitEl) unitEl.value = unit>0 ? unit : '';
+  if(discEl && base>0 && price>0){
+    discEl.value = Math.round((1 - (price/(base*qty)))*100*10)/10;
+  }
+  saveRoasInput(key+'-unit'); saveRoasInput(key+'-price'); saveRoasInput(key+'-disc');
+  if(typeof calcRoasSet==='function') calcRoasSet();
+}
+
+// 할인율 입력 → 개당가 = 단품가×(1-할인율)(10원반올림), 세트가 = 개당×수량
+function onSetDiscInput_BOS(key, qty){
+  var disc = parseFloat(document.getElementById(key+'-disc')?.value);
+  var base = getUnitBasePrice_BOS();
+  if(base<=0){ alert('ROAS 탭에서 단품 판매가를 먼저 입력하세요. (할인율 기준)'); return; }
+  if(isNaN(disc)) disc=0;
+  var unit = round10_BOS(base*(1-disc/100));
+  var unitEl=document.getElementById(key+'-unit');
+  var priceEl=document.getElementById(key+'-price');
+  if(unitEl) unitEl.value = unit;
+  if(priceEl) priceEl.value = unit*qty;
+  saveRoasInput(key+'-unit'); saveRoasInput(key+'-price'); saveRoasInput(key+'-disc');
+  if(typeof calcRoasSet==='function') calcRoasSet();
+}
+window.loadUnitPriceToSet_BOS = loadUnitPriceToSet_BOS;
+window.onSetUnitInput_BOS = onSetUnitInput_BOS;
+window.onSetPriceInput_BOS = onSetPriceInput_BOS;
+window.onSetDiscInput_BOS = onSetDiscInput_BOS;
 
 
 function renderProdRows(){
@@ -7381,8 +7486,9 @@ function saveIdea(){sv();buildIdea();buildIdeaIngredients();showToast('아이디
 // ============================================================
 // ━━ ROAS/세트 탭 입력값 저장·복원 (roasInputs) ━━
 var ROAS_INPUT_IDS = ['roas-price2','roas-payfee','roas-etcfee','roas-box','roas-wrapfee','roas-extramaterial','roas-shipfee',
-  'rs1-price','rs1-ship','rs2-price','rs2-ship','rs3-price','rs3-ship',
-  'rs4-price','rs4-ship','rs5-price','rs5-ship','rs6-price','rs6-ship'];
+  'rs2-price','rs2-ship','rs2-unit','rs2-disc',
+  'rs3-price','rs3-ship','rs3-unit','rs3-disc',
+  'rs5-price','rs5-ship','rs5-unit','rs5-disc'];
 function saveRoasInput(id){
   if(typeof roasInputs==='undefined'||!roasInputs) roasInputs={};
   var el=document.getElementById(id);
@@ -8597,30 +8703,123 @@ function buildWIG(){
    <button class="ib dl" onclick="delWIG('${pid}',${wi})">✕</button>
   </div>
   <div class="sec-body">
-   <div class="fg3" style="margin-bottom:12px">
+   <div class="fg3" style="margin-bottom:8px">
     <div class="fi"><label>현재값 (From)</label><input value="${wig.from||''}" onchange="setWigField('${pid}',${wi},'from',this.value);buildWIG()"></div>
     <div class="fi"><label>목표값 (To)</label><input value="${wig.to||''}" onchange="setWigField('${pid}',${wi},'to',this.value);buildWIG()"></div>
-    <div class="fi"><label>목표일</label><input type="date" value="${wig.deadline||''}" onchange="setWigField('${pid}',${wi},'deadline',this.value);buildWIG()"></div>
+    <div class="fi"><label>구분</label><select onchange="setWigField('${pid}',${wi},'term',this.value);buildWIG()" style="width:100%;padding:6px 8px;border:1px solid var(--bd);border-radius:5px;font-size:12px;background:var(--bg);color:var(--tx)"><option value="month"${(wig.term||'month')==='month'?' selected':''}>월 목표</option><option value="quarter"${wig.term==='quarter'?' selected':''}>분기 목표</option><option value="year"${wig.term==='year'?' selected':''}>연 목표</option></select></div>
+   </div>
+   <div class="fg3" style="margin-bottom:12px">
+    <div class="fi"><label>시작일</label><input type="date" value="${wig.startDate||''}" onchange="setWigDateField_BOS('${pid}',${wi},'startDate',this.value)"></div>
+    <div class="fi"><label>목표일(종료)</label><input type="date" value="${wig.deadline||''}" onchange="setWigDateField_BOS('${pid}',${wi},'deadline',this.value)"></div>
+    <div class="fi"><label>&nbsp;</label><div style="font-size:10px;color:var(--mu);padding:7px 0;line-height:1.4">${wig.startDate&&wig.deadline?('기간 '+wigDaysBetween_BOS(wig.startDate,wig.deadline)+'일'):'시작·목표일 입력'}</div></div>
    </div>
    <div style="font-size:11px;font-weight:500;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">선행 지표 (실행 목표)</div>
    ${(wig.leads||[]).map((lead,li)=>`
-   <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+   <div style="margin-bottom:8px">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
     <span style="font-size:11px;color:var(--mu);min-width:20px">${li+1}.</span>
     <input value="${lead.text||''}" placeholder="선행 지표 입력..." onchange="setWigLeadField('${pid}',${wi},${li},'text',this.value)" style="flex:1;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;font-size:12px;background:var(--bg);color:var(--tx);outline:none">
     <input type="number" value="${lead.current||0}" onchange="setWigLeadField('${pid}',${wi},${li},'current',parseFloat(this.value)||0);buildWIG()" style="width:60px;padding:5px 6px;border:1px solid var(--bd);border-radius:5px;font-size:12px;font-family:var(--mn);background:var(--bg);color:var(--tx);outline:none" title="현재값">
     <span style="font-size:11px;color:var(--mu)">/</span>
     <input type="number" value="${lead.target||0}" onchange="setWigLeadField('${pid}',${wi},${li},'target',parseFloat(this.value)||0);buildWIG()" style="width:60px;padding:5px 6px;border:1px solid var(--bd);border-radius:5px;font-size:12px;font-family:var(--mn);background:var(--bg);color:var(--tx);outline:none" title="목표값">
     <button class="ib dl" onclick="delLead('${pid}',${wi},${li})">✕</button>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;margin-left:28px">
+     <span style="font-size:9.5px;color:var(--mu)">기간</span>
+     <input type="date" value="${lead.startDate||''}" onchange="setWigLeadDateField_BOS('${pid}',${wi},${li},'startDate',this.value)" style="padding:3px 5px;border:1px solid var(--bd);border-radius:4px;font-size:10px;background:var(--bg);color:var(--tx)" title="선행지표 시작일">
+     <span style="font-size:9.5px;color:var(--mu)">~</span>
+     <input type="date" value="${lead.endDate||''}" onchange="setWigLeadDateField_BOS('${pid}',${wi},${li},'endDate',this.value)" style="padding:3px 5px;border:1px solid var(--bd);border-radius:4px;font-size:10px;background:var(--bg);color:var(--tx)" title="선행지표 종료일">
+    </div>
    </div>`).join('')}
    ${(wig.leads||[]).length<3?`<button class="btn" style="font-size:11px;padding:3px 8px" onclick="addLead('${pid}',${wi})">+ 선행 지표 추가 (최대 3개)</button>`:''}
    <div style="font-size:11px;font-weight:500;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin:12px 0 8px">점수판</div>
    <div style="display:flex;gap:10px;flex-wrap:wrap">
     ${buildScoreBoard(wig)}
    </div>
+   <div style="font-size:11px;font-weight:500;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin:16px 0 8px">📅 목표 캘린더 <span style="text-transform:none;font-weight:400;font-size:10px">— 목표 기간과 선행지표를 달력에서 확인 (마우스 오버 시 기간 표시)</span></div>
+   <div id="wig-cal-${pid}-${wi}" class="wig-minical"></div>
   </div>
  </div>`).join('')}
  ${(period.wigs||[]).length<3?`<button class="btn pri" onclick="addWIG('${pid}')">+ 가중목 추가 (최대 3개)</button>`:''}`;
+
+ // 각 WIG 캘린더 렌더
+ setTimeout(function(){ renderAllWigCalendars_BOS(period, pid); }, 30);
 }
+
+// ━━━ WIG 캘린더 헬퍼 ━━━
+function wigDaysBetween_BOS(s, e){
+  if(!s||!e) return 0;
+  var d = Math.round((new Date(e+'T00:00:00') - new Date(s+'T00:00:00'))/86400000);
+  return d>=0 ? d : 0;
+}
+window.setWigDateField_BOS = function(pid, wi, field, val){
+  var w = wigData.periods.find(function(p){return p.id===pid;});
+  if(!w) return;
+  var wig = w.wigs[wi];
+  if(!wig) return;
+  // 목표일 < 시작일 검증
+  if(field==='deadline' && wig.startDate && val){
+    if(new Date(val+'T00:00:00') < new Date(wig.startDate+'T00:00:00')){
+      alert('목표일(종료)은 시작일보다 앞설 수 없습니다.');
+      buildWIG();
+      return;
+    }
+  }
+  if(field==='startDate' && wig.deadline && val){
+    if(new Date(wig.deadline+'T00:00:00') < new Date(val+'T00:00:00')){
+      alert('시작일은 목표일보다 뒤설 수 없습니다.');
+      buildWIG();
+      return;
+    }
+  }
+  wig[field] = val;
+  if(typeof saveWIG==='function') saveWIG(true);
+  buildWIG();
+};
+window.setWigLeadDateField_BOS = function(pid, wi, li, field, val){
+  var w = wigData.periods.find(function(p){return p.id===pid;});
+  if(!w) return;
+  var wig = w.wigs[wi]; if(!wig || !wig.leads || !wig.leads[li]) return;
+  var lead = wig.leads[li];
+  if(field==='endDate' && lead.startDate && val){
+    if(new Date(val+'T00:00:00') < new Date(lead.startDate+'T00:00:00')){
+      alert('선행지표 종료일은 시작일보다 앞설 수 없습니다.');
+      buildWIG();
+      return;
+    }
+  }
+  lead[field] = val;
+  if(typeof saveWIG==='function') saveWIG(true);
+  buildWIG();
+};
+
+// WIG 캘린더들 렌더
+window.renderAllWigCalendars_BOS = function(period, pid){
+  if(!period || !period.wigs) return;
+  period.wigs.forEach(function(wig, wi){
+    var containerId = 'wig-cal-' + pid + '-' + wi;
+    var el = document.getElementById(containerId);
+    if(!el) return;
+    // 이벤트 구성: 목표(기간), 선행지표(기간)
+    var events = [];
+    // 목표 자체
+    if(wig.startDate){
+      events.push({date: wig.startDate, color:'#C0392B', label:'🏆 [목표 시작] '+(resolvePlaceholders(wig.title)||'가중목'), sid:'wig'+wi});
+    }
+    if(wig.deadline){
+      events.push({date: wig.deadline, color:'#E74C3C', label:'🎯 [목표일] '+(resolvePlaceholders(wig.title)||'가중목')+' ('+(wig.from||'?')+'→'+(wig.to||'?')+')', sid:'wig'+wi});
+    }
+    // 선행지표
+    (wig.leads||[]).forEach(function(lead, li){
+      if(lead.startDate) events.push({date: lead.startDate, color:'#1565C0', label:'▶ [선행'+(li+1)+' 시작] '+(lead.text||''), sid:'wig'+wi+'l'+li});
+      if(lead.endDate) events.push({date: lead.endDate, color:'#16A085', label:'■ [선행'+(li+1)+' 종료] '+(lead.text||''), sid:'wig'+wi+'l'+li});
+    });
+    if(typeof window.renderMiniCal==='function'){
+      window.renderMiniCal(containerId, events, 'wig'+pid+wi);
+    }
+  });
+};
+
 function buildScoreBoard(wig){
  const from=parseFloat(wig.from)||0;
  const to=parseFloat(wig.to)||1;
@@ -8707,7 +8906,7 @@ function delLead(pid,wi,li){
  const p=wigData.periods.find(p=>p.id===pid);if(!p)return;
  p.wigs[wi].leads.splice(li,1);sv();buildWIG();
 }
-function saveWIG(){sv();showToast('가중목/점수판 저장 완료');}
+function saveWIG(silent){sv();if(!silent)showToast('가중목/점수판 저장 완료');}
 
 // ============================================================
 // EXPORT
@@ -13059,6 +13258,7 @@ function forceIsolationReset(){
   // 카테고리 정의 (전역) - 워크플로우 순서대로
   var CAL_CATEGORIES_BOS = [
     // ━━ 빨강 → 보라 spectrum (시간 흐름 순) ━━
+    {key:'목표',           emoji:'🏆', color:'#C0392B'},  // 0️⃣  진빨강 (월/분기 목표)
     {key:'기획',           emoji:'🎯', color:'#E74C3C'},  // 1️⃣  빨강 (시작)
     {key:'샘플의뢰',        emoji:'🧪', color:'#E67E22'},  // 2️⃣  주황
     {key:'사양픽스',        emoji:'📋', color:'#F39C12'},  // 3️⃣  황금주황
@@ -13609,6 +13809,15 @@ function forceIsolationReset(){
     var startDate = document.getElementById('bos-cal-item-start').value;
     if(!title){ alert('제목을 입력하세요'); return; }
     if(!startDate){ alert('시작일을 입력하세요'); return; }
+    
+    // 종료일 < 시작일 방어 (저장 시점)
+    var _endVal = document.getElementById('bos-cal-item-end').value;
+    if(_endVal && new Date(_endVal+'T00:00:00') < new Date(startDate+'T00:00:00')){
+      alert('종료일은 시작일보다 앞설 수 없습니다.');
+      var _e = document.getElementById('bos-cal-item-end');
+      _e.value = startDate; _e.focus();
+      return;
+    }
     
     var item = {
       title: title,
@@ -16582,8 +16791,8 @@ window.addEventListener('resize', function(){
     var value = parseInt(valEl.value);
     var unit = unitEl.value || 'week';
     
-    if(!startStr || !value || value <= 0){
-      // 리드타임 값이 없으면 자동 계산 안 함
+    // 값이 비어있으면(NaN) 계산 안 함. 단 0은 허용(= 당일 종료)
+    if(!startStr || isNaN(value) || value < 0){
       return;
     }
     
@@ -16613,12 +16822,21 @@ window.addEventListener('resize', function(){
   window.onCalEndManualChange_BOS = function(){
     var endEl = document.getElementById('bos-cal-item-end');
     var valEl = document.getElementById('bos-cal-item-leadtime-value');
+    var startEl = document.getElementById('bos-cal-item-start');
     if(!endEl || !valEl) return;
     
+    // ── 종료일 < 시작일 검증 ──
+    if(endEl.value && startEl && startEl.value){
+      if(new Date(endEl.value+'T00:00:00') < new Date(startEl.value+'T00:00:00')){
+        alert('종료일은 시작일보다 앞설 수 없습니다.');
+        endEl.value = startEl.value;  // 종료일을 시작일로 되돌림 (재수정 가능)
+        endEl.focus();
+        return;
+      }
+    }
+    
     // 종료일을 수동으로 변경하면 리드타임 값 비움 (충돌 방지)
-    // 단, 비어있는 상태로 둘 때는 그대로
     if(endEl.value && valEl.value){
-      // 사용자가 의도적으로 종료일을 바꾼 것 - 리드타임 비움
       valEl.value = '';
       window._calEndManualOverride = true;
     }
@@ -21494,6 +21712,7 @@ setTimeout(function(){
 <!-- ━━━ 샘플/아웃소싱 행 → 미니캘린더 강조 ━━━ -->
 <style>
 .minical-cell-bos.sid-dimmed{ opacity:.2; transition:opacity .15s; }
+.wig-minical{ background:var(--bg); border:1px solid var(--bd); border-radius:8px; padding:12px; }
 .minical-cell-bos.sid-hidden .minical-dot-bos{ visibility:hidden; }
 .minical-cell-bos.sid-hidden{ opacity:.35; transition:opacity .15s; }
 .minical-cell-bos.sid-active{ background:#FFF3CD !important; outline:2.5px solid #FF9800; outline-offset:-2px; border-radius:4px; transition:all .15s; z-index:3; position:relative; box-shadow:0 0 0 3px rgba(255,152,0,.25); animation:sidPulse 1s ease-in-out infinite; }
