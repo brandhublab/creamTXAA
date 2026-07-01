@@ -8679,6 +8679,8 @@ function _wp(pid){return wigData&&wigData.periods&&wigData.periods.find(p=>p.id=
 function _ww(pid,wi){const p=_wp(pid);return p&&p.wigs?p.wigs[wi]:undefined;}
 function _wl(pid,wi,li){const w=_ww(pid,wi);return w&&w.leads?w.leads[li]:undefined;}
 function setWigField(pid,wi,field,val){const w=_ww(pid,wi);if(w){w[field]=val;sv();}}
+function setWigTitle_BOS(pid,wi,val){const w=_ww(pid,wi);if(w){w.title=val;sv();buildWIG();}}
+window.setWigTitle_BOS = setWigTitle_BOS;
 function setWigLeadField(pid,wi,li,field,val){const l=_wl(pid,wi,li);if(l){l[field]=val;sv();}}
 
 function buildWIG(){
@@ -8696,9 +8698,10 @@ function buildWIG(){
  ${(period.wigs||[]).map((wig,wi)=>`
  <div class="section" style="margin:0 0 16px">
   <div class="sec-head">
-   <div>
-    <div contenteditable="true" style="font-size:13px;font-weight:500;outline:none" onblur="setWigField('${pid}',${wi},'title',this.textContent.trim())">${resolvePlaceholders(wig.title)||'가중목 '+(wi+1)}</div>
-    <div style="font-size:11px;color:var(--mu);margin-top:2px">목표: ${wig.from||'?'} → ${wig.to||'?'} (${wig.deadline||'?'}까지)</div>
+   <div style="flex:1">
+    <div style="font-size:9.5px;color:#C0392B;font-weight:700;letter-spacing:.05em;margin-bottom:3px">🎯 가중목 (WIG · 후행지표)</div>
+    <input value="${(wig.title||'').replace(/"/g,'&quot;')}" placeholder="예: 8/31까지 월 매출 0 → 1,000만원" onchange="setWigTitle_BOS('${pid}',${wi},this.value)" style="width:100%;font-size:13px;font-weight:600;outline:none;border:1px solid transparent;border-radius:5px;padding:5px 8px;background:var(--bg);color:var(--tx)" onfocus="this.style.borderColor='var(--bd)';this.style.background='#fff'" onblur="this.style.borderColor='transparent';this.style.background='var(--bg)'">
+    <div style="font-size:11px;color:var(--mu);margin-top:3px;padding-left:2px">특정일까지 <b>${wig.from||'?'}</b> → <b>${wig.to||'?'}</b> (${wig.deadline||'?'}까지) · 결과로 측정되는 목표</div>
    </div>
    <button class="ib dl" onclick="delWIG('${pid}',${wi})">✕</button>
   </div>
@@ -8713,12 +8716,15 @@ function buildWIG(){
     <div class="fi"><label>목표일(종료)</label><input type="date" value="${wig.deadline||''}" onchange="setWigDateField_BOS('${pid}',${wi},'deadline',this.value)"></div>
     <div class="fi"><label>&nbsp;</label><div style="font-size:10px;color:var(--mu);padding:7px 0;line-height:1.4">${wig.startDate&&wig.deadline?('기간 '+wigDaysBetween_BOS(wig.startDate,wig.deadline)+'일'):'시작·목표일 입력'}</div></div>
    </div>
-   <div style="font-size:11px;font-weight:500;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">선행 지표 (실행 목표)</div>
+   <div style="margin-bottom:8px">
+    <div style="font-size:11px;font-weight:600;color:#1565C0;text-transform:uppercase;letter-spacing:.05em">▶ 선행 지표 (통제 가능한 실행)</div>
+    <div style="font-size:10px;color:var(--mu);margin-top:2px">내가 직접 통제할 수 있는 행동 — 예: 이메일 발송, 거래처 전화, 콘텐츠 업로드, 광고 제작</div>
+   </div>
    ${(wig.leads||[]).map((lead,li)=>`
    <div style="margin-bottom:8px">
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
     <span style="font-size:11px;color:var(--mu);min-width:20px">${li+1}.</span>
-    <input value="${lead.text||''}" placeholder="선행 지표 입력..." onchange="setWigLeadField('${pid}',${wi},${li},'text',this.value)" style="flex:1;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;font-size:12px;background:var(--bg);color:var(--tx);outline:none">
+    <input value="${lead.text||''}" placeholder="예: 주 3회 콘텐츠 업로드 / 하루 10곳 거래처 전화" onchange="setWigLeadField('${pid}',${wi},${li},'text',this.value)" style="flex:1;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;font-size:12px;background:var(--bg);color:var(--tx);outline:none">
     <input type="number" value="${lead.current||0}" onchange="setWigLeadField('${pid}',${wi},${li},'current',parseFloat(this.value)||0);buildWIG()" style="width:60px;padding:5px 6px;border:1px solid var(--bd);border-radius:5px;font-size:12px;font-family:var(--mn);background:var(--bg);color:var(--tx);outline:none" title="현재값">
     <span style="font-size:11px;color:var(--mu)">/</span>
     <input type="number" value="${lead.target||0}" onchange="setWigLeadField('${pid}',${wi},${li},'target',parseFloat(this.value)||0);buildWIG()" style="width:60px;padding:5px 6px;border:1px solid var(--bd);border-radius:5px;font-size:12px;font-family:var(--mn);background:var(--bg);color:var(--tx);outline:none" title="목표값">
