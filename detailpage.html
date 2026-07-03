@@ -346,6 +346,10 @@ body:not(.tx-refmode) .tx-ref-col{display:none !important;}
 <button onclick="txSavePDF()">📕 PDF 저장</button>
 <button onclick="txSaveSlices()">🧩 이미지 분할저장</button>
 <button onclick="txSaveWithRef()">🔀 본문+레퍼런스 함께저장</button>
+<span style="width:1px;height:20px;background:rgba(255,255,255,.25);margin:0 4px;display:inline-block;vertical-align:middle"></span>
+<button onclick="txCloudSave()" id="eb-cloud-save" style="background:#2C4A7C">☁️ 클라우드 저장</button>
+<button onclick="txCloudLoad()" id="eb-cloud-load">📥 불러오기</button>
+<button onclick="txCloudSettings()" id="eb-cloud-set" title="GitHub 토큰·Gist ID 설정">⚙️</button>
 <span class="eb-hint">글자·이미지 클릭 수정 · 레퍼런스 패널로 참고이미지 비교</span>
 </div>
 
@@ -1256,9 +1260,95 @@ document.addEventListener('drop',function(e){
 window.addEventListener('scroll',function(){if(txStructMode)txUpdatePx();});
 window.addEventListener('resize',function(){if(txStructMode)txUpdatePx();});
 
+
+// ═══════════════════════════════════════════════
+//  ☁️ 클라우드 동기화 (GitHub Gist) — 기기 간 편집 공유
+//  본문(.tx-detail .page)의 innerHTML을 gist에 저장/불러오기
+// ═══════════════════════════════════════════════
+var TX_CLOUD = {
+  get token(){ return localStorage.getItem('tx_gist_token') || ''; },
+  set token(v){ localStorage.setItem('tx_gist_token', v); },
+  get gistId(){ return localStorage.getItem('tx_gist_id') || ''; },
+  set gistId(v){ localStorage.setItem('tx_gist_id', v); },
+  filename: 'tetrarix-detail-content.html'
+};
+
+function txCloudSettings(){
+  var t = prompt('GitHub 개인 액세스 토큰 (gist 권한)\n\n※ github.com → Settings → Developer settings → Personal access tokens\n※ gist 권한만 체크하면 됩니다.\n\n현재 저장된 토큰을 그대로 두려면 취소를 누르세요.', TX_CLOUD.token);
+  if(t !== null) TX_CLOUD.token = t.trim();
+  var g = prompt('Gist ID\n\n※ 기존 gist 주소 gist.github.com/사용자/[이 부분]\n※ 비워두면 저장 시 새 gist를 자동 생성합니다.\n※ OS키트와 같은 gist를 쓰려면 그 Gist ID를 넣으세요.', TX_CLOUD.gistId);
+  if(g !== null) TX_CLOUD.gistId = g.trim();
+  txToast('클라우드 설정 저장됨');
+}
+
+function txGetPageHtml(){
+  var page = document.querySelector('.tx-detail .page');
+  if(!page) return '';
+  // 편집 흔적(contenteditable) 제거한 복제본
+  var clone = page.cloneNode(true);
+  clone.querySelectorAll('[contenteditable]').forEach(function(el){ el.removeAttribute('contenteditable'); });
+  clone.querySelectorAll('.tx-img-btns, .tx-px-badge, .tx-struct-ctrl').forEach(function(el){ el.remove(); });
+  return clone.innerHTML;
+}
+
+function txCloudSave(){
+  if(!TX_CLOUD.token){ alert('먼저 ⚙️ 버튼으로 GitHub 토큰을 설정하세요.'); txCloudSettings(); return; }
+  var content = txGetPageHtml();
+  if(!content){ alert('본문을 찾을 수 없습니다.'); return; }
+  var btn = document.getElementById('eb-cloud-save');
+  if(btn){ btn.textContent = '☁️ 저장 중...'; btn.disabled = true; }
+  var body = { files: {} };
+  body.files[TX_CLOUD.filename] = { content: content };
+  body.description = 'TETRARIX 상세페이지 편집본 (' + new Date().toLocaleString('ko-KR') + ')';
+
+  var isNew = !TX_CLOUD.gistId;
+  var url = isNew ? 'https://api.github.com/gists' : 'https://api.github.com/gists/' + TX_CLOUD.gistId;
+  if(isNew) body.public = false;
+
+  fetch(url, {
+    method: isNew ? 'POST' : 'PATCH',
+    headers: { 'Authorization':'token '+TX_CLOUD.token, 'Accept':'application/vnd.github+json', 'Content-Type':'application/json' },
+    body: JSON.stringify(body)
+  }).then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+  }).then(function(data){
+    if(isNew && data.id){ TX_CLOUD.gistId = data.id; }
+    txToast('☁️ 클라우드 저장 완료' + (isNew ? ' (새 Gist 생성: '+data.id+')' : ''));
+    if(btn){ btn.textContent = '☁️ 클라우드 저장'; btn.disabled = false; }
+  }).catch(function(e){
+    alert('저장 실패: ' + e.message + '\n\n토큰/Gist ID를 확인하세요 (⚙️).');
+    if(btn){ btn.textContent = '☁️ 클라우드 저장'; btn.disabled = false; }
+  });
+}
+
+function txCloudLoad(silent){
+  if(!TX_CLOUD.gistId){ if(!silent){ alert('불러올 Gist ID가 없습니다. ⚙️ 설정에서 입력하거나, 먼저 저장하세요.'); } return; }
+  var headers = { 'Accept':'application/vnd.github+json' };
+  if(TX_CLOUD.token) headers['Authorization'] = 'token ' + TX_CLOUD.token;
+  fetch('https://api.github.com/gists/' + TX_CLOUD.gistId, { headers: headers })
+  .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+  .then(function(data){
+    var file = data.files && data.files[TX_CLOUD.filename];
+    if(!file || !file.content){ if(!silent) alert('Gist에 저장된 편집본이 없습니다.'); return; }
+    var page = document.querySelector('.tx-detail .page');
+    if(page){
+      page.innerHTML = file.content;
+      if(typeof txAddImgButtons==='function' && txEditMode) txAddImgButtons();
+      if(typeof txInitPx==='function') txInitPx();
+      if(!silent) txToast('📥 클라우드에서 불러옴 (' + new Date(data.updated_at).toLocaleString('ko-KR') + ')');
+    }
+  }).catch(function(e){ if(!silent) alert('불러오기 실패: ' + e.message); });
+}
+window.txCloudSave = txCloudSave;
+window.txCloudLoad = txCloudLoad;
+window.txCloudSettings = txCloudSettings;
+
 // 시작 시 편집모드 자동 ON
 window.addEventListener('load',function(){
   txToggleEdit();           // 편집 모드 ON (txInitPx 포함)
+  // ☁️ 클라우드에 저장된 편집본이 있으면 자동으로 불러오기 (기기 간 동기화)
+  if(TX_CLOUD.gistId){ setTimeout(function(){ txCloudLoad(true); }, 400); }
   setTimeout(txUpdatePx,300);
   setTimeout(txUpdatePx,1000);
   if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){txUpdatePx();});}
