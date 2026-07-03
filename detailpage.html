@@ -250,10 +250,11 @@ body.tx-editing [data-edit]:focus{outline:2px solid #A88B5C;background:rgba(201,
 body.tx-editing .visual{cursor:default;}
 body.tx-editing .visual:hover{outline:1px solid rgba(201,168,106,0.4);outline-offset:-2px;}
 /* 이미지 업로드 버튼 (가운데) */
-.tx-img-btn{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:8;background:#A88B5C;color:#1F0808;border:none;padding:10px 20px;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,0.3);white-space:nowrap;}
+.tx-img-btn{display:none;position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:8;background:#A88B5C;color:#1F0808;border:none;padding:9px 18px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,0.4);white-space:nowrap;}
 .tx-img-btn:hover{background:#C9A86A;}
 body.tx-editing .visual .tx-img-btn,body.tx-structmode .visual .tx-img-btn{display:block;}
 .tx-img-uploaded{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:1;}
+.tx-detail .visual.img-focused{outline:2px solid #C9A86A;outline-offset:-2px;}
 #tx-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1F0808;color:#C9A86A;padding:12px 24px;border-radius:100px;font-size:13px;z-index:99999;opacity:0;transition:opacity 0.3s;pointer-events:none;font-family:'Pretendard',sans-serif;}
 #tx-toast.show{opacity:1;}
 
@@ -279,8 +280,8 @@ body.tx-structmode [data-block]{outline:2px solid rgba(91,130,184,0.4);outline-o
 body.tx-structmode [data-block]:hover{outline:2px solid #5B82B8;}
 body.tx-structmode [data-block].tx-dragging{opacity:0.4;}
 body.tx-structmode [data-block].tx-dragover{outline:3px dashed #C9A86A;background:rgba(201,168,106,0.1);}
-.tx-block-ctrl{position:absolute;top:4px;left:4px;z-index:50;display:none;gap:3px;background:rgba(31,8,8,0.9);border-radius:6px;padding:3px;}
-body.tx-structmode [data-block]:hover>.tx-block-ctrl{display:flex;}
+.tx-block-ctrl{position:absolute;top:4px;left:4px;z-index:50;display:none;gap:3px;background:rgba(31,8,8,0.95);border-radius:6px;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,0.4);}
+body.tx-structmode [data-block]>.tx-block-ctrl{display:flex;}
 .tx-block-ctrl button{background:#A88B5C;color:#1F0808;border:none;width:24px;height:24px;border-radius:4px;font-size:12px;cursor:pointer;font-weight:700;line-height:1;padding:0;font-family:'Pretendard',sans-serif;}
 .tx-block-ctrl button:hover{background:#C9A86A;}
 .tx-block-ctrl .drag-handle{cursor:grab;background:#5B82B8;color:#fff;}
@@ -326,6 +327,9 @@ body.tx-refmode .tx-detail .page>*{grid-column:1;}
 body.tx-refmode .tx-ref-col{display:block;position:absolute;top:0;right:0;width:50%;height:100%;border-left:2px dashed #C9A86A;background:#F5F0E8;}
 .tx-ref-slot{border-bottom:1px dashed #C9A86A;padding:12px;min-height:120px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;background:#FAFAF7;}
 .tx-ref-slot:hover{background:#F0E8DA;}
+.tx-ref-slot.ref-focused{background:#FDF6E8;outline:2px solid #C9A86A;outline-offset:-2px;}
+.ref-upload-btn{margin-top:8px;background:#A88B5C;color:#1F0808;border:none;padding:6px 14px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;}
+.ref-upload-btn:hover{background:#C9A86A;}
 .tx-ref-slot .ref-ph{color:#9A9890;font-size:12px;text-align:center;font-family:'Pretendard',sans-serif;}
 .tx-ref-slot img{max-width:100%;max-height:400px;object-fit:contain;}
 .tx-ref-slot .ref-del{position:absolute;top:6px;right:6px;background:#B83A2E;color:#fff;border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:12px;display:none;}
@@ -798,7 +802,16 @@ function txAddImgButtons(){
   document.querySelectorAll('.tx-detail .visual').forEach(function(v){
     if(v.querySelector('.tx-img-btn'))return;
     var btn=document.createElement('button');btn.className='tx-img-btn';btn.type='button';
-    btn.textContent='📷 이미지 업로드';btn.contentEditable=false;
+    btn.textContent='📷 파일 업로드';btn.contentEditable=false;
+    // visual 클릭 = 붙여넣기 대상 지정 (파일창 안 뜸)
+    v.addEventListener('click',function(ev){
+      if(ev.target.classList.contains('tx-img-btn'))return;
+      if(!txEditMode && !txStructMode)return;
+      document.querySelectorAll('.tx-detail .visual.img-focused').forEach(function(x){x.classList.remove('img-focused');});
+      v.classList.add('img-focused');
+      window._txImgFocus=v;
+      txToast('여기에 Ctrl+V로 붙여넣거나, 📷 파일 업로드를 누르세요');
+    });
     btn.addEventListener('click',function(ev){
       ev.stopPropagation();
       var inp=document.createElement('input');inp.type='file';inp.accept='image/*,video/*,.gif';
@@ -877,7 +890,7 @@ function txBuildRefCol(){
     var h=b.getBoundingClientRect().height;
     var slot=document.createElement('div');slot.className='tx-ref-slot';slot.dataset.refIdx=i;
     slot.style.minHeight=Math.max(h,80)+'px';
-    slot.innerHTML='<div class="ref-ph">📎 참고 이미지<br>붙여넣기(Ctrl+V)<br>또는 클릭</div>';
+    slot.innerHTML='<div class="ref-ph">📎 참고 이미지<br><b>여기 클릭 후 Ctrl+V</b>로 붙여넣기<br><button class="ref-upload-btn" type="button">📁 파일 선택</button></div>';
     col.appendChild(slot);
   });
   page.appendChild(col);
@@ -889,15 +902,27 @@ function txToggleRef(){
   if(txRefMode){txBuildRefCol();btn.style.background='#C9A86A';txToast('레퍼런스 패널 ON — 오른쪽에 참고이미지 붙여넣기');}
   else{btn.style.background='';txToast('레퍼런스 패널 OFF');}
 }
-// 레퍼런스 슬롯: 클릭 업로드
+// 레퍼런스 슬롯: (1)슬롯 클릭 = 붙여넣기 대기  (2)파일선택 버튼 = 파일 업로드
 document.addEventListener('click',function(e){
-  var slot=e.target.closest('.tx-ref-slot');
-  if(slot && !e.target.classList.contains('ref-del')){
+  // 삭제 버튼
+  if(e.target.classList.contains('ref-del')){e.stopPropagation();var s=e.target.closest('.tx-ref-slot');s.innerHTML='<div class="ref-ph">📎 참고 이미지<br><b>여기 클릭 후 Ctrl+V</b>로 붙여넣기<br><button class="ref-upload-btn" type="button">📁 파일 선택</button></div>';return;}
+  // 파일 선택 버튼 → 파일창
+  if(e.target.classList.contains('ref-upload-btn')){
+    e.stopPropagation();
+    var slotU=e.target.closest('.tx-ref-slot');
     var inp=document.createElement('input');inp.type='file';inp.accept='image/*';
-    inp.onchange=function(){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){txSetRefImg(slot,r.result);};r.readAsDataURL(f);};
+    inp.onchange=function(){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){txSetRefImg(slotU,r.result);};r.readAsDataURL(f);};
     inp.click();
+    return;
   }
-  if(e.target.classList.contains('ref-del')){e.stopPropagation();var s=e.target.closest('.tx-ref-slot');s.innerHTML='<div class="ref-ph">📎 참고 이미지<br>붙여넣기(Ctrl+V)<br>또는 클릭</div>';}
+  // 슬롯 클릭 = 붙여넣기 대상으로 지정(포커스). 파일창 안 띄움
+  var slot=e.target.closest('.tx-ref-slot');
+  if(slot){
+    document.querySelectorAll('.tx-ref-slot.ref-focused').forEach(function(s){s.classList.remove('ref-focused');});
+    slot.classList.add('ref-focused');
+    txLastSlot=slot;
+    txToast('여기에 Ctrl+V로 붙여넣거나, 📁 파일 선택을 누르세요');
+  }
 });
 function txSetRefImg(slot,src){
   slot.innerHTML='<img src="'+src+'"><button class="ref-del">×</button>';
@@ -906,14 +931,35 @@ function txSetRefImg(slot,src){
 let txLastSlot=null;
 document.addEventListener('mouseover',function(e){var s=e.target.closest('.tx-ref-slot');if(s)txLastSlot=s;});
 document.addEventListener('paste',function(e){
-  if(!txRefMode)return;
   var items=(e.clipboardData||window.clipboardData).items;
-  for(var i=0;i<items.length;i++){
-    if(items[i].type.indexOf('image')===0){
-      var f=items[i].getAsFile();var r=new FileReader();
-      var target=txLastSlot||document.querySelector('.tx-ref-slot');
-      r.onload=(function(t){return function(){txSetRefImg(t,r.result);txToast('참고이미지 붙여넣기 완료');};})(target);
-      r.readAsDataURL(f);e.preventDefault();return;
+  // (1) 레퍼런스 패널 모드: 포커스 슬롯에 붙여넣기
+  if(txRefMode){
+    for(var i=0;i<items.length;i++){
+      if(items[i].type.indexOf('image')===0){
+        var f=items[i].getAsFile();var r=new FileReader();
+        var target=document.querySelector('.tx-ref-slot.ref-focused')||txLastSlot||document.querySelector('.tx-ref-slot');
+        r.onload=(function(t){return function(){txSetRefImg(t,r.result);txToast('참고이미지 붙여넣기 완료');};})(target);
+        r.readAsDataURL(f);e.preventDefault();return;
+      }
+    }
+    return;
+  }
+  // (2) 편집/구조 모드: 포커스된 본문 이미지(visual)에 붙여넣기
+  if((txEditMode||txStructMode) && window._txImgFocus){
+    for(var j=0;j<items.length;j++){
+      if(items[j].type.indexOf('image')===0){
+        var f2=items[j].getAsFile();var r2=new FileReader();
+        var v=window._txImgFocus;
+        r2.onload=function(){
+          var old2=v.querySelector('.tx-img-uploaded');if(old2)old2.remove();
+          var img=document.createElement('img');img.src=r2.result;img.className='tx-img-uploaded';
+          img.onload=function(){txUpdatePx();};
+          v.insertBefore(img,v.firstChild);
+          var b=v.querySelector('.tx-img-btn');if(b)b.textContent='📷 이미지 교체';
+          txToast('이미지 붙여넣기 완료');setTimeout(txUpdatePx,100);
+        };
+        r2.readAsDataURL(f2);e.preventDefault();return;
+      }
     }
   }
 });
@@ -1155,7 +1201,7 @@ function txToggleStruct(){
   if(txStructMode){
     if(txEditMode)txToggleEdit(); // 텍스트편집 끄고 구조편집
     txInitStruct();txAddImgButtons();btn.style.background='#5B82B8';btn.style.color='#fff';
-    txToast('구조 편집 ON — 파랑=섹션, 초록=항목. 끌어서 이동/삭제/추가/병합');
+    txToast('구조 편집 ON — 각 섹션 왼쪽 위 ▲▼ 이동 · ＋↑＋↓ 추가(이미지/텍스트) · ✕ 삭제');
   }else{btn.style.background='';btn.style.color='';txToast('구조 편집 OFF');}
 }
 
@@ -1190,8 +1236,31 @@ document.addEventListener('click',function(e){
   var block=e.target.closest('[data-block]');
   var line=e.target.closest('[data-line]');
   // 블록 버튼
-  if(e.target.classList.contains('up-btn')){var p=block.previousElementSibling;while(p&&!p.dataset.block)p=p.previousElementSibling;if(p)block.parentNode.insertBefore(block,p);txReflow();e.stopPropagation();}
-  else if(e.target.classList.contains('down-btn')){var n=block.nextElementSibling;while(n&&!n.dataset.block)n=n.nextElementSibling;if(n){var nn=n.nextElementSibling;while(nn&&!nn.dataset.block)nn=nn.nextElementSibling;block.parentNode.insertBefore(block,nn);}txReflow();e.stopPropagation();}
+  if(e.target.classList.contains('up-btn')&&block){
+    e.stopPropagation();
+    // 이전 블록 찾기 (add-zone 건너뜀)
+    var p=block.previousElementSibling;while(p&&!p.dataset.block)p=p.previousElementSibling;
+    if(p){
+      // 현재 블록의 add-zone도 함께 이동
+      var myAz=block.nextElementSibling;var azMove=(myAz&&myAz.classList.contains('tx-add-zone'))?myAz:null;
+      block.parentNode.insertBefore(block,p);
+      if(azMove)block.parentNode.insertBefore(azMove,block.nextSibling);
+      txResetStruct();txSyncRef();txToast('위로 이동');
+    }
+  }
+  else if(e.target.classList.contains('down-btn')&&block){
+    e.stopPropagation();
+    // 다음 블록 찾기
+    var n=block.nextElementSibling;while(n&&!n.dataset.block)n=n.nextElementSibling;
+    if(n){
+      var nAz=n.nextElementSibling;var nAzIsZone=(nAz&&nAz.classList.contains('tx-add-zone'));
+      var insertPoint=nAzIsZone?nAz.nextSibling:n.nextSibling;
+      var myAz=block.nextElementSibling;var azMove=(myAz&&myAz.classList.contains('tx-add-zone'))?myAz:null;
+      block.parentNode.insertBefore(block,insertPoint);
+      if(azMove)block.parentNode.insertBefore(azMove,block.nextSibling);
+      txResetStruct();txSyncRef();txToast('아래로 이동');
+    }
+  }
   else if(e.target.classList.contains('addabove-btn')&&block){e.stopPropagation();txPickBlock(function(kind){var html=txNewBlockHTML(kind);if(html){block.insertAdjacentHTML('beforebegin',html);txResetStruct();txSyncRef();txToast('위에 새 영역 추가됨');}});}
   else if(e.target.classList.contains('addbelow-btn')&&block){e.stopPropagation();txPickBlock(function(kind){var html=txNewBlockHTML(kind);if(html){block.insertAdjacentHTML('afterend',html);txResetStruct();txSyncRef();txToast('아래에 새 영역 추가됨');}});}
   else if(e.target.classList.contains('dup-btn')){var cl=block.cloneNode(true);block.parentNode.insertBefore(cl,block.nextSibling);txResetStruct();txSyncRef();txToast('섹션 복제됨');e.stopPropagation();}
