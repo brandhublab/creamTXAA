@@ -11460,40 +11460,36 @@ function renderDetailRefs(){
  const el=document.getElementById('detail-refs-wrap');if(!el)return;
  const refs = detailRefs || [];
  const escAttr = function(s){ return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); };
+ const n = refs.length;
  
  el.innerHTML=refs.map(function(ref, i){
-  // 메모 요약 (mouseover tooltip 용)
+  // ↑↓ 이동 버튼 (드래그가 안 되는 환경 대비 — 확실한 방법)
+  var upBtn = i>0 ? '<button onclick="moveDetailRef('+i+',-1)" title="위로" style="background:var(--bg);border:1px solid var(--bd);border-radius:4px;width:22px;height:20px;font-size:10px;cursor:pointer;padding:0;color:var(--tx)">▲</button>' : '<span style="width:22px;display:inline-block"></span>';
+  var downBtn = i<n-1 ? '<button onclick="moveDetailRef('+i+',1)" title="아래로" style="background:var(--bg);border:1px solid var(--bd);border-radius:4px;width:22px;height:20px;font-size:10px;cursor:pointer;padding:0;color:var(--tx)">▼</button>' : '<span style="width:22px;display:inline-block"></span>';
+  var moveBtns = '<div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">'+upBtn+downBtn+'</div>';
+
+  // ── 구분선(섹션 헤더) 타입 ──
+  if(ref.type === 'divider'){
+    return '<div class="detail-ref-row" style="padding:8px 0 4px;margin-top:6px">'
+     + '<div style="display:flex;gap:6px;align-items:center">'
+       + moveBtns
+       + '<span style="font-size:13px;flex-shrink:0">📁</span>'
+       + '<input value="' + escAttr(ref.name) + '" placeholder="구분 (예: DA / 네이버 / 쿠팡 / 홈쇼핑)" onchange="detailRefs[' + i + '].name=this.value;sv()" style="flex:1;padding:5px 8px;border:none;border-bottom:2px solid #C8A45A;border-radius:0;font-size:12.5px;font-weight:700;background:transparent;color:#8B5E00;outline:none;letter-spacing:.02em">'
+       + '<button class="ib dl" onclick="detailRefs.splice(' + i + ',1);sv();renderDetailRefs()" title="구분선 삭제">✕</button>'
+     + '</div></div>';
+  }
+  
+  // ── 일반 레퍼런스 행 ──
   var memoReason = ref.memoReason || '';
   var memoAdopt = ref.memoAdopt || '';
   var memoFree = ref.memoFree || '';
   var hasMemo = !!(memoReason || memoAdopt || memoFree);
-  
-  // 툴팁 텍스트
   var tipParts = [];
   if(memoReason) tipParts.push('[선정 이유] ' + memoReason);
   if(memoAdopt) tipParts.push('[차용할 점] ' + memoAdopt);
   if(memoFree) tipParts.push('[메모] ' + memoFree);
   var tipText = tipParts.join('\n\n');
   
-  return '<div class="detail-ref-row" draggable="true" data-idx="' + i + '" '
-       + 'ondragstart="onDetailRefDragStart(event,' + i + ')" '
-       + 'ondragover="onDetailRefDragOver(event)" '
-       + 'ondragleave="onDetailRefDragLeave(event)" '
-       + 'ondrop="onDetailRefDrop(event,' + i + ')" '
-       + 'ondragend="onDetailRefDragEnd(event)" '
-       + 'style="padding:6px 0;border-bottom:.5px solid var(--bd);transition:background .15s">'
-   + '<div style="display:flex;gap:6px;align-items:center">'
-     + '<span class="drag-handle" style="cursor:grab;color:var(--hi);font-size:14px;user-select:none;padding:2px 4px" title="드래그하여 순서 변경">⋮⋮</span>'
-     + '<input value="' + escAttr(ref.name) + '" placeholder="브랜드/제품명" onchange="detailRefs[' + i + '].name=this.value;sv()" style="flex:1;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:12px;background:var(--bg);color:var(--tx);outline:none">'
-     + '<input value="' + escAttr(ref.url) + '" placeholder="https://..." onchange="detailRefs[' + i + '].url=this.value;sv()" style="flex:2;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:var(--bg);color:var(--tx);outline:none">'
-     + '<a href="' + escAttr(ref.url || '#') + '" target="_blank" style="font-size:11px;color:#2563EB;white-space:nowrap;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;background:var(--bg)" title="새 탭에서 열기">열기↗</a>'
-     + '<button class="ib" onclick="openDetailRefMemo(' + i + ')" '
-        + 'title="' + escAttr(tipText || '메모를 작성하려면 클릭') + '" '
-        + 'style="position:relative;background:' + (hasMemo?'#FFF8E1':'var(--bg)') + ';border:1px solid ' + (hasMemo?'#FFD54F':'var(--bd)') + ';border-radius:4px;padding:3px 7px;font-size:11px;cursor:pointer;color:' + (hasMemo?'#8B5E00':'var(--mu)') + '">📝' + (hasMemo?'<span style="position:absolute;top:-3px;right:-3px;width:7px;height:7px;background:#F44336;border-radius:50%;border:1.5px solid #fff"></span>':'') + '</button>'
-     + '<button class="ib dl" onclick="detailRefs.splice(' + i + ',1);sv();renderDetailRefs()">✕</button>'
-   + '</div>';
-  
-  // 메모 일부 항상 표시 (있을 경우)
   var preview = '';
   if(hasMemo){
     preview = '<div style="margin-left:30px;margin-top:4px;font-size:10px;color:var(--mu);line-height:1.6">';
@@ -11501,15 +11497,10 @@ function renderDetailRefs(){
     if(memoAdopt) preview += '<div><b style="color:#2563EB">차용:</b> ' + escAttr(memoAdopt).slice(0,80) + (memoAdopt.length>80?'…':'') + '</div>';
     preview += '</div>';
   }
-  return '<div class="detail-ref-row" draggable="true" data-idx="' + i + '" '
-       + 'ondragstart="onDetailRefDragStart(event,' + i + ')" '
-       + 'ondragover="onDetailRefDragOver(event)" '
-       + 'ondragleave="onDetailRefDragLeave(event)" '
-       + 'ondrop="onDetailRefDrop(event,' + i + ')" '
-       + 'ondragend="onDetailRefDragEnd(event)" '
-       + 'style="padding:6px 0;border-bottom:.5px solid var(--bd);transition:background .15s">'
+  
+  return '<div class="detail-ref-row" style="padding:6px 0;border-bottom:.5px solid var(--bd)">'
    + '<div style="display:flex;gap:6px;align-items:center">'
-     + '<span class="drag-handle" style="cursor:grab;color:var(--hi);font-size:14px;user-select:none;padding:2px 4px" title="드래그하여 순서 변경">⋮⋮</span>'
+     + moveBtns
      + '<input value="' + escAttr(ref.name) + '" placeholder="브랜드/제품명" onchange="detailRefs[' + i + '].name=this.value;sv()" style="flex:1;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:12px;background:var(--bg);color:var(--tx);outline:none">'
      + '<input value="' + escAttr(ref.url) + '" placeholder="https://..." onchange="detailRefs[' + i + '].url=this.value;sv()" style="flex:2;padding:4px 7px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:var(--bg);color:var(--tx);outline:none">'
      + '<a href="' + escAttr(ref.url || '#') + '" target="_blank" style="font-size:11px;color:#2563EB;white-space:nowrap;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;background:var(--bg)" title="새 탭에서 열기">열기↗</a>'
@@ -11520,8 +11511,25 @@ function renderDetailRefs(){
    + '</div>'
    + preview
    + '</div>';
- }).join('') + '<button class="btn" style="margin-top:8px;font-size:11px" onclick="addDetailRef()">+ 레퍼런스 추가</button>';
+ }).join('')
+  + '<div style="display:flex;gap:6px;margin-top:10px">'
+  + '<button class="btn" style="font-size:11px" onclick="addDetailRef()">+ 레퍼런스 추가</button>'
+  + '<button class="btn" style="font-size:11px" onclick="addDetailRefDivider()">+ 구분 항목 추가</button>'
+  + '</div>';
 }
+
+// 레퍼런스 순서 이동 (위 -1 / 아래 +1)
+function moveDetailRef(i, dir){
+  if(!detailRefs) return;
+  var j = i + dir;
+  if(j < 0 || j >= detailRefs.length) return;
+  var tmp = detailRefs[i];
+  detailRefs[i] = detailRefs[j];
+  detailRefs[j] = tmp;
+  sv();
+  renderDetailRefs();
+}
+window.moveDetailRef = moveDetailRef;
 
 // ━━ 드래그앤드롭 (경쟁사 레퍼런스) ━━
 var _draggedDetailRefIdx = null;
@@ -11635,6 +11643,12 @@ function addDetailRef(){
  detailRefs.push({id:'dr'+Date.now(),name:'',url:''});
  sv();renderDetailRefs();
 }
+function addDetailRefDivider(){
+ if(!detailRefs)detailRefs=[];
+ detailRefs.push({id:'dv'+Date.now(),type:'divider',name:''});
+ sv();renderDetailRefs();
+}
+window.addDetailRefDivider = addDetailRefDivider;
 
 
 // ============================================================
@@ -12348,7 +12362,7 @@ function forceIsolationReset(){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div>
         <div class="section" style="margin:0">
-          <div class="sec-head"><h3>🔗 경쟁사 상세페이지 레퍼런스</h3><button class="btn" onclick="addDetailRef()">+ 추가</button></div>
+          <div class="sec-head"><h3>🔗 경쟁사 상세페이지 레퍼런스</h3><div style="display:flex;gap:6px"><button class="btn" onclick="addDetailRefDivider()">+ 구분 항목</button><button class="btn" onclick="addDetailRef()">+ 추가</button></div></div>
           <div class="sec-body">
             <div id="detail-refs-wrap"></div>
           </div>
