@@ -1302,9 +1302,9 @@ function txCloudSettings(){
 
   var modal = document.createElement('div');
   modal.id = 'tx-cloud-modal';
-  modal.style.cssText = 'position:fixed;inset:0;z-index:999999;background:rgba(31,8,8,0.6);display:flex;align-items:center;justify-content:center;padding:20px;font-family:Pretendard,sans-serif;';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:rgba(31,8,8,0.6);display:flex;align-items:flex-start;justify-content:center;padding:0;font-family:Pretendard,sans-serif;';
   modal.innerHTML =
-    '<div style="background:#fff;border-radius:14px;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.4)">'
+    '<div id="tx-cloud-box" style="background:#fff;border-radius:0 0 14px 14px;max-width:520px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5);margin-top:0">'
     + '<div style="padding:18px 22px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;border-radius:14px 14px 0 0">'
       + '<div style="font-size:16px;font-weight:800;color:#1F0808">☁️ 클라우드 동기화 설정</div>'
       + '<button onclick="document.getElementById(\'tx-cloud-modal\').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;line-height:1">×</button>'
@@ -1330,6 +1330,30 @@ function txCloudSettings(){
     + '</div>'
     + '</div></div>';
   document.body.appendChild(modal);
+  // ── iframe 안에서 '지금 보고 있는 위치'에 모달을 띄우기 ──
+  // position:fixed가 iframe 전체 기준이 되는 경우를 대비해, 현재 스크롤 위치에 맞춰 재배치
+  try {
+    requestAnimationFrame(function(){
+      var box = document.getElementById('tx-cloud-box');
+      if(!box) return;
+      // 뷰포트 상단 = 현재 스크롤 위치. 그 바로 아래에 모달이 오도록
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      var viewH = window.innerHeight || 600;
+      // 모달 컨테이너를 absolute로 바꿔 현재 스크롤 지점에 고정
+      modal.style.position = 'absolute';
+      modal.style.top = scrollTop + 'px';
+      modal.style.left = '0';
+      modal.style.height = viewH + 'px';
+      modal.style.alignItems = 'flex-start';
+      // 박스는 화면 상단에서 살짝(24px) 아래
+      box.style.marginTop = '24px';
+      box.style.maxHeight = (viewH - 48) + 'px';
+      // 혹시 부모(OS키트) iframe이 스크롤을 잡고 있으면, 상단으로 올려달라는 신호
+      try { if(window.parent && window.parent !== window){ window.parent.postMessage({type:'tx-scroll-to-iframe'}, '*'); } } catch(e){}
+      // 모달이 확실히 화면에 보이도록 (부모가 iframe을 늘려 스크롤을 잡는 경우 대비)
+      try { box.scrollIntoView({block:'start', behavior:'auto'}); } catch(e){}
+    });
+  } catch(e){}
 }
 
 function txCloudSaveSettings(){
