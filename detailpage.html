@@ -790,7 +790,8 @@ function txToggleEdit(){
   document.body.classList.toggle('tx-editing',txEditMode);
   document.querySelectorAll('[data-edit]').forEach(function(el){el.contentEditable=txEditMode;});
   if(txEditMode){btn.textContent='편집 모드 OFF';btn.classList.remove('off');document.body.classList.add('tx-has-fmt');txAddImgButtons();txInitPx();txToast('편집 모드 ON — 글자 클릭 수정 · 이미지는 가운데 버튼');}
-  else{btn.textContent='편집 모드 ON';btn.classList.add('off');document.body.classList.remove('tx-has-fmt');txToast('편집 모드 OFF');}
+  else{btn.textContent='편집 모드 ON';btn.classList.add('off');document.body.classList.remove('tx-has-fmt');document.body.style.paddingTop='';txToast('편집 모드 OFF');}
+  if(typeof txAdjustBars==='function'){ txAdjustBars(); setTimeout(txAdjustBars,50); setTimeout(txAdjustBars,300); }
 }
 // 이미지 슬롯: 가운데 업로드 버튼 부착
 function txAddImgButtons(){
@@ -1266,20 +1267,81 @@ window.addEventListener('resize',function(){if(txStructMode)txUpdatePx();});
 //  본문(.tx-detail .page)의 innerHTML을 gist에 저장/불러오기
 // ═══════════════════════════════════════════════
 var TX_CLOUD = {
-  get token(){ return localStorage.getItem('tx_gist_token') || ''; },
+  // 토큰·Gist ID는 OS키트(같은 도메인)의 설정을 자동으로 물려받음 → 한 곳에만 입력하면 됨
+  get token(){
+    return localStorage.getItem('tx_gist_token')
+        || localStorage.getItem('bos_gist_token_backup_v1')  // ← OS키트 설정 자동 상속
+        || '';
+  },
   set token(v){ localStorage.setItem('tx_gist_token', v); },
-  get gistId(){ return localStorage.getItem('tx_gist_id') || ''; },
+  get gistId(){
+    return localStorage.getItem('tx_gist_id')
+        || localStorage.getItem('bos_gist_id_backup_v1')     // ← OS키트 Gist ID 자동 상속
+        || '';
+  },
   set gistId(v){ localStorage.setItem('tx_gist_id', v); },
   filename: 'tetrarix-detail-content.html'
 };
 
 function txCloudSettings(){
-  var t = prompt('GitHub 개인 액세스 토큰 (gist 권한)\n\n※ github.com → Settings → Developer settings → Personal access tokens\n※ gist 권한만 체크하면 됩니다.\n\n현재 저장된 토큰을 그대로 두려면 취소를 누르세요.', TX_CLOUD.token);
-  if(t !== null) TX_CLOUD.token = t.trim();
-  var g = prompt('Gist ID\n\n※ 기존 gist 주소 gist.github.com/사용자/[이 부분]\n※ 비워두면 저장 시 새 gist를 자동 생성합니다.\n※ OS키트와 같은 gist를 쓰려면 그 Gist ID를 넣으세요.', TX_CLOUD.gistId);
-  if(g !== null) TX_CLOUD.gistId = g.trim();
-  txToast('클라우드 설정 저장됨');
+  var inherited = !!(localStorage.getItem('bos_gist_token_backup_v1') && !localStorage.getItem('tx_gist_token'));
+  var curToken = localStorage.getItem('tx_gist_token') || '';
+  var curGist = localStorage.getItem('tx_gist_id') || '';
+  var effToken = TX_CLOUD.token;
+  var effGist = TX_CLOUD.gistId;
+
+  // 기존 모달 제거
+  var old = document.getElementById('tx-cloud-modal');
+  if(old) old.remove();
+
+  var statusHtml = inherited
+    ? '<div style="background:#E9F7EF;border:1px solid #A9DFBF;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#1E8449;line-height:1.6">✅ <b>OS키트 설정을 자동으로 물려받았습니다.</b><br>같은 Gist에 상세페이지가 함께 저장됩니다. 아래는 그대로 두고 <b>☁️ 클라우드 저장</b>만 누르면 됩니다.</div>'
+    : (effToken
+        ? '<div style="background:#F0F4F8;border:1px solid #B5C9E8;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#1A3FAA;line-height:1.6">🔑 토큰이 설정되어 있습니다.' + (effGist ? ' Gist ID: <code>'+effGist+'</code>' : ' (저장 시 새 Gist 자동 생성)') + '</div>'
+        : '<div style="background:#FDF2E8;border:1px solid #F5CBA0;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#B9610E;line-height:1.6">⚠️ 아직 토큰이 없습니다. 아래 안내를 따라 설정하세요.</div>');
+
+  var modal = document.createElement('div');
+  modal.id = 'tx-cloud-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:999999;background:rgba(31,8,8,0.6);display:flex;align-items:center;justify-content:center;padding:20px;font-family:Pretendard,sans-serif;';
+  modal.innerHTML =
+    '<div style="background:#fff;border-radius:14px;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.4)">'
+    + '<div style="padding:18px 22px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;border-radius:14px 14px 0 0">'
+      + '<div style="font-size:16px;font-weight:800;color:#1F0808">☁️ 클라우드 동기화 설정</div>'
+      + '<button onclick="document.getElementById(\'tx-cloud-modal\').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;line-height:1">×</button>'
+    + '</div>'
+    + '<div style="padding:22px">'
+    + statusHtml
+    + '<div style="font-size:13px;font-weight:700;color:#1F0808;margin-bottom:10px">📖 처음 설정하는 방법</div>'
+    + '<ol style="margin:0 0 18px;padding-left:20px;font-size:12.5px;color:#444;line-height:1.85">'
+      + '<li><b>GitHub 토큰 발급</b><br><span style="color:#666">github.com 로그인 → 우측 상단 프로필 → <b>Settings</b> → 맨 아래 <b>Developer settings</b> → <b>Personal access tokens</b> → <b>Tokens (classic)</b> → <b>Generate new token (classic)</b></span></li>'
+      + '<li style="margin-top:8px"><b>권한(scope)은 <code style="background:#F5F0E8;padding:1px 5px;border-radius:3px">gist</code> 하나만 체크</b><br><span style="color:#666">다른 권한은 필요 없습니다. 만료기간은 편한 대로.</span></li>'
+      + '<li style="margin-top:8px"><b>생성된 토큰(ghp_로 시작) 복사</b> → 아래 칸에 붙여넣기<br><span style="color:#C0392B">※ 토큰은 이 브라우저에만 저장되고, 파일이나 Gist에는 들어가지 않습니다.</span></li>'
+      + '<li style="margin-top:8px"><b>Gist ID</b>는 비워두세요<br><span style="color:#666">☁️ 클라우드 저장을 누르면 새 비공개 Gist가 자동 생성됩니다. OS키트를 이미 쓰고 있으면 자동으로 같은 Gist를 씁니다.</span></li>'
+    + '</ol>'
+    + '<div style="border-top:1px solid #eee;padding-top:16px">'
+      + '<label style="display:block;font-size:12px;font-weight:700;color:#1F0808;margin-bottom:5px">GitHub 토큰</label>'
+      + '<input id="tx-cloud-token-in" type="password" value="' + curToken.replace(/"/g,'&quot;') + '" placeholder="' + (inherited?'(OS키트에서 자동 상속됨 — 비워두면 그대로 사용)':'ghp_...') + '" style="width:100%;padding:9px 11px;border:1px solid #ccc;border-radius:7px;font-size:12px;font-family:monospace;margin-bottom:12px;box-sizing:border-box">'
+      + '<label style="display:block;font-size:12px;font-weight:700;color:#1F0808;margin-bottom:5px">Gist ID <span style="font-weight:400;color:#999">(선택 — 비워두면 자동)</span></label>'
+      + '<input id="tx-cloud-gist-in" value="' + curGist.replace(/"/g,'&quot;') + '" placeholder="' + (inherited && effGist ? effGist+' (자동 상속)' : '비워두면 저장 시 자동 생성') + '" style="width:100%;padding:9px 11px;border:1px solid #ccc;border-radius:7px;font-size:12px;font-family:monospace;margin-bottom:18px;box-sizing:border-box">'
+      + '<div style="display:flex;gap:8px;justify-content:flex-end">'
+        + '<button onclick="document.getElementById(\'tx-cloud-modal\').remove()" style="padding:9px 16px;border:1px solid #ccc;background:#fff;border-radius:7px;font-size:13px;cursor:pointer;color:#666">취소</button>'
+        + '<button onclick="txCloudSaveSettings()" style="padding:9px 18px;border:none;background:#2C4A7C;color:#fff;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer">저장</button>'
+      + '</div>'
+    + '</div>'
+    + '</div></div>';
+  document.body.appendChild(modal);
 }
+
+function txCloudSaveSettings(){
+  var tIn = document.getElementById('tx-cloud-token-in');
+  var gIn = document.getElementById('tx-cloud-gist-in');
+  if(tIn && tIn.value.trim()) TX_CLOUD.token = tIn.value.trim();
+  if(gIn){ if(gIn.value.trim()) TX_CLOUD.gistId = gIn.value.trim(); }
+  var modal = document.getElementById('tx-cloud-modal');
+  if(modal) modal.remove();
+  txToast('☁️ 클라우드 설정 저장됨');
+}
+window.txCloudSaveSettings = txCloudSaveSettings;
 
 function txGetPageHtml(){
   var page = document.querySelector('.tx-detail .page');
@@ -1344,9 +1406,34 @@ window.txCloudSave = txCloudSave;
 window.txCloudLoad = txCloudLoad;
 window.txCloudSettings = txCloudSettings;
 
+
+// ═══════════════════════════════════════════════
+//  📐 편집기 바 높이 동적 보정 (iframe/좁은 폭에서 바가 여러 줄이 돼도 본문 안 가리게)
+// ═══════════════════════════════════════════════
+function txAdjustBars(){
+  var bar = document.getElementById('tx-editor-bar');
+  var fmt = document.getElementById('tx-format-bar');
+  if(!bar) return;
+  var barH = bar.offsetHeight || 52;
+  // 포맷 바는 편집기 바 바로 아래에 위치
+  var fmtVisible = fmt && getComputedStyle(fmt).display !== 'none';
+  var fmtH = 0;
+  if(fmt){
+    fmt.style.top = barH + 'px';
+    if(fmtVisible) fmtH = fmt.offsetHeight || 40;
+  }
+  // 본문 상단 여백 = 편집기 바 + (보이면)포맷 바
+  var total = barH + (fmtVisible ? fmtH : 0);
+  document.body.style.paddingTop = total + 'px';
+}
+window.txAdjustBars = txAdjustBars;
+// 리사이즈·폰트로드 시 재보정
+window.addEventListener('resize', function(){ if(document.body.classList.contains('tx-editing')) txAdjustBars(); });
+
 // 시작 시 편집모드 자동 ON
 window.addEventListener('load',function(){
   txToggleEdit();           // 편집 모드 ON (txInitPx 포함)
+  if(typeof txAdjustBars==='function'){ txAdjustBars(); setTimeout(txAdjustBars,100); setTimeout(txAdjustBars,600); }
   // ☁️ 클라우드에 저장된 편집본이 있으면 자동으로 불러오기 (기기 간 동기화)
   if(TX_CLOUD.gistId){ setTimeout(function(){ txCloudLoad(true); }, 400); }
   setTimeout(txUpdatePx,300);
