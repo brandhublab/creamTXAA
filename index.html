@@ -12851,7 +12851,7 @@ function forceIsolationReset(){
         <table id="sample-table-bos" style="width:100%;border-collapse:collapse;font-size:12px;min-width:1480px">
           <thead style="background:#FAFAF8;border-bottom:2px solid var(--bd)">
             <tr>
-              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:130px">업체명</th>
+              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:130px;position:sticky;left:0;z-index:3;background:#FAFAF8;box-shadow:2px 0 4px rgba(0,0,0,0.06)">업체명</th>
               <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">거래처 담당자</th>
               <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:115px">우리 담당자</th>
               <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px;width:200px">의뢰 샘플</th>
@@ -18507,7 +18507,7 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
       
       return '<tr style="border-bottom:1px solid var(--bd);background:' + statusBg + '" data-sample-id="' + s.id + '" onmouseenter="hoverSampleRow_BOS(\'' + s.id + '\')" onmouseleave="leaveSampleRow_BOS()">'
         // 1) 업체명
-        + '<td style="padding:5px 6px"><input value="' + escAttr(s.vendor) + '" placeholder="업체명" oninput="updateSampleField_BOS(\'' + s.id + '\',\'vendor\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;font-weight:500;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
+        + '<td style="padding:5px 6px;position:sticky;left:0;z-index:2;background:' + statusBg + ';box-shadow:2px 0 4px rgba(0,0,0,0.06)"><input value="' + escAttr(s.vendor) + '" placeholder="업체명" oninput="updateSampleField_BOS(\'' + s.id + '\',\'vendor\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;font-weight:600;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'"></td>'
         // 2) 거래처 담당자 (📇 연락처 카드 버튼 포함)
         + '<td style="padding:5px 6px"><div style="display:flex;align-items:center;gap:3px">'
           + '<input value="' + escAttr(s.contactVendor || s.contact || '') + '" placeholder="거래처 담당자" oninput="updateSampleField_BOS(\'' + s.id + '\',\'contactVendor\',this.value)" style="flex:1;min-width:0;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11.5px;background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">'
@@ -18652,7 +18652,11 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
             cells[7].innerHTML = '<span style="color:var(--mu);font-size:10.5px">진행중</span>';
           }
         }
-        row.style.background = item.arrivalDate ? '#F0F9F4' : '#FFFBF0';
+        var newBg = item.arrivalDate ? '#F0F9F4' : '#FFFBF0';
+        row.style.background = newBg;
+        // 고정된 업체명 셀 배경도 함께 갱신 (sticky 셀은 별도 배경)
+        var stickyTd = row.querySelector('td[style*="sticky"]');
+        if(stickyTd) stickyTd.style.background = newBg;
       }
       renderSampleSummary_BOS(data);
     }
