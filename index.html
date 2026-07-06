@@ -20492,11 +20492,13 @@ body.cal-highlighting .cal-item-card-bos:hover{
     var has = cnt > 0;
     // 미회신(답변 없는 문의) 개수
     var pending = list.filter(function(q){ return (q.question||'').trim() && !(q.answer||'').trim(); }).length;
-    // 툴팁: 최근 문의 요약
-    var tipLines = list.slice(-3).map(function(q, i){
-      var qt = (q.question||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').slice(0,40);
+    // 툴팁: 문의 요약 (종류 + 문의내용 + 회신상태)
+    var tipLines = list.map(function(q, i){
+      var typ = q.type ? ('['+q.type+'] ') : ('['+(i+1)+'차] ');
+      var qt = (q.question||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').slice(0,50);
+      if(!qt) qt = '(내용 미입력)';
       var at = (q.answer||'').trim() ? '✅' : '⏳';
-      return at + ' ' + qt + ((q.question||'').length>40?'…':'');
+      return at + ' ' + typ + qt + ((q.question||'').length>50?'…':'');
     });
     var tip = tipLines.join('\n');
     return '<button class="sample-inq-btn" data-inq-for="' + s.id + '" onclick="openSampleInquiry_BOS(\'' + s.id + '\')" '
@@ -20508,6 +20510,22 @@ body.cal-highlighting .cal-item-card-bos:hover{
       + '</button>';
   };
 
+  // OEM사 관련 문의 종류
+  window.SAMPLE_INQ_TYPES_BOS = [
+    {key:'성분·처방',  color:'#7A4AA8'},
+    {key:'샘플 요청',  color:'#E67E22'},
+    {key:'단가·견적',  color:'#1A6B4A'},
+    {key:'MOQ·수량',   color:'#2563EB'},
+    {key:'납기·일정',  color:'#C0392B'},
+    {key:'사양 변경',  color:'#B9610E'},
+    {key:'부자재·용기', color:'#0097A7'},
+    {key:'인증·서류',  color:'#5D6D7E'},
+    {key:'임상·시험',  color:'#16A085'},
+    {key:'라벨·표기',  color:'#8E44AD'},
+    {key:'품질·불량',  color:'#E74C3C'},
+    {key:'기타',       color:'#7F8C8D'}
+  ];
+
   window.openSampleInquiry_BOS = function(id){
     var data = (typeof loadSample==='function') ? loadSample() : JSON.parse(localStorage.getItem('bos_sample_data_v1')||'[]');
     var s = data.find(function(x){ return x.id === id; });
@@ -20518,21 +20536,26 @@ body.cal-highlighting .cal-item-card-bos:hover{
     var old = document.getElementById('sample-inquiry-modal');
     if(old) old.remove();
 
+    // 선택된 탭 인덱스 (기본: 마지막 문의, 없으면 0)
+    window._inqActiveIdx = (s.inquiries.length > 0) ? s.inquiries.length - 1 : 0;
+
     var modal = document.createElement('div');
     modal.id = 'sample-inquiry-modal';
     modal.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9300;align-items:center;justify-content:center;padding:20px';
-    modal.innerHTML = '<div style="background:#fff;border-radius:14px;padding:0;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.3)" onclick="event.stopPropagation()">'
-      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:20px 22px 14px;border-bottom:1px solid var(--bd)">'
+    modal.innerHTML = '<div style="background:#fff;border-radius:14px;padding:0;max-width:720px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.3)" onclick="event.stopPropagation()">'
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:22px 24px 16px;border-bottom:1px solid var(--bd)">'
         + '<div>'
-          + '<div style="font-size:15px;font-weight:700">💬 문의사항 · 회신 기록</div>'
-          + '<div style="font-size:11px;color:var(--mu);margin-top:3px">' + subtitle + ' · 업체에 문의한 내용과 받은 회신을 순차적으로 기록</div>'
+          + '<div style="font-size:16px;font-weight:700">💬 문의사항 · 회신 기록</div>'
+          + '<div style="font-size:11.5px;color:var(--mu);margin-top:4px">' + subtitle + ' · 업체에 문의한 내용과 받은 회신을 순차 기록</div>'
         + '</div>'
-        + '<button onclick="document.getElementById(\'sample-inquiry-modal\').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu);line-height:1;padding:0">×</button>'
+        + '<button onclick="document.getElementById(\'sample-inquiry-modal\').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--mu);line-height:1;padding:0">×</button>'
       + '</div>'
-      + '<div id="sample-inq-list" style="padding:16px 22px;overflow-y:auto;flex:1"></div>'
-      + '<div style="padding:14px 22px;border-top:1px solid var(--bd);display:flex;gap:8px;justify-content:space-between;align-items:center">'
-        + '<button onclick="addSampleInquiry_BOS(\'' + id + '\')" style="background:#E8F4FD;border:1px solid #90CAF9;color:#1565C0;border-radius:7px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">＋ 문의 추가</button>'
-        + '<button onclick="document.getElementById(\'sample-inquiry-modal\').remove()" style="background:#1565C0;color:#fff;border:none;border-radius:7px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer">완료</button>'
+      // 탭 바
+      + '<div id="sample-inq-tabs" style="display:flex;gap:6px;padding:12px 24px 0;overflow-x:auto;flex-wrap:wrap"></div>'
+      // 선택된 문의 내용
+      + '<div id="sample-inq-body" style="padding:18px 24px;overflow-y:auto;flex:1"></div>'
+      + '<div style="padding:16px 24px;border-top:1px solid var(--bd);display:flex;gap:8px;justify-content:flex-end;align-items:center">'
+        + '<button onclick="document.getElementById(\'sample-inquiry-modal\').remove()" style="background:#1565C0;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer">완료</button>'
       + '</div>'
     + '</div>';
     modal.onclick = function(){ modal.remove(); };
@@ -20540,43 +20563,85 @@ body.cal-highlighting .cal-item-card-bos:hover{
     renderSampleInquiryList_BOS(id);
   };
 
+  // 탭 선택
+  window.selectInquiryTab_BOS = function(id, idx){
+    window._inqActiveIdx = idx;
+    renderSampleInquiryList_BOS(id);
+  };
+
   window.renderSampleInquiryList_BOS = function(id){
-    var listEl = document.getElementById('sample-inq-list');
-    if(!listEl) return;
+    var tabsEl = document.getElementById('sample-inq-tabs');
+    var bodyEl = document.getElementById('sample-inq-body');
+    if(!tabsEl || !bodyEl) return;
     var data = (typeof loadSample==='function') ? loadSample() : JSON.parse(localStorage.getItem('bos_sample_data_v1')||'[]');
     var s = data.find(function(x){ return x.id === id; });
     if(!s) return;
     var list = getSampleInquiries_BOS(s);
+    var TYPES = window.SAMPLE_INQ_TYPES_BOS;
+    var esc2 = function(x){ return String(x||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
 
+    // ── 탭 바: 각 문의 + [＋ 문의 추가] ──
+    var tabsHtml = list.map(function(q, idx){
+      var active = idx === window._inqActiveIdx;
+      var answered = (q.answer||'').trim();
+      var typeInfo = TYPES.find(function(t){ return t.key === q.type; }) || null;
+      var dotColor = answered ? '#27AE60' : '#E67E22';
+      var label = q.type ? q.type : ((idx+1) + '차');
+      return '<button onclick="selectInquiryTab_BOS(\'' + id + '\',' + idx + ')" '
+        + 'style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:9px 9px 0 0;font-size:11.5px;cursor:pointer;font-family:inherit;white-space:nowrap;'
+        + 'background:' + (active ? '#fff' : '#F2F0EC') + ';color:' + (active ? 'var(--tx)' : 'var(--mu)') + ';'
+        + 'border:1px solid var(--bd);border-bottom:' + (active ? '1px solid #fff' : '1px solid var(--bd)') + ';margin-bottom:-1px;font-weight:' + (active?'700':'500') + '">'
+        + '<span style="width:7px;height:7px;border-radius:50%;background:' + dotColor + ';flex-shrink:0"></span>'
+        + '<span style="font-size:9px;opacity:.7">' + (idx+1) + '</span>'
+        + esc2(label)
+        + '</button>';
+    }).join('');
+    tabsHtml += '<button onclick="addSampleInquiry_BOS(\'' + id + '\')" style="padding:7px 14px;border-radius:9px 9px 0 0;font-size:11.5px;cursor:pointer;background:#E8F4FD;color:#1565C0;border:1px solid #90CAF9;border-bottom:none;font-weight:700;white-space:nowrap;margin-bottom:-1px">＋ 문의 추가</button>';
+    tabsEl.innerHTML = tabsHtml;
+
+    // ── 본문: 선택된 문의 ──
     if(list.length === 0){
-      listEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--mu);font-size:12px;background:#FAFAF8;border-radius:8px;border:1px dashed var(--bd)">'
-        + '아직 문의 기록이 없습니다.<br>＋ 문의 추가 를 눌러 업체에 문의한 내용을 기록하세요.</div>';
+      bodyEl.innerHTML = '<div style="padding:44px 20px;text-align:center;color:var(--mu);font-size:13px;background:#FAFAF8;border-radius:10px;border:1px dashed var(--bd)">'
+        + '아직 문의 기록이 없습니다.<br><br><b>＋ 문의 추가</b> 를 눌러 업체에 문의한 내용을 기록하세요.</div>';
       return;
     }
-    var esc2 = function(x){ return String(x||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
-    listEl.innerHTML = list.map(function(q, idx){
-      var answered = (q.answer||'').trim();
-      return '<div style="border:1px solid var(--bd);border-left:3px solid ' + (answered?'#27AE60':'#E67E22') + ';border-radius:8px;padding:12px 14px;margin-bottom:12px;background:#fff">'
-        // 헤더: 회차 + 날짜 + 삭제
-        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
-          + '<span style="font-size:10px;font-weight:700;color:#1565C0;background:#E8F4FD;padding:2px 8px;border-radius:8px">' + (idx+1) + '차 문의</span>'
-          + '<input type="date" value="' + esc2(q.date) + '" onchange="updateSampleInquiry_BOS(\'' + id + '\',' + idx + ',\'date\',this.value)" style="padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff">'
-          + '<span style="flex:1"></span>'
-          + '<span style="font-size:10px;font-weight:600;color:' + (answered?'#27AE60':'#E67E22') + '">' + (answered?'✅ 회신 완료':'⏳ 회신 대기') + '</span>'
-          + '<button onclick="delSampleInquiry_BOS(\'' + id + '\',' + idx + ')" title="이 문의 삭제" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:13px;padding:2px 4px">✕</button>'
-        + '</div>'
-        // 문의 내용
-        + '<div style="margin-bottom:8px">'
-          + '<label style="font-size:10px;color:#E67E22;font-weight:700;display:block;margin-bottom:3px">📤 문의 (우리 → 업체)</label>'
-          + '<textarea placeholder="업체에 문의한 내용 (예: 미백 성분 함량 확인 요청, 샘플 재발송 가능한지)" oninput="updateSampleInquiry_BOS(\'' + id + '\',' + idx + ',\'question\',this.value)" style="width:100%;box-sizing:border-box;min-height:52px;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;font-family:inherit;line-height:1.5;resize:vertical">' + esc2(q.question) + '</textarea>'
-        + '</div>'
-        // 회신 내용
-        + '<div>'
-          + '<label style="font-size:10px;color:#1A6B4A;font-weight:700;display:block;margin-bottom:3px">📥 회신 (업체 → 우리)</label>'
-          + '<textarea placeholder="업체에서 받은 회신 (이메일·전화·샘플 등). 받는 대로 기록" oninput="updateSampleInquiry_BOS(\'' + id + '\',' + idx + ',\'answer\',this.value)" style="width:100%;box-sizing:border-box;min-height:52px;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;font-family:inherit;line-height:1.5;resize:vertical;background:' + (answered?'#F4FBF7':'#fff') + '">' + esc2(q.answer) + '</textarea>'
-        + '</div>'
-      + '</div>';
+    var idx = Math.min(window._inqActiveIdx, list.length - 1);
+    if(idx < 0) idx = 0;
+    window._inqActiveIdx = idx;
+    var q = list[idx];
+    var answered = (q.answer||'').trim();
+
+    // 문의 종류 select
+    var typeOpts = '<option value="">종류 선택…</option>' + TYPES.map(function(t){
+      return '<option value="' + t.key + '"' + (q.type === t.key ? ' selected' : '') + '>' + t.key + '</option>';
     }).join('');
+
+    bodyEl.innerHTML = '<div style="border:1px solid var(--bd);border-top:3px solid ' + (answered?'#27AE60':'#E67E22') + ';border-radius:0 10px 10px 10px;padding:20px;background:#fff">'
+      // 상단: 종류 + 날짜 + 상태 + 삭제
+      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">'
+        + '<div style="display:flex;flex-direction:column;gap:3px">'
+          + '<label style="font-size:9.5px;color:var(--mu);font-weight:700">문의 종류</label>'
+          + '<select onchange="updateSampleInquiry_BOS(\'' + id + '\',' + idx + ',\'type\',this.value)" style="padding:7px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;background:#fff;cursor:pointer;min-width:130px">' + typeOpts + '</select>'
+        + '</div>'
+        + '<div style="display:flex;flex-direction:column;gap:3px">'
+          + '<label style="font-size:9.5px;color:var(--mu);font-weight:700">날짜</label>'
+          + '<input type="date" value="' + esc2(q.date) + '" onchange="updateSampleInquiry_BOS(\'' + id + '\',' + idx + ',\'date\',this.value)" style="padding:7px 8px;border:1px solid var(--bd);border-radius:6px;font-size:12px;background:#fff">'
+        + '</div>'
+        + '<div style="flex:1"></div>'
+        + '<span style="font-size:11px;font-weight:700;color:' + (answered?'#27AE60':'#E67E22') + ';align-self:flex-end;padding-bottom:8px">' + (answered?'✅ 회신 완료':'⏳ 회신 대기') + '</span>'
+        + '<button onclick="delSampleInquiry_BOS(\'' + id + '\',' + idx + ')" title="이 문의 삭제" style="background:none;border:1px solid var(--bd);border-radius:6px;color:#C0392B;cursor:pointer;font-size:12px;padding:6px 10px;align-self:flex-end">✕ 삭제</button>'
+      + '</div>'
+      // 문의 내용 (크게)
+      + '<div style="margin-bottom:16px">'
+        + '<label style="font-size:11.5px;color:#E67E22;font-weight:700;display:block;margin-bottom:6px">📤 문의 (우리 → 업체)</label>'
+        + '<textarea placeholder="업체에 문의한 내용을 입력하세요&#10;예: 미백 성분(트라넥삼산) 함량 확인 요청 / 샘플 재발송 가능한지 / MOQ 조건" oninput="updateSampleInquiry_BOS(\'' + id + '\',' + idx + ',\'question\',this.value)" style="width:100%;box-sizing:border-box;min-height:150px;padding:14px 16px;border:1px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit;line-height:1.7;resize:vertical;outline:none" onfocus="this.style.borderColor=\'#E67E22\'" onblur="this.style.borderColor=\'var(--bd)\'">' + esc2(q.question) + '</textarea>'
+      + '</div>'
+      // 회신 내용 (크게)
+      + '<div>'
+        + '<label style="font-size:11.5px;color:#1A6B4A;font-weight:700;display:block;margin-bottom:6px">📥 회신 (업체 → 우리)</label>'
+        + '<textarea placeholder="업체에서 받은 회신을 입력하세요 (이메일·전화·샘플 등)&#10;받는 대로 기록해두면 히스토리가 남습니다" oninput="updateSampleInquiry_BOS(\'' + id + '\',' + idx + ',\'answer\',this.value)" style="width:100%;box-sizing:border-box;min-height:150px;padding:14px 16px;border:1px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit;line-height:1.7;resize:vertical;outline:none;background:' + (answered?'#F4FBF7':'#fff') + '" onfocus="this.style.borderColor=\'#1A6B4A\'" onblur="this.style.borderColor=\'var(--bd)\'">' + esc2(q.answer) + '</textarea>'
+      + '</div>'
+    + '</div>';
   };
 
   window.addSampleInquiry_BOS = function(id){
@@ -20584,7 +20649,8 @@ body.cal-highlighting .cal-item-card-bos:hover{
     var s = data.find(function(x){ return x.id === id; });
     if(!s) return;
     getSampleInquiries_BOS(s);
-    s.inquiries.push({ date: new Date().toISOString().slice(0,10), question:'', answer:'' });
+    s.inquiries.push({ date: new Date().toISOString().slice(0,10), type:'', question:'', answer:'' });
+    window._inqActiveIdx = s.inquiries.length - 1;  // 새로 추가한 탭으로 이동
     if(typeof saveSample==='function') saveSample(data);
     else localStorage.setItem('bos_sample_data_v1', JSON.stringify(data));
     renderSampleInquiryList_BOS(id);
@@ -20597,11 +20663,46 @@ body.cal-highlighting .cal-item-card-bos:hover{
     if(!s) return;
     getSampleInquiries_BOS(s);
     if(!s.inquiries[idx]) return;
+    var wasAnswered = (s.inquiries[idx].answer||'').trim() ? true : false;
     s.inquiries[idx][key] = val;
     if(typeof saveSample==='function') saveSample(data);
     else localStorage.setItem('bos_sample_data_v1', JSON.stringify(data));
-    // 회신 상태 색 갱신을 위해 목록만 다시 (단, 입력 중 포커스 유지 위해 셀 배지만 갱신)
     refreshSampleInquiryCell_BOS(id);
+    // 종류 변경 → 탭 라벨 갱신 / 회신 유무 상태 바뀜 → 탭 점 색 갱신 (텍스트 입력 중엔 갱신 안 함: 포커스 유지)
+    if(key === 'type'){
+      var tabsEl = document.getElementById('sample-inq-tabs');
+      if(tabsEl && typeof renderSampleInquiryTabsOnly_BOS === 'function') renderSampleInquiryTabsOnly_BOS(id);
+    } else if(key === 'answer'){
+      var nowAnswered = (val||'').trim() ? true : false;
+      if(wasAnswered !== nowAnswered && typeof renderSampleInquiryTabsOnly_BOS === 'function') renderSampleInquiryTabsOnly_BOS(id);
+    }
+  };
+
+  // 탭 바만 갱신 (본문 textarea 포커스 유지)
+  window.renderSampleInquiryTabsOnly_BOS = function(id){
+    var tabsEl = document.getElementById('sample-inq-tabs');
+    if(!tabsEl) return;
+    var data = (typeof loadSample==='function') ? loadSample() : JSON.parse(localStorage.getItem('bos_sample_data_v1')||'[]');
+    var s = data.find(function(x){ return x.id === id; });
+    if(!s) return;
+    var list = getSampleInquiries_BOS(s);
+    var esc2 = function(x){ return String(x||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+    var tabsHtml = list.map(function(q, i){
+      var active = i === window._inqActiveIdx;
+      var answered = (q.answer||'').trim();
+      var dotColor = answered ? '#27AE60' : '#E67E22';
+      var label = q.type ? q.type : ((i+1) + '차');
+      return '<button onclick="selectInquiryTab_BOS(\'' + id + '\',' + i + ')" '
+        + 'style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:9px 9px 0 0;font-size:11.5px;cursor:pointer;font-family:inherit;white-space:nowrap;'
+        + 'background:' + (active ? '#fff' : '#F2F0EC') + ';color:' + (active ? 'var(--tx)' : 'var(--mu)') + ';'
+        + 'border:1px solid var(--bd);border-bottom:' + (active ? '1px solid #fff' : '1px solid var(--bd)') + ';margin-bottom:-1px;font-weight:' + (active?'700':'500') + '">'
+        + '<span style="width:7px;height:7px;border-radius:50%;background:' + dotColor + ';flex-shrink:0"></span>'
+        + '<span style="font-size:9px;opacity:.7">' + (i+1) + '</span>'
+        + esc2(label)
+        + '</button>';
+    }).join('');
+    tabsHtml += '<button onclick="addSampleInquiry_BOS(\'' + id + '\')" style="padding:7px 14px;border-radius:9px 9px 0 0;font-size:11.5px;cursor:pointer;background:#E8F4FD;color:#1565C0;border:1px solid #90CAF9;border-bottom:none;font-weight:700;white-space:nowrap;margin-bottom:-1px">＋ 문의 추가</button>';
+    tabsEl.innerHTML = tabsHtml;
   };
 
   window.delSampleInquiry_BOS = function(id, idx){
@@ -20677,7 +20778,7 @@ body.cal-highlighting .cal-item-card-bos:hover{
     var modal = document.createElement('div');
     modal.id = 'sample-memo-modal';
     modal.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9300;align-items:center;justify-content:center;padding:20px';
-    modal.innerHTML = '<div style="background:#fff;border-radius:14px;padding:22px;max-width:460px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3)" onclick="event.stopPropagation()">'
+    modal.innerHTML = '<div style="background:#fff;border-radius:14px;padding:26px;max-width:640px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3)" onclick="event.stopPropagation()">'
       + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;padding-bottom:12px;border-bottom:1px solid var(--bd)">'
         + '<div>'
           + '<div style="font-size:15px;font-weight:700">📝 샘플 메모</div>'
@@ -20686,7 +20787,7 @@ body.cal-highlighting .cal-item-card-bos:hover{
         + '<button onclick="document.getElementById(\'sample-memo-modal\').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu);line-height:1;padding:0">×</button>'
       + '</div>'
       + '<textarea id="sample-memo-textarea" placeholder="이 샘플에 대한 메모를 입력하세요&#10;예: 사양 바뀌기 전 샘플 · 미백 중복 / 도착 지연됨 / 가장 보수적임" '
-        + 'style="width:100%;box-sizing:border-box;min-height:140px;padding:11px 13px;border:1px solid var(--bd);border-radius:8px;font-size:13px;font-family:inherit;line-height:1.6;resize:vertical;outline:none" '
+        + 'style="width:100%;box-sizing:border-box;min-height:260px;padding:15px 17px;border:1px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit;line-height:1.7;resize:vertical;outline:none" '
         + 'onfocus="this.style.borderColor=\'#8B5E00\'" onblur="this.style.borderColor=\'var(--bd)\'">' + (s.memo||'').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</textarea>'
       + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">'
         + '<button onclick="document.getElementById(\'sample-memo-modal\').remove()" style="background:#fff;border:1px solid var(--bd);border-radius:7px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer">취소</button>'
