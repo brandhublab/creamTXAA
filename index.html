@@ -12861,12 +12861,13 @@ function forceIsolationReset(){
               <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:100px">실제소요</th>
               <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;white-space:nowrap;width:54px" title="문안검수 · CT Test · 양산 일정">공정</th>
               <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;width:90px" title="업체 선정 평가 (담당자 응대·요청 반영·제작 속도)">📋 평가</th>
-              <th style="padding:9px 8px;text-align:left;font-weight:700;color:var(--mu);font-size:10.5px">메모</th>
+              <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;width:60px">메모</th>
+              <th style="padding:9px 8px;text-align:center;font-weight:700;color:var(--mu);font-size:10.5px;width:70px">문의사항</th>
               <th style="padding:9px 8px;width:36px"></th>
             </tr>
           </thead>
           <tbody id="sample-tbody-bos">
-            <tr><td colspan="12" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">샘플 의뢰 내역이 없습니다. <b>＋ 샘플 의뢰 추가</b> 를 눌러 시작하세요.</td></tr>
+            <tr><td colspan="13" style="padding:30px;text-align:center;color:var(--mu);font-size:12px">샘플 의뢰 내역이 없습니다. <b>＋ 샘플 의뢰 추가</b> 를 눌러 시작하세요.</td></tr>
           </tbody>
         </table>
       </div>
@@ -18535,8 +18536,10 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
         + '</td>'
         // 8.7) 📋 평가 (업체 선정 점수 + 최종 선정)
         + '<td style="padding:5px 4px;text-align:center">' + buildSampleEvalCell_BOS(s) + '</td>'
-        // 9) 메모
-        + '<td style="padding:5px 6px"><input value="' + escAttr(s.memo) + '" placeholder="메모" oninput="updateSampleField_BOS(\'' + s.id + '\',\'memo\',this.value)" style="width:100%;padding:4px 6px;border:1px solid transparent;border-radius:4px;font-size:11px;color:var(--mu);background:transparent" onfocus="this.style.borderColor=\'var(--bd)\';this.style.background=\'#fff\';this.style.color=\'var(--tx)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\';this.style.color=\'var(--mu)\'"></td>'
+        // 9) 메모 (아이콘 버튼 + 팝업 + 툴팁)
+        + '<td style="padding:5px 6px;text-align:center">' + buildSampleMemoCell_BOS(s) + '</td>'
+        // 9.5) 문의사항 (문의→회신 순차 기록)
+        + '<td style="padding:5px 6px;text-align:center">' + buildSampleInquiryCell_BOS(s) + '</td>'
         // 10) 삭제
         + '<td style="padding:5px 4px;text-align:center"><button onclick="deleteSampleEntry_BOS(\'' + s.id + '\')" title="삭제" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:13px;padding:4px 6px">✕</button></td>'
         + '</tr>'
@@ -18587,7 +18590,8 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
       requestDate: new Date().toISOString().slice(0,10),
       expectedDays: '',
       arrivalDate: '',
-      memo: ''
+      memo: '',
+      inquiries: []
     });
     saveSample(data);
     renderSampleTable_BOS();
@@ -20476,6 +20480,246 @@ body.cal-highlighting .cal-item-card-bos:hover{
     }
   };
   
+  // ━━ 💬 샘플 문의사항 (문의→회신 순차 기록) ━━
+  window.getSampleInquiries_BOS = function(s){
+    if(!s.inquiries || !Array.isArray(s.inquiries)) s.inquiries = [];
+    return s.inquiries;
+  };
+
+  window.buildSampleInquiryCell_BOS = function(s){
+    var list = (s.inquiries && Array.isArray(s.inquiries)) ? s.inquiries : [];
+    var cnt = list.length;
+    var has = cnt > 0;
+    // 미회신(답변 없는 문의) 개수
+    var pending = list.filter(function(q){ return (q.question||'').trim() && !(q.answer||'').trim(); }).length;
+    // 툴팁: 최근 문의 요약
+    var tipLines = list.slice(-3).map(function(q, i){
+      var qt = (q.question||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').slice(0,40);
+      var at = (q.answer||'').trim() ? '✅' : '⏳';
+      return at + ' ' + qt + ((q.question||'').length>40?'…':'');
+    });
+    var tip = tipLines.join('\n');
+    return '<button class="sample-inq-btn" data-inq-for="' + s.id + '" onclick="openSampleInquiry_BOS(\'' + s.id + '\')" '
+      + (has ? 'onmouseenter="showSampleMemoTip_BOS(this,event)" onmousemove="showSampleMemoTip_BOS(this,event)" onmouseleave="hideSampleMemoTip_BOS()" data-memo-text="' + tip + '" ' : '')
+      + 'title="' + (has ? '' : '문의사항 기록') + '" '
+      + 'style="position:relative;background:' + (has?'#E8F4FD':'transparent') + ';border:1px solid ' + (has?'#90CAF9':'var(--bd)') + ';border-radius:5px;padding:4px 9px;font-size:13px;cursor:pointer;color:' + (has?'#1565C0':'var(--mu)') + ';line-height:1">'
+      + '💬'
+      + (has ? '<span style="position:absolute;top:-6px;right:-6px;min-width:14px;height:14px;background:' + (pending>0?'#E67E22':'#1976D2') + ';color:#fff;border-radius:8px;font-size:8.5px;font-weight:700;line-height:14px;padding:0 3px;border:1.5px solid #fff">' + cnt + '</span>' : '')
+      + '</button>';
+  };
+
+  window.openSampleInquiry_BOS = function(id){
+    var data = (typeof loadSample==='function') ? loadSample() : JSON.parse(localStorage.getItem('bos_sample_data_v1')||'[]');
+    var s = data.find(function(x){ return x.id === id; });
+    if(!s) return;
+    getSampleInquiries_BOS(s);
+    var subtitle = ((s.vendor||'업체') + ' · ' + (s.sampleName||'샘플')).replace(/</g,'&lt;');
+
+    var old = document.getElementById('sample-inquiry-modal');
+    if(old) old.remove();
+
+    var modal = document.createElement('div');
+    modal.id = 'sample-inquiry-modal';
+    modal.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9300;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = '<div style="background:#fff;border-radius:14px;padding:0;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.3)" onclick="event.stopPropagation()">'
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:20px 22px 14px;border-bottom:1px solid var(--bd)">'
+        + '<div>'
+          + '<div style="font-size:15px;font-weight:700">💬 문의사항 · 회신 기록</div>'
+          + '<div style="font-size:11px;color:var(--mu);margin-top:3px">' + subtitle + ' · 업체에 문의한 내용과 받은 회신을 순차적으로 기록</div>'
+        + '</div>'
+        + '<button onclick="document.getElementById(\'sample-inquiry-modal\').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu);line-height:1;padding:0">×</button>'
+      + '</div>'
+      + '<div id="sample-inq-list" style="padding:16px 22px;overflow-y:auto;flex:1"></div>'
+      + '<div style="padding:14px 22px;border-top:1px solid var(--bd);display:flex;gap:8px;justify-content:space-between;align-items:center">'
+        + '<button onclick="addSampleInquiry_BOS(\'' + id + '\')" style="background:#E8F4FD;border:1px solid #90CAF9;color:#1565C0;border-radius:7px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">＋ 문의 추가</button>'
+        + '<button onclick="document.getElementById(\'sample-inquiry-modal\').remove()" style="background:#1565C0;color:#fff;border:none;border-radius:7px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer">완료</button>'
+      + '</div>'
+    + '</div>';
+    modal.onclick = function(){ modal.remove(); };
+    document.body.appendChild(modal);
+    renderSampleInquiryList_BOS(id);
+  };
+
+  window.renderSampleInquiryList_BOS = function(id){
+    var listEl = document.getElementById('sample-inq-list');
+    if(!listEl) return;
+    var data = (typeof loadSample==='function') ? loadSample() : JSON.parse(localStorage.getItem('bos_sample_data_v1')||'[]');
+    var s = data.find(function(x){ return x.id === id; });
+    if(!s) return;
+    var list = getSampleInquiries_BOS(s);
+
+    if(list.length === 0){
+      listEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--mu);font-size:12px;background:#FAFAF8;border-radius:8px;border:1px dashed var(--bd)">'
+        + '아직 문의 기록이 없습니다.<br>＋ 문의 추가 를 눌러 업체에 문의한 내용을 기록하세요.</div>';
+      return;
+    }
+    var esc2 = function(x){ return String(x||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+    listEl.innerHTML = list.map(function(q, idx){
+      var answered = (q.answer||'').trim();
+      return '<div style="border:1px solid var(--bd);border-left:3px solid ' + (answered?'#27AE60':'#E67E22') + ';border-radius:8px;padding:12px 14px;margin-bottom:12px;background:#fff">'
+        // 헤더: 회차 + 날짜 + 삭제
+        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+          + '<span style="font-size:10px;font-weight:700;color:#1565C0;background:#E8F4FD;padding:2px 8px;border-radius:8px">' + (idx+1) + '차 문의</span>'
+          + '<input type="date" value="' + esc2(q.date) + '" onchange="updateSampleInquiry_BOS(\'' + id + '\',' + idx + ',\'date\',this.value)" style="padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:#fff">'
+          + '<span style="flex:1"></span>'
+          + '<span style="font-size:10px;font-weight:600;color:' + (answered?'#27AE60':'#E67E22') + '">' + (answered?'✅ 회신 완료':'⏳ 회신 대기') + '</span>'
+          + '<button onclick="delSampleInquiry_BOS(\'' + id + '\',' + idx + ')" title="이 문의 삭제" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:13px;padding:2px 4px">✕</button>'
+        + '</div>'
+        // 문의 내용
+        + '<div style="margin-bottom:8px">'
+          + '<label style="font-size:10px;color:#E67E22;font-weight:700;display:block;margin-bottom:3px">📤 문의 (우리 → 업체)</label>'
+          + '<textarea placeholder="업체에 문의한 내용 (예: 미백 성분 함량 확인 요청, 샘플 재발송 가능한지)" oninput="updateSampleInquiry_BOS(\'' + id + '\',' + idx + ',\'question\',this.value)" style="width:100%;box-sizing:border-box;min-height:52px;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;font-family:inherit;line-height:1.5;resize:vertical">' + esc2(q.question) + '</textarea>'
+        + '</div>'
+        // 회신 내용
+        + '<div>'
+          + '<label style="font-size:10px;color:#1A6B4A;font-weight:700;display:block;margin-bottom:3px">📥 회신 (업체 → 우리)</label>'
+          + '<textarea placeholder="업체에서 받은 회신 (이메일·전화·샘플 등). 받는 대로 기록" oninput="updateSampleInquiry_BOS(\'' + id + '\',' + idx + ',\'answer\',this.value)" style="width:100%;box-sizing:border-box;min-height:52px;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;font-family:inherit;line-height:1.5;resize:vertical;background:' + (answered?'#F4FBF7':'#fff') + '">' + esc2(q.answer) + '</textarea>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+  };
+
+  window.addSampleInquiry_BOS = function(id){
+    var data = (typeof loadSample==='function') ? loadSample() : JSON.parse(localStorage.getItem('bos_sample_data_v1')||'[]');
+    var s = data.find(function(x){ return x.id === id; });
+    if(!s) return;
+    getSampleInquiries_BOS(s);
+    s.inquiries.push({ date: new Date().toISOString().slice(0,10), question:'', answer:'' });
+    if(typeof saveSample==='function') saveSample(data);
+    else localStorage.setItem('bos_sample_data_v1', JSON.stringify(data));
+    renderSampleInquiryList_BOS(id);
+    refreshSampleInquiryCell_BOS(id);
+  };
+
+  window.updateSampleInquiry_BOS = function(id, idx, key, val){
+    var data = (typeof loadSample==='function') ? loadSample() : JSON.parse(localStorage.getItem('bos_sample_data_v1')||'[]');
+    var s = data.find(function(x){ return x.id === id; });
+    if(!s) return;
+    getSampleInquiries_BOS(s);
+    if(!s.inquiries[idx]) return;
+    s.inquiries[idx][key] = val;
+    if(typeof saveSample==='function') saveSample(data);
+    else localStorage.setItem('bos_sample_data_v1', JSON.stringify(data));
+    // 회신 상태 색 갱신을 위해 목록만 다시 (단, 입력 중 포커스 유지 위해 셀 배지만 갱신)
+    refreshSampleInquiryCell_BOS(id);
+  };
+
+  window.delSampleInquiry_BOS = function(id, idx){
+    if(!confirm((idx+1) + '차 문의 기록을 삭제하시겠습니까?')) return;
+    var data = (typeof loadSample==='function') ? loadSample() : JSON.parse(localStorage.getItem('bos_sample_data_v1')||'[]');
+    var s = data.find(function(x){ return x.id === id; });
+    if(!s || !s.inquiries) return;
+    s.inquiries.splice(idx, 1);
+    if(typeof saveSample==='function') saveSample(data);
+    else localStorage.setItem('bos_sample_data_v1', JSON.stringify(data));
+    renderSampleInquiryList_BOS(id);
+    refreshSampleInquiryCell_BOS(id);
+  };
+
+  window.refreshSampleInquiryCell_BOS = function(id){
+    var cell = document.querySelector('.sample-inq-btn[data-inq-for="' + id + '"]');
+    if(!cell) return;
+    var data = (typeof loadSample==='function') ? loadSample() : [];
+    var s = data.find(function(x){ return x.id === id; });
+    if(!s) return;
+    var wrap = cell.parentNode;
+    if(wrap) wrap.innerHTML = buildSampleInquiryCell_BOS(s);
+  };
+
+  // ━━ 📝 샘플 메모 (아이콘 버튼 + 팝업 + 툴팁) ━━
+  window.buildSampleMemoCell_BOS = function(s){
+    var memo = (s.memo || '').trim();
+    var has = !!memo;
+    // 툴팁용 (전체 내용, HTML 이스케이프)
+    var tip = memo.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return '<button class="sample-memo-btn" data-memo-for="' + s.id + '" onclick="openSampleMemo_BOS(\'' + s.id + '\')" '
+      + (has ? 'onmouseenter="showSampleMemoTip_BOS(this,event)" onmousemove="showSampleMemoTip_BOS(this,event)" onmouseleave="hideSampleMemoTip_BOS()" data-memo-text="' + tip + '" ' : '')
+      + 'title="' + (has ? '' : '메모 작성') + '" '
+      + 'style="position:relative;background:' + (has?'#FFF8E1':'transparent') + ';border:1px solid ' + (has?'#FFD54F':'var(--bd)') + ';border-radius:5px;padding:4px 9px;font-size:13px;cursor:pointer;color:' + (has?'#8B5E00':'var(--mu)') + ';line-height:1">'
+      + '📝'
+      + (has ? '<span style="position:absolute;top:-3px;right:-3px;width:7px;height:7px;background:#F44336;border-radius:50%;border:1.5px solid #fff"></span>' : '')
+      + '</button>';
+  };
+
+  // 툴팁 (미니캘 툴팁 재사용 스타일)
+  window.showSampleMemoTip_BOS = function(el, event){
+    var txt = el.getAttribute('data-memo-text') || '';
+    if(!txt) return;
+    var tip = document.getElementById('minical-tip-bos');
+    if(!tip){
+      tip = document.createElement('div');
+      tip.id = 'minical-tip-bos';
+      document.body.appendChild(tip);
+    }
+    tip.innerHTML = '<div style="max-width:280px;white-space:pre-wrap;line-height:1.5">' + txt + '</div>';
+    tip.style.display = 'block';
+    var x = event.clientX + 12, y = event.clientY + 12;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    var r = tip.getBoundingClientRect();
+    if(x + r.width > window.innerWidth - 8) tip.style.left = (event.clientX - r.width - 12) + 'px';
+    if(y + r.height > window.innerHeight - 8) tip.style.top = (event.clientY - r.height - 12) + 'px';
+  };
+  window.hideSampleMemoTip_BOS = function(){
+    var tip = document.getElementById('minical-tip-bos');
+    if(tip) tip.style.display = 'none';
+  };
+
+  // 팝업 모달로 메모 편집
+  window.openSampleMemo_BOS = function(id){
+    var data = (typeof loadSample==='function') ? loadSample() : JSON.parse(localStorage.getItem('bos_sample_data_v1')||'[]');
+    var s = data.find(function(x){ return x.id === id; });
+    if(!s) return;
+    var subtitle = ((s.vendor||'업체') + ' · ' + (s.sampleName||'샘플')).replace(/</g,'&lt;');
+
+    var old = document.getElementById('sample-memo-modal');
+    if(old) old.remove();
+
+    var modal = document.createElement('div');
+    modal.id = 'sample-memo-modal';
+    modal.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9300;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = '<div style="background:#fff;border-radius:14px;padding:22px;max-width:460px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3)" onclick="event.stopPropagation()">'
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;padding-bottom:12px;border-bottom:1px solid var(--bd)">'
+        + '<div>'
+          + '<div style="font-size:15px;font-weight:700">📝 샘플 메모</div>'
+          + '<div style="font-size:11px;color:var(--mu);margin-top:3px">' + subtitle + '</div>'
+        + '</div>'
+        + '<button onclick="document.getElementById(\'sample-memo-modal\').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu);line-height:1;padding:0">×</button>'
+      + '</div>'
+      + '<textarea id="sample-memo-textarea" placeholder="이 샘플에 대한 메모를 입력하세요&#10;예: 사양 바뀌기 전 샘플 · 미백 중복 / 도착 지연됨 / 가장 보수적임" '
+        + 'style="width:100%;box-sizing:border-box;min-height:140px;padding:11px 13px;border:1px solid var(--bd);border-radius:8px;font-size:13px;font-family:inherit;line-height:1.6;resize:vertical;outline:none" '
+        + 'onfocus="this.style.borderColor=\'#8B5E00\'" onblur="this.style.borderColor=\'var(--bd)\'">' + (s.memo||'').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</textarea>'
+      + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">'
+        + '<button onclick="document.getElementById(\'sample-memo-modal\').remove()" style="background:#fff;border:1px solid var(--bd);border-radius:7px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer">취소</button>'
+        + '<button onclick="saveSampleMemo_BOS(\'' + id + '\')" style="background:#8B5E00;color:#fff;border:none;border-radius:7px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer">💾 저장</button>'
+      + '</div>'
+    + '</div>';
+    modal.onclick = function(){ modal.remove(); };
+    document.body.appendChild(modal);
+    setTimeout(function(){ var ta = document.getElementById('sample-memo-textarea'); if(ta){ ta.focus(); } }, 50);
+  };
+
+  window.saveSampleMemo_BOS = function(id){
+    var ta = document.getElementById('sample-memo-textarea');
+    if(!ta) return;
+    var val = ta.value;
+    if(typeof updateSampleField_BOS === 'function'){
+      updateSampleField_BOS(id, 'memo', val);
+    }
+    // 아이콘 셀만 부분 갱신 (포커스 유지 불필요, 모달 닫힘)
+    var cell = document.querySelector('.sample-memo-btn[data-memo-for="' + id + '"]');
+    if(cell){
+      var data = (typeof loadSample==='function') ? loadSample() : [];
+      var s = data.find(function(x){ return x.id === id; });
+      if(s){
+        var wrap = cell.parentNode;
+        if(wrap) wrap.innerHTML = buildSampleMemoCell_BOS(s);
+      }
+    }
+    var modal = document.getElementById('sample-memo-modal');
+    if(modal) modal.remove();
+    if(typeof syncToast === 'function') syncToast('📝 메모 저장됨', 'ok');
+  };
+
   // 차수 배지 HTML 생성 (재사용)
   window.buildRoundBadgeHtml_BOS = function(s){
     var rs = getSampleRoundStatus_BOS(s);
@@ -20632,7 +20876,7 @@ body.cal-highlighting .cal-item-card-bos:hover{
     }).join('');
     
     return '<tr class="sample-detail-row" data-detail-for="' + s.id + '" style="display:' + (open ? 'table-row' : 'none') + ';background:#FBFAF7">'
-      + '<td colspan="12" style="padding:10px 14px;border-bottom:1px solid var(--bd)">'
+      + '<td colspan="13" style="padding:10px 14px;border-bottom:1px solid var(--bd)">'
         + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px">' + blocks + '</div>'
         + '<div style="font-size:9.5px;color:var(--mu);margin-top:7px">💡 입력한 일정은 아래 🗓 캘린더에 색 점으로 표시됩니다 (시작 + 종료 예정일)</div>'
       + '</td>'
