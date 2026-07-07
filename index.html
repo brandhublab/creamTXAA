@@ -13286,7 +13286,7 @@ function forceIsolationReset(){
 .cal-wd-bos.sun{color:#C0392B}
 .cal-wd-bos.sat{color:#2563EB}
 .cal-days-bos{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.cal-cell-bos{position:relative;aspect-ratio:1;border:1px solid var(--bd);border-radius:4px;padding:2px 3px;background:#fff;min-height:32px;display:flex;flex-direction:column;align-items:flex-start;font-size:10px;transition:.1s}
+.cal-cell-bos{position:relative;aspect-ratio:1;border:1px solid var(--bd);border-radius:4px;padding:2px 3px;background:#fff;min-height:34px;display:flex;flex-direction:column;align-items:flex-start;font-size:10px;transition:.1s;overflow:hidden}
 .cal-cell-bos:hover:not(.empty){border-color:#C8A45A;transform:scale(1.05);z-index:2;box-shadow:0 2px 6px rgba(0,0,0,.1)}
 .cal-cell-bos.empty{background:transparent;border-color:transparent}
 .cal-cell-bos.today{background:#2563EB !important;color:#fff !important;border:2px solid #1d4ed8 !important;font-weight:800;box-shadow:0 0 0 2px rgba(37,99,235,.25)}
@@ -13295,8 +13295,8 @@ function forceIsolationReset(){
 .cal-cell-bos.sat .cal-cell-day-bos{color:#2563EB}
 .cal-cell-bos.today.sun .cal-cell-day-bos, .cal-cell-bos.today.sat .cal-cell-day-bos{color:#fff}
 .cal-cell-day-bos{font-size:10px;font-weight:600;line-height:1}
-.cal-cell-badges-bos{display:flex;flex-wrap:wrap;gap:1px;margin-top:auto;width:100%}
-.cal-cell-week-bos{display:inline-flex;align-items:center;justify-content:center;min-width:13px;height:12px;padding:0 2px;border-radius:2px;font-size:8px;font-weight:700;color:#fff;line-height:1;flex-shrink:0}
+.cal-cell-badges-bos{display:flex;flex-wrap:wrap;gap:1.5px;margin-top:2px;width:100%;align-content:flex-start;flex:1;min-height:0}
+.cal-cell-week-bos{display:inline-flex;align-items:center;justify-content:center;min-width:14px;height:13px;padding:0 3px;border-radius:3px;font-size:8.5px;font-weight:700;color:#fff;line-height:1;flex-shrink:0}
 
 .cal-color-picker-bos{display:flex;flex-wrap:wrap;gap:6px;padding:6px 0}
 .cal-color-swatch-bos{width:28px;height:28px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:.1s;display:inline-block}
@@ -13761,7 +13761,7 @@ function forceIsolationReset(){
       var dayClass = dayOfWeek === 0 ? 'sun' : (dayOfWeek === 6 ? 'sat' : '');
       
       // ━━ 셀 안 배지가 너무 많이 쌓이지 않도록: 최대 6개 표시 + 나머지는 "+N" ━━
-      var MAX_VISIBLE = 6;  // 한 셀당 최대 표시 배지 수
+      var MAX_VISIBLE = 9;  // 한 셀당 최대 표시 배지 수 (셀 overflow로 자동 조절)
       var visibleBadges = weekBadges.slice(0, MAX_VISIBLE);
       var hiddenCount = weekBadges.length - visibleBadges.length;
       var overflowTitle = '';
@@ -19052,8 +19052,7 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
 <style id="cal-highlight-style">
 /* 셀 배지 영역 - 오버플로 제한 (max 2줄 보장) */
 .cal-cell-badges-bos{
-  max-height:26px;
-  overflow:hidden;
+  overflow:visible;
   position:relative;
 }
 
@@ -19078,7 +19077,7 @@ console.log('[Filename] getBosFilename 헬퍼 준비됨');
 /* ━━ 하이라이트 모드: body 에 cal-highlighting 클래스 시 ━━ */
 /* 모든 배지를 흐리게 만들고, .cal-item-highlight 만 강조 */
 body.cal-highlighting .cal-cell-week-bos{
-  opacity:0.18;
+  opacity:1;
   transition:opacity .15s, transform .2s, box-shadow .2s;
 }
 body.cal-highlighting .cal-cell-week-bos.cal-item-highlight{
@@ -21687,6 +21686,14 @@ setTimeout(function(){
     
     <div style="font-size:11px;color:var(--mu);margin-bottom:14px;line-height:1.6">각 항목을 <b>1~10점</b>으로 평가하세요. 어느 업체로 최종 결정할지 비교하는 데 사용됩니다.</div>
     
+    <div id="seval-price-target-box" style="margin-bottom:14px;padding:12px 14px;background:#FBF7F0;border:1px solid #E8D9C0;border-radius:8px">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:12px;font-weight:700;color:#8B5E00">💰 단가 마지노선 (전체 공통)</span>
+        <input type="number" id="seval-price-target-input" placeholder="예: 3200" onchange="setSamplePriceTarget_BOS(this.value)" style="width:110px;padding:6px 10px;border:1px solid var(--bd);border-radius:5px;font-size:12px;font-family:var(--mn);text-align:right;background:#fff;outline:none">
+        <span style="font-size:11px;color:var(--mu)">원 초과 시 <b style="color:#C0392B">과락(탈락)</b></span>
+        <span id="seval-price-fail-warn" style="font-size:11px;font-weight:700;color:#C0392B;margin-left:auto"></span>
+      </div>
+    </div>
     <div id="seval-items"></div>
     
     <!-- 종합 -->
@@ -21783,6 +21790,38 @@ setTimeout(function(){
   }
   
   // ━━ 표 셀 빌더 (종합점수 + 선정 마크 + 버튼) ━━
+  // ━━ 단가 목표(마지노선) + 과락 판정 ━━
+  window.getSamplePriceTarget_BOS = function(){
+    var v = parseFloat(localStorage.getItem('bos_sample_price_target_v1') || '');
+    return (!isNaN(v) && v > 0) ? v : null;
+  };
+  window.setSamplePriceTarget_BOS = function(val){
+    var v = parseFloat(val);
+    if(!isNaN(v) && v > 0) localStorage.setItem('bos_sample_price_target_v1', String(v));
+    else localStorage.removeItem('bos_sample_price_target_v1');
+    if(typeof renderSampleTable_BOS === 'function') renderSampleTable_BOS();
+    // 평가 팝업이 열려있으면 그 업체 과락 경고 갱신
+    var warnEl = document.getElementById('seval-price-fail-warn');
+    if(warnEl && typeof _evalId !== 'undefined' && _evalId){
+      var data = getSampleData();
+      var s = data.find(function(x){ return x.id === _evalId; });
+      if(s){
+        if(isSamplePriceFail_BOS(s)){
+          var pp = parseFloat((s.eval && s.eval.evalPrice) || '') || 0;
+          warnEl.innerHTML = '❌ 이 업체 과락 — 단가 ' + pp.toLocaleString() + '원 > 목표 ' + (v||0).toLocaleString() + '원';
+        } else { warnEl.textContent = ''; }
+      }
+    }
+  };
+  // 이 샘플이 단가 과락인지 (목표 초과 = 탈락)
+  window.isSamplePriceFail_BOS = function(s){
+    var target = getSamplePriceTarget_BOS();
+    if(target === null) return false;  // 목표 미설정이면 과락 없음
+    var price = parseFloat((s.eval && s.eval.evalPrice) || '');
+    if(isNaN(price) || price <= 0) return false;  // 단가 미입력이면 판정 보류
+    return price > target;  // 목표보다 비싸면 과락
+  };
+
   window.buildSampleEvalCell_BOS = function(s){
     var allData = getSampleData();
     var scores = SAMPLE_EVAL_ITEMS.map(function(it){ return getItemScore_BOS(s, it, allData); });
@@ -21790,9 +21829,15 @@ setTimeout(function(){
     var maxScore = SAMPLE_EVAL_ITEMS.reduce(function(a, it){ return a + (it.max||10); }, 0);
     var hasScore = scores.some(function(v){ return v > 0; });
     var isFinal = !!s.finalPick;
+    var priceFail = isSamplePriceFail_BOS(s);
     
     var badge = '';
-    if(isFinal){
+    if(priceFail){
+      // 단가 과락 = 탈락 (선정보다 우선 표시 안 함, 단 선정이면 선정 유지)
+      var target = getSamplePriceTarget_BOS();
+      var price = parseFloat((s.eval && s.eval.evalPrice) || '') || 0;
+      badge = '<div style="font-size:11px;font-weight:800;color:#C0392B" title="단가 ' + price.toLocaleString() + '원 > 목표 ' + (target||0).toLocaleString() + '원">❌ 과락</div>';
+    } else if(isFinal){
       badge = '<div style="font-size:11px;font-weight:700;color:#E65100">⭐ 선정</div>';
     } else if(hasScore){
       var color = sum >= maxScore*0.8 ? '#1A6B4A' : (sum >= maxScore*0.5 ? '#F57F17' : '#C0392B');
@@ -21803,7 +21848,7 @@ setTimeout(function(){
     
     return '<div style="display:flex;flex-direction:column;align-items:center;gap:3px">'
       + badge
-      + '<button onclick="openSampleEval_BOS(\'' + s.id + '\')" style="background:' + (isFinal?'#FFF3E0':(hasScore?'#EAF3EE':'none')) + ';border:1px solid ' + (isFinal?'#FFB74D':'var(--bd)') + ';border-radius:4px;padding:2px 8px;font-size:10px;cursor:pointer;color:' + (isFinal?'#E65100':'var(--tx)') + '">📋 평가</button>'
+      + '<button onclick="openSampleEval_BOS(\'' + s.id + '\')" style="background:' + (priceFail?'#FDEDEC':(isFinal?'#FFF3E0':(hasScore?'#EAF3EE':'none'))) + ';border:1px solid ' + (priceFail?'#E6A9A2':(isFinal?'#FFB74D':'var(--bd)')) + ';border-radius:4px;padding:2px 8px;font-size:10px;cursor:pointer;color:' + (priceFail?'#C0392B':(isFinal?'#E65100':'var(--tx)')) + '">📋 평가</button>'
       + '</div>';
   };
   
@@ -21815,6 +21860,20 @@ setTimeout(function(){
     _evalId = id;
     
     document.getElementById('seval-subtitle').textContent = (s.vendor || '(업체명 없음)') + (s.sampleName ? ' · ' + s.sampleName : '');
+    
+    // 목표 단가(마지노선) 채우기 + 과락 경고
+    var ptInput = document.getElementById('seval-price-target-input');
+    if(ptInput){ var pt = getSamplePriceTarget_BOS(); ptInput.value = (pt !== null) ? pt : ''; }
+    var warnEl = document.getElementById('seval-price-fail-warn');
+    if(warnEl){
+      if(isSamplePriceFail_BOS(s)){
+        var tp = getSamplePriceTarget_BOS();
+        var pp = parseFloat((s.eval && s.eval.evalPrice) || '') || 0;
+        warnEl.innerHTML = '❌ 이 업체 과락 — 단가 ' + pp.toLocaleString() + '원 > 목표 ' + (tp||0).toLocaleString() + '원';
+      } else {
+        warnEl.textContent = '';
+      }
+    }
     
     var ev = s.eval || {};
     var allData = getSampleData();
@@ -21899,6 +21958,17 @@ setTimeout(function(){
     saveSampleData(data);
     refreshSampleEvalAutoScores();
     updateSampleEvalTotal();
+    // 단가 변경 시 과락 경고 즉시 갱신
+    if(field === 'evalPrice'){
+      var warnEl = document.getElementById('seval-price-fail-warn');
+      if(warnEl){
+        if(isSamplePriceFail_BOS(s)){
+          var tp = getSamplePriceTarget_BOS();
+          var pp = parseFloat(val) || 0;
+          warnEl.innerHTML = '❌ 이 업체 과락 — 단가 ' + pp.toLocaleString() + '원 > 목표 ' + (tp||0).toLocaleString() + '원';
+        } else { warnEl.textContent = ''; }
+      }
+    }
   };
   
   function refreshSampleEvalAutoScores(){
